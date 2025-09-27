@@ -7,8 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Users, GraduationCap, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// You'll need to add your Mapbox token here or via environment
-const MAPBOX_TOKEN = 'pk.eyJ1IjoidGVzdC1tYXBib3giLCJhIjoiY2tqdjNtNGU4MDF1ODJxbW1xb2x1aWEzeCJ9.example';
+// Mock implementation for demo - in real app, you'd use actual Mapbox token
+const MAPBOX_TOKEN = null; // Will use mock map
 
 interface MapComponentProps {
   selectedSchool?: string;
@@ -84,23 +84,33 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
           <div className="w-full h-full bg-gradient-to-br from-blue-100 to-green-100"></div>
         </div>
 
-        {/* Mock School Pins */}
-        {mockSchools.map((school) => (
-          <div
-            key={school.id}
-            className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform"
-            style={{
-              left: `${30 + (parseFloat(school.id) * 15)}%`,
-              top: `${25 + (parseFloat(school.id) * 12)}%`,
-            }}
-            onClick={() => handleSchoolClick(school)}
-          >
-            <div className="relative">
-              <MapPin className="w-8 h-8 text-pin-primary drop-shadow-lg" fill="currentColor" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-pin-secondary rounded-full border-2 border-white"></div>
+        {/* Mock School Pins positioned over Salvador neighborhoods */}
+        {mockSchools.map((school, index) => {
+          // Better positioning to simulate Salvador map
+          const positions = [
+            { left: '35%', top: '40%' }, // Paralela
+            { left: '45%', top: '45%' }, // Brotas
+            { left: '25%', top: '60%' }, // Barra
+            { left: '70%', top: '35%' }, // Itapuã
+            { left: '40%', top: '55%' }, // Liberdade
+            { left: '30%', top: '65%' }  // Ondina
+          ];
+          const position = positions[index] || { left: '50%', top: '50%' };
+          
+          return (
+            <div
+              key={school.id}
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform"
+              style={position}
+              onClick={() => handleSchoolClick(school)}
+            >
+              <div className="relative">
+                <MapPin className="w-8 h-8 text-pin-primary drop-shadow-lg" fill="currentColor" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-pin-secondary rounded-full border-2 border-white"></div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Map Search Bar */}
         <div className="absolute top-4 left-4 right-4 z-10">
@@ -152,9 +162,18 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                   <span>{selectedPopup.periods.slice(0, 2).join(', ')}</span>
                 </div>
                 
-                <div className="flex items-center text-sm font-montserrat">
-                  <Users className="w-4 h-4 mr-2 text-secondary" />
-                  <span>{selectedPopup.instructors.slice(0, 3).map(i => i.name.split(' ')[0]).join(', ')}</span>
+                <div className="text-sm font-montserrat">
+                  <div className="flex items-center mb-2">
+                    <Users className="w-4 h-4 mr-2 text-secondary" />
+                    <span className="font-semibold">Professores:</span>
+                  </div>
+                  <div className="space-y-1 ml-6">
+                    {selectedPopup.instructors.slice(0, 3).map((instructor, idx) => (
+                      <div key={idx} className="text-xs">
+                        {instructor.name} - {instructor.subject}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 

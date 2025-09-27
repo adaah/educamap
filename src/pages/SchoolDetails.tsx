@@ -15,7 +15,10 @@ import {
   Users, 
   UserCheck,
   Building2,
-  Clock
+  Clock,
+  MessageCircle,
+  Instagram,
+  Linkedin
 } from 'lucide-react';
 
 const SchoolDetails = () => {
@@ -192,14 +195,36 @@ const SchoolDetails = () => {
                         <h4 className="font-poppins font-semibold text-sm">{instructor.name}</h4>
                         <p className="text-muted-foreground font-montserrat text-sm">{instructor.subject}</p>
                       </div>
-                      {instructor.email && (
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={`mailto:${instructor.email}`}>
-                            <Mail className="w-3 h-3 mr-1" />
-                            Contato
-                          </a>
-                        </Button>
-                      )}
+                      <div className="flex gap-2">
+                        {instructor.email && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={`mailto:${instructor.email}`} title="E-mail">
+                              <Mail className="w-3 h-3" />
+                            </a>
+                          </Button>
+                        )}
+                        {instructor.linkedin && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={instructor.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                              <Linkedin className="w-3 h-3" />
+                            </a>
+                          </Button>
+                        )}
+                        {instructor.whatsapp && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={`https://wa.me/${instructor.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" title="WhatsApp">
+                              <MessageCircle className="w-3 h-3" />
+                            </a>
+                          </Button>
+                        )}
+                        {instructor.instagram && (
+                          <Button variant="outline" size="sm" asChild>
+                            <a href={instructor.instagram} target="_blank" rel="noopener noreferrer" title="Instagram">
+                              <Instagram className="w-3 h-3" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -237,15 +262,44 @@ const SchoolDetails = () => {
                 <div className="space-y-3">
                   {school.formerStudents.map((student, index) => (
                     <div key={index} className="p-3 bg-filter-bg rounded-lg">
-                      <h4 className="font-poppins font-semibold text-sm">{student.name}</h4>
-                      <p className="text-muted-foreground font-montserrat text-xs">
-                        {student.university} - {student.course}
-                      </p>
-                      {student.contact && (
-                        <p className="text-primary font-montserrat text-xs mt-1">
-                          {student.contact}
-                        </p>
-                      )}
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-poppins font-semibold text-sm">{student.name}</h4>
+                          <p className="text-muted-foreground font-montserrat text-xs">
+                            {student.university} - {student.course}
+                          </p>
+                        </div>
+                        <div className="flex gap-1 ml-2">
+                          {student.email && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={`mailto:${student.email}`} title="E-mail">
+                                <Mail className="w-3 h-3" />
+                              </a>
+                            </Button>
+                          )}
+                          {student.linkedin && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={student.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn">
+                                <Linkedin className="w-3 h-3" />
+                              </a>
+                            </Button>
+                          )}
+                          {student.whatsapp && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={`https://wa.me/${student.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" title="WhatsApp">
+                                <MessageCircle className="w-3 h-3" />
+                              </a>
+                            </Button>
+                          )}
+                          {student.instagram && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={student.instagram} target="_blank" rel="noopener noreferrer" title="Instagram">
+                                <Instagram className="w-3 h-3" />
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -258,14 +312,20 @@ const SchoolDetails = () => {
                 <CardTitle className="font-poppins font-bold text-lg">Localização</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="w-full h-48 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg flex items-center justify-center relative overflow-hidden">
+                <div 
+                  className="w-full h-48 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => {
+                    const encodedAddress = encodeURIComponent(school.fullAddress);
+                    window.open(`https://maps.google.com/?q=${encodedAddress}`, '_blank');
+                  }}
+                >
                   <div className="absolute inset-0 opacity-20">
                     <div className="w-full h-full bg-gradient-to-br from-blue-100 to-green-100"></div>
                   </div>
                   <div className="relative text-center">
                     <MapPin className="w-12 h-12 text-pin-primary mx-auto mb-2" fill="currentColor" />
                     <p className="font-montserrat text-sm text-muted-foreground">
-                      Mapa da localização<br />
+                      Clique para abrir no mapa<br />
                       {school.neighborhood}
                     </p>
                   </div>

@@ -117,8 +117,8 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
           <div className="max-w-md">
             <input
               type="text"
-              placeholder="Buscar escolas por nome ou bairro..."
-              className="w-full px-4 py-2 rounded-lg border bg-background/95 backdrop-blur-sm shadow-sm font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Buscar escolas..."
+              className="w-full px-3 py-2 rounded-lg border bg-background/95 backdrop-blur-sm shadow-sm font-montserrat text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
         </div>
@@ -136,8 +136,8 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
 
       {/* School Popup */}
       {selectedPopup && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <Card className="w-80 shadow-popup">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-full max-w-[90vw] sm:max-w-80">
+          <Card className="shadow-popup mx-4 sm:mx-0">
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-3">
                 <h3 className="font-poppins font-bold text-lg text-foreground">
@@ -165,10 +165,10 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                 <div className="text-sm font-montserrat">
                   <div className="flex items-center mb-2">
                     <Users className="w-4 h-4 mr-2 text-secondary" />
-                    <span className="font-semibold">Professores:</span>
+                    <span className="font-semibold">Professores Instrutores:</span>
                   </div>
-                  <div className="space-y-1 ml-6">
-                    {selectedPopup.instructors.slice(0, 3).map((instructor, idx) => (
+                  <div className="max-h-16 overflow-y-auto space-y-1 ml-6">
+                    {selectedPopup.instructors.map((instructor, idx) => (
                       <div key={idx} className="text-xs">
                         {instructor.name} - {instructor.subject}
                       </div>

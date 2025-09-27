@@ -79,7 +79,10 @@ const SchoolDetails = () => {
               </div>
             </div>
             
-            <Badge variant={school.nature === 'Pública' ? 'secondary' : 'outline'} className="text-sm">
+            <Badge 
+              variant="outline" 
+              className={`text-sm ${school.nature === 'Pública' ? 'bg-badge-public border-badge-public text-muted-foreground' : ''}`}
+            >
               <Building2 className="w-4 h-4 mr-1" />
               {school.nature}
             </Badge>

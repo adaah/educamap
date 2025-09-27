@@ -76,7 +76,7 @@ const ListPage = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 container py-6">
+      <main className="flex-1 container py-6 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
           {/* Filter Panel - Left Column */}
           <div className="lg:col-span-1">
@@ -100,14 +100,14 @@ const ListPage = () => {
                   placeholder="Buscar escolas por nome, bairro ou endereço..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border rounded-lg bg-background font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg bg-background font-montserrat text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
 
             {/* Results Header */}
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="font-poppins font-bold text-2xl text-foreground">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-2">
+              <h1 className="font-poppins font-bold text-xl sm:text-2xl text-foreground">
                 Escolas Disponíveis
               </h1>
               <p className="text-muted-foreground font-montserrat text-sm">

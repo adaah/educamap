@@ -37,7 +37,10 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
             </div>
           </div>
           
-          <Badge variant={school.nature === 'Pública' ? 'secondary' : 'outline'} className="font-montserrat">
+          <Badge 
+            variant="outline" 
+            className={`font-montserrat ${school.nature === 'Pública' ? 'bg-badge-public border-badge-public text-muted-foreground' : ''}`}
+          >
             <Building2 className="w-3 h-3 mr-1" />
             {school.nature}
           </Badge>
@@ -72,7 +75,7 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={handleViewDetails}
             variant="hero"
@@ -86,9 +89,11 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
             onClick={handleViewOnMap}
             variant="outline"
             size="default"
+            className="sm:w-auto"
           >
             <Eye className="w-4 h-4 mr-2" />
-            Ver no Mapa
+            <span className="sm:inline">Ver no Mapa</span>
+            <span className="sm:hidden">Mapa</span>
           </Button>
         </div>
       </CardContent>

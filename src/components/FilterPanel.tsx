@@ -73,9 +73,9 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
   );
 
   return (
-    <div className="w-full h-full">
-      <Card className="h-full shadow-card">
-        <CardHeader className="pb-4">
+    <div className="w-full h-fit">
+      <Card className="max-h-[calc(100vh-8rem)] flex flex-col shadow-card">
+        <CardHeader className="pb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="font-poppins font-bold text-lg flex items-center gap-2">
               <Filter className="w-5 h-5 text-primary" />
@@ -98,7 +98,7 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-6 pb-6">
+        <CardContent className="overflow-y-auto flex-1 space-y-6 pb-6">
           <FilterGroup 
             title="Bairro" 
             options={neighborhoods} 

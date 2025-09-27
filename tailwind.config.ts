@@ -56,6 +56,7 @@ export default {
         'pin-secondary': "hsl(var(--pin-secondary))",
         'filter-bg': "hsl(var(--filter-bg))",
         'hover-overlay': "hsl(var(--hover-overlay))",
+        'badge-public': "hsl(var(--badge-public))",
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',

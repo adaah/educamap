@@ -1,0 +1,177 @@
+import { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { mockSchools, type School } from '@/data/schools';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { MapPin, Users, GraduationCap, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+// You'll need to add your Mapbox token here or via environment
+const MAPBOX_TOKEN = 'pk.eyJ1IjoidGVzdC1tYXBib3giLCJhIjoiY2tqdjNtNGU4MDF1ODJxbW1xb2x1aWEzeCJ9.example';
+
+interface MapComponentProps {
+  selectedSchool?: string;
+  onSchoolSelect?: (school: School) => void;
+}
+
+const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const [selectedPopup, setSelectedPopup] = useState<School | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!mapContainer.current) return;
+
+    // Note: In a real implementation, you'd need a valid Mapbox token
+    // For this demo, we'll use a mock implementation
+    if (!MAPBOX_TOKEN || MAPBOX_TOKEN.includes('example')) {
+      // Mock map implementation for demo
+      return;
+    }
+
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+    
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: [-38.5014, -12.9777], // Salvador center
+      zoom: 11,
+    });
+
+    // Add navigation controls
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    // Add markers for schools
+    mockSchools.forEach((school) => {
+      const marker = new mapboxgl.Marker({
+        color: '#FFC700', // Primary yellow
+      })
+        .setLngLat(school.coordinates)
+        .addTo(map.current!);
+
+      marker.getElement().addEventListener('click', () => {
+        setSelectedPopup(school);
+        onSchoolSelect?.(school);
+      });
+    });
+
+    return () => {
+      map.current?.remove();
+    };
+  }, [onSchoolSelect]);
+
+  // Mock map for demo purposes
+  const handleSchoolClick = (school: School) => {
+    setSelectedPopup(school);
+    onSchoolSelect?.(school);
+  };
+
+  const handleViewDetails = (schoolId: string) => {
+    navigate(`/escola/${schoolId}`);
+  };
+
+  return (
+    <div className="relative w-full h-full">
+      {/* Mock Map Container */}
+      <div 
+        ref={mapContainer} 
+        className="w-full h-full bg-gradient-to-br from-blue-50 to-green-50 relative overflow-hidden"
+      >
+        {/* Mock map background */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="w-full h-full bg-gradient-to-br from-blue-100 to-green-100"></div>
+        </div>
+
+        {/* Mock School Pins */}
+        {mockSchools.map((school) => (
+          <div
+            key={school.id}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform"
+            style={{
+              left: `${30 + (parseFloat(school.id) * 15)}%`,
+              top: `${25 + (parseFloat(school.id) * 12)}%`,
+            }}
+            onClick={() => handleSchoolClick(school)}
+          >
+            <div className="relative">
+              <MapPin className="w-8 h-8 text-pin-primary drop-shadow-lg" fill="currentColor" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-pin-secondary rounded-full border-2 border-white"></div>
+            </div>
+          </div>
+        ))}
+
+        {/* Map Search Bar */}
+        <div className="absolute top-4 left-4 right-4 z-10">
+          <div className="max-w-md">
+            <input
+              type="text"
+              placeholder="Buscar escolas por nome ou bairro..."
+              className="w-full px-4 py-2 rounded-lg border bg-background/95 backdrop-blur-sm shadow-sm font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        </div>
+
+        {/* Map Controls */}
+        <div className="absolute top-4 right-4 space-y-2 z-10">
+          <Button variant="map" size="map">
+            Zoom +
+          </Button>
+          <Button variant="map" size="map">
+            Zoom -
+          </Button>
+        </div>
+      </div>
+
+      {/* School Popup */}
+      {selectedPopup && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+          <Card className="w-80 shadow-popup">
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="font-poppins font-bold text-lg text-foreground">
+                  {selectedPopup.name}
+                </h3>
+                <button
+                  onClick={() => setSelectedPopup(null)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <p className="text-muted-foreground font-montserrat text-sm mb-2">
+                <MapPin className="w-4 h-4 inline mr-1" />
+                {selectedPopup.neighborhood}
+              </p>
+              
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center text-sm font-montserrat">
+                  <GraduationCap className="w-4 h-4 mr-2 text-primary" />
+                  <span>{selectedPopup.periods.slice(0, 2).join(', ')}</span>
+                </div>
+                
+                <div className="flex items-center text-sm font-montserrat">
+                  <Users className="w-4 h-4 mr-2 text-secondary" />
+                  <span>{selectedPopup.instructors.slice(0, 3).map(i => i.name.split(' ')[0]).join(', ')}</span>
+                </div>
+              </div>
+
+              <Button 
+                onClick={() => handleViewDetails(selectedPopup.id)}
+                className="w-full"
+                variant="hero"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Ver Detalhes
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MapComponent;

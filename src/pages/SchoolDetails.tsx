@@ -1,0 +1,284 @@
+import { useParams, useNavigate } from 'react-router-dom';
+import { mockSchools } from '@/data/schools';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  ArrowLeft, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  ExternalLink, 
+  GraduationCap, 
+  Users, 
+  UserCheck,
+  Building2,
+  Clock
+} from 'lucide-react';
+
+const SchoolDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  
+  const school = mockSchools.find(s => s.id === id);
+
+  if (!school) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 container py-8">
+          <div className="text-center">
+            <h1 className="font-poppins font-bold text-2xl mb-4">Escola não encontrada</h1>
+            <Button onClick={() => navigate('/')} variant="hero">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar ao Mapa
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      
+      <main className="flex-1 container py-8">
+        {/* Breadcrumb/Back Button */}
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate(-1)}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar
+          </Button>
+          
+          <nav className="text-sm font-montserrat text-muted-foreground">
+            <span>Início</span> / <span>Escolas</span> / <span className="text-foreground">{school.name}</span>
+          </nav>
+        </div>
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h1 className="font-poppins font-bold text-3xl text-foreground mb-2">
+                {school.name}
+              </h1>
+              <div className="flex items-center text-muted-foreground font-montserrat">
+                <MapPin className="w-4 h-4 mr-2" />
+                <span>{school.fullAddress}</span>
+              </div>
+            </div>
+            
+            <Badge variant={school.nature === 'Pública' ? 'secondary' : 'outline'} className="text-sm">
+              <Building2 className="w-4 h-4 mr-1" />
+              {school.nature}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Contact Information */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="font-poppins font-bold text-xl flex items-center">
+                  <Phone className="w-5 h-5 mr-2 text-primary" />
+                  Informações de Contato
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {school.email && (
+                  <div className="flex items-center font-montserrat">
+                    <Mail className="w-4 h-4 mr-3 text-muted-foreground" />
+                    <a href={`mailto:${school.email}`} className="text-primary hover:underline">
+                      {school.email}
+                    </a>
+                  </div>
+                )}
+                
+                {school.phone && (
+                  <div className="flex items-center font-montserrat">
+                    <Phone className="w-4 h-4 mr-3 text-muted-foreground" />
+                    <a href={`tel:${school.phone}`} className="text-primary hover:underline">
+                      {school.phone}
+                    </a>
+                  </div>
+                )}
+                
+                {school.website && (
+                  <div className="flex items-center font-montserrat">
+                    <ExternalLink className="w-4 h-4 mr-3 text-muted-foreground" />
+                    <a 
+                      href={school.website.startsWith('http') ? school.website : `https://${school.website}`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      {school.website}
+                    </a>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Teaching Opportunities */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="font-poppins font-bold text-xl flex items-center">
+                  <GraduationCap className="w-5 h-5 mr-2 text-primary" />
+                  Oportunidades de Estágio
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h3 className="font-poppins font-semibold text-sm mb-2">Períodos de Ensino</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {school.periods.map((period) => (
+                      <Badge key={period} variant="outline" className="font-montserrat">
+                        {period}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-poppins font-semibold text-sm mb-2">Matérias/Disciplinas</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {school.subjects.map((subject) => (
+                      <Badge key={subject} variant="secondary" className="font-montserrat">
+                        {subject}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-poppins font-semibold text-sm mb-2 flex items-center">
+                    <Clock className="w-4 h-4 mr-1" />
+                    Turnos Disponíveis
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {school.shift.map((shift) => (
+                      <Badge key={shift} variant="outline" className="font-montserrat">
+                        {shift}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Instructors */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="font-poppins font-bold text-xl flex items-center">
+                  <Users className="w-5 h-5 mr-2 text-primary" />
+                  Professores Instrutores
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {school.instructors.map((instructor, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-filter-bg rounded-lg">
+                      <div>
+                        <h4 className="font-poppins font-semibold text-sm">{instructor.name}</h4>
+                        <p className="text-muted-foreground font-montserrat text-sm">{instructor.subject}</p>
+                      </div>
+                      {instructor.email && (
+                        <Button variant="outline" size="sm" asChild>
+                          <a href={`mailto:${instructor.email}`}>
+                            <Mail className="w-3 h-3 mr-1" />
+                            Contato
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="font-poppins font-bold text-lg">Ações Rápidas</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button variant="hero" className="w-full" onClick={() => navigate('/')}>
+                  <MapPin className="w-4 h-4 mr-2" />
+                  Ver no Mapa
+                </Button>
+                <Button variant="outline" className="w-full" onClick={() => navigate('/lista')}>
+                  Ver Outras Escolas
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Former Students */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="font-poppins font-bold text-lg flex items-center">
+                  <UserCheck className="w-5 h-5 mr-2 text-secondary" />
+                  Ex-Alunos Estagiários
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {school.formerStudents.map((student, index) => (
+                    <div key={index} className="p-3 bg-filter-bg rounded-lg">
+                      <h4 className="font-poppins font-semibold text-sm">{student.name}</h4>
+                      <p className="text-muted-foreground font-montserrat text-xs">
+                        {student.university} - {student.course}
+                      </p>
+                      {student.contact && (
+                        <p className="text-primary font-montserrat text-xs mt-1">
+                          {student.contact}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location Map */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="font-poppins font-bold text-lg">Localização</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full h-48 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-20">
+                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-green-100"></div>
+                  </div>
+                  <div className="relative text-center">
+                    <MapPin className="w-12 h-12 text-pin-primary mx-auto mb-2" fill="currentColor" />
+                    <p className="font-montserrat text-sm text-muted-foreground">
+                      Mapa da localização<br />
+                      {school.neighborhood}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+};
+
+export default SchoolDetails;

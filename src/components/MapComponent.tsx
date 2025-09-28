@@ -188,7 +188,15 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                 </div>
             </div>
 
-            {/* Map Controls removed as requested - using native Leaflet controls */}
+            {/* Map Controls - Moved to bottom right */}
+            <div className="absolute bottom-4 right-4 space-y-2 z-[401]">
+                <Button variant="map" size="map" onClick={() => map.current?.zoomIn()}>
+                    +
+                </Button>
+                <Button variant="map" size="map" onClick={() => map.current?.zoomOut()}>
+                    -
+                </Button>
+            </div>
 
             {/* OBS: O Card/Popup de React (selectedPopup) foi **removido** pois o Leaflet usa seu próprio Popup de HTML. 
                O código foi movido para o 'popupContent' do marcador no useEffect.

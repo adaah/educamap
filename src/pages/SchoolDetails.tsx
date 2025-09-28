@@ -81,7 +81,11 @@ const SchoolDetails = () => {
             
             <Badge 
               variant="outline" 
-              className={`text-sm ${school.nature === 'Pública' ? 'bg-badge-public border-badge-public text-muted-foreground' : ''}`}
+              className={`text-sm ${
+                school.nature === 'Pública' 
+                  ? 'bg-badge-public border-badge-public text-foreground' 
+                  : 'bg-badge-private border-badge-private text-foreground'
+              }`}
             >
               <Building2 className="w-4 h-4 mr-1" />
               {school.nature}
@@ -96,7 +100,7 @@ const SchoolDetails = () => {
             <Card className="shadow-card">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-xl flex items-center">
-                  <Phone className="w-5 h-5 mr-2 text-primary" />
+                  <Phone className="w-5 h-5 mr-2 text-secondary" />
                   Informações de Contato
                 </CardTitle>
               </CardHeader>

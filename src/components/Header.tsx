@@ -13,7 +13,7 @@ const Header = () => {
           to="/" 
           className="flex items-center space-x-2 font-poppins font-bold text-xl"
         >
-          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center">
             <Map className="w-5 h-5 text-white" />
           </div>
           <span>EduMap Salvador</span>
@@ -56,11 +56,9 @@ const Header = () => {
           </Button>
         </nav>
 
-        {/* Right side - Optional CTA or additional nav */}
+        {/* Right side - Reserved for future use */}
         <div className="ml-auto">
-          <span className="text-sm text-muted-foreground font-montserrat hidden md:inline">
-            Estágios em Pedagogia
-          </span>
+          {/* Content removed as requested */}
         </div>
       </div>
     </header>

@@ -15,7 +15,7 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-button font-poppins font-medium",
         ghost: "hover:bg-hover-overlay hover:text-foreground font-montserrat",
         link: "text-primary underline-offset-4 hover:underline font-montserrat",
-        hero: "bg-gradient-primary text-foreground hover:opacity-90 shadow-button font-poppins font-semibold",
+        hero: "bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-button font-poppins font-semibold",
         filter: "bg-filter-bg border border-border hover:bg-hover-overlay font-montserrat text-sm",
         map: "bg-background/95 backdrop-blur-sm border hover:bg-hover-overlay font-montserrat shadow-sm",
       },

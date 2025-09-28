@@ -24,8 +24,8 @@ All colors MUST be HSL for consistency and theme support
     --primary: 49 100% 50%;           /* #FFC700 - Vibrant Yellow */
     --primary-foreground: 0 0% 0%;
 
-    /* Secondary Action Colors - Orange */
-    --secondary: 30 100% 50%;         /* #FF8C00 - Orange */
+    /* Secondary Action Colors - New Orange */
+    --secondary: 36 100% 50%;         /* #ff9900 - New Orange */
     --secondary-foreground: 0 0% 0%;
 
     /* Muted Elements */
@@ -50,13 +50,14 @@ All colors MUST be HSL for consistency and theme support
 
     /* EduMap Specific Colors */
     --pin-primary: 49 100% 50%;       /* Yellow pins on map */
-    --pin-secondary: 30 100% 50%;     /* Orange accent pins */
+    --pin-secondary: 36 100% 50%;     /* New Orange accent pins */
     --filter-bg: 0 0% 98%;            /* Filter panel background */
     --hover-overlay: 49 100% 95%;     /* Subtle yellow hover states */
-    --badge-public: 0 0% 85%;         /* Subtle gray for public badge */
+    --badge-public: 49 100% 50%;      /* Yellow for public badge */
+    --badge-private: 36 100% 50%;     /* Orange for private badge */
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(49 100% 50%), hsl(30 100% 50%));
+    /* Gradients - Removed for solid colors */
+    --gradient-primary: hsl(36 100% 50%);  /* Solid new orange */
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
 
     /* Shadows */

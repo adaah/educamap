@@ -55,13 +55,41 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
             attribution: '© OpenStreetMap contributors'
         }).addTo(map.current!);
 
-        // 3. Adiciona marcadores para as escolas
+        // 3. Criar ícones customizados para as escolas
+        const createCustomIcon = (school: any) => {
+            const color = school.nature === 'Pública' ? '#FFC700' : '#ff9900'; // Yellow for public, orange for private
+            
+            return L.divIcon({
+                className: 'custom-pin',
+                html: `
+                    <div style="
+                        width: 30px;
+                        height: 30px;
+                        background-color: ${color};
+                        border: 3px solid white;
+                        border-radius: 50%;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: relative;
+                    ">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </div>
+                `,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+                popupAnchor: [0, -15]
+            });
+        };
+
+        // 4. Adiciona marcadores para as escolas
         mockSchools.forEach((school) => {
-            // Cria um marcador (L.marker) com as coordenadas
+            // Cria um marcador com ícone customizado
             const marker = L.marker(school.coordinates as [number, number], {
-                // Leaflet usa a propriedade 'icon' para customização. 
-                // Para customizar a cor, precisaremos de ícones SVG ou imagens customizadas.
-                // Usaremos o ícone padrão por enquanto.
+                icon: createCustomIcon(school)
             })
             .addTo(map.current!);
 
@@ -160,17 +188,7 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                 </div>
             </div>
 
-            {/* Map Controls - Botões de zoom personalizados (ou remova e use os nativos do Leaflet) */}
-            {/* O Leaflet adiciona botões de zoom automaticamente, você pode removê-los se usar os seus: */}
-            <div className="absolute top-4 right-4 space-y-2 z-[401]">
-                {/* Você pode chamar map.current.zoomIn() e map.current.zoomOut() aqui */}
-                <Button variant="map" size="map" onClick={() => map.current?.zoomIn()}>
-                    Zoom +
-                </Button>
-                <Button variant="map" size="map" onClick={() => map.current?.zoomOut()}>
-                    Zoom -
-                </Button>
-            </div>
+            {/* Map Controls removed as requested - using native Leaflet controls */}
 
             {/* OBS: O Card/Popup de React (selectedPopup) foi **removido** pois o Leaflet usa seu próprio Popup de HTML. 
                O código foi movido para o 'popupContent' do marcador no useEffect.

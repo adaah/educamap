@@ -14,6 +14,7 @@ const ListPage = () => {
   const navigate = useNavigate();
   const { data: schools = [], isLoading } = useSchools();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     neighborhoods: [],
     periods: [],
@@ -97,42 +98,21 @@ const ListPage = () => {
           {/* Filter Panel - Left Column */}
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-20">
-              {/* Mobile: Show icon button */}
-              <div className="lg:hidden mb-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    const filterCard = document.querySelector('[data-filter-card]');
-                    if (filterCard) {
-                      filterCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                  }}
-                  className="w-full flex items-center justify-center gap-2"
-                >
-                  <SlidersHorizontal className="w-4 h-4" />
-                  <span>Filtros</span>
-                  {(filters.neighborhoods.length + filters.periods.length + filters.subjects.length + filters.natures.length + filters.shifts.length) > 0 && (
-                    <Badge variant="secondary" className="text-xs">
-                      {filters.neighborhoods.length + filters.periods.length + filters.subjects.length + filters.natures.length + filters.shifts.length}
-                    </Badge>
-                  )}
-                </Button>
-              </div>
-              <div data-filter-card>
-                <FilterPanel 
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  onClear={handleClearFilters}
-                />
-              </div>
+              <FilterPanel 
+                filters={filters}
+                onFiltersChange={setFilters}
+                onClear={handleClearFilters}
+                isExpanded={showFilters}
+                onToggle={() => setShowFilters(!showFilters)}
+              />
             </div>
           </div>
 
           {/* Results Column */}
           <div className="lg:col-span-3">
-            {/* Search Bar */}
-            <div className="mb-4 sm:mb-6">
-              <div className="relative">
+            {/* Search Bar with Filter Icon */}
+            <div className="mb-4 sm:mb-6 flex gap-2">
+              <div className="relative flex-1">
                 <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   type="text"
@@ -142,6 +122,16 @@ const ListPage = () => {
                   className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 border-2 border-primary/20 rounded-xl bg-background font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all"
                 />
               </div>
+              
+              {/* Filter Icon Button - Only on Mobile */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setShowFilters(!showFilters)}
+                className="lg:hidden h-[52px] w-[52px] flex-shrink-0 border-2 border-primary/20"
+              >
+                <SlidersHorizontal className="w-5 h-5 text-primary" />
+              </Button>
             </div>
 
             {/* Results List */}

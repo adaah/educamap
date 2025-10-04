@@ -18,10 +18,15 @@ interface FilterPanelProps {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
   onClear: () => void;
+  isExpanded?: boolean;
+  onToggle?: () => void;
 }
 
-const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) => {
-  const [isExpanded, setIsExpanded] = useState(false); // Changed to false for mobile collapsed by default
+const FilterPanel = ({ filters, onFiltersChange, onClear, isExpanded: externalExpanded, onToggle }: FilterPanelProps) => {
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const isExpanded = externalExpanded !== undefined ? externalExpanded : internalExpanded;
+  const handleToggle = onToggle || (() => setInternalExpanded(!internalExpanded));
+  
   const [availableFilters, setAvailableFilters] = useState({
     neighborhoods: [] as string[],
     periods: [] as string[],
@@ -149,8 +154,8 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
         <CardHeader className="pb-3 sm:pb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 flex-1 text-left lg:cursor-default"
+              onClick={handleToggle}
+              className="flex items-center gap-2 flex-1 text-left"
             >
               <CardTitle className="font-poppins font-bold text-base sm:text-lg flex items-center gap-2">
                 <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
@@ -171,7 +176,7 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
               onClick={onClear}
               className="text-muted-foreground hover:text-foreground text-xs h-8"
             >
-              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
               <span className="hidden sm:inline">Limpar</span>
             </Button>
           </div>

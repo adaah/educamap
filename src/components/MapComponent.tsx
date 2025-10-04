@@ -186,13 +186,13 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
             <div 
                 ref={mapContainer} 
                 id="leaflet-map-container"
-                className="w-full h-full relative"
+                className="w-full h-full relative z-0"
             >
                 {/* Aqui será onde o Leaflet injetará o mapa */}
             </div>
 
             {/* Map Search Bar - No canto direito */}
-            <div className="absolute top-4 right-4 z-[401]">
+            <div className="absolute top-4 right-4 z-10">
                 <MapSearch 
                     schools={schools}
                     onSchoolSelect={handleSchoolSearch}

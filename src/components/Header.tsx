@@ -17,7 +17,7 @@ const Header = () => {
             <Map className="w-5 h-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-poppins font-bold text-xl">EduMap Salvador</span>
+            <span className="font-poppins font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">EduMap Salvador</span>
             <span className="font-montserrat text-xs text-muted-foreground">Estágio em instituições de ensino</span>
           </div>
         </Link>

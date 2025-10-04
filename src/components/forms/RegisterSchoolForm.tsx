@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AddressAutocomplete } from '@/components/AddressAutocomplete';
 import {
   Form,
   FormControl,
@@ -66,6 +67,7 @@ const availableSubjects = [
 export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -83,6 +85,15 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
   });
 
   const onSubmit = async (data: FormData) => {
+    if (!coordinates) {
+      toast({
+        title: 'Validação necessária',
+        description: 'Por favor, valide o endereço clicando no botão de busca.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       // Inserir escola
@@ -93,8 +104,8 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
           full_address: data.fullAddress,
           neighborhood: data.neighborhood,
           nature: data.nature,
-          latitude: 0, // Será atualizado posteriormente com geocoding
-          longitude: 0,
+          latitude: coordinates.lat,
+          longitude: coordinates.lon,
           additional_info: data.additionalInfo || null,
         })
         .select()
@@ -182,7 +193,12 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
               <FormItem>
                 <FormLabel>Endereço Completo *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Rua, número, complemento, cidade, estado" {...field} />
+                  <AddressAutocomplete
+                    value={field.value}
+                    onChange={field.onChange}
+                    onCoordinatesChange={(lat, lon) => setCoordinates({ lat, lon })}
+                    placeholder="Rua, número, complemento, cidade, estado"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

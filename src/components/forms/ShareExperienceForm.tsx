@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { AddressAutocomplete } from '@/components/AddressAutocomplete';
 import {
   Form,
   FormControl,
@@ -64,6 +65,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNewSchool, setIsNewSchool] = useState(false);
+  const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
 
   const { data: schools, isLoading: schoolsLoading } = useQuery({
     queryKey: ['schools-list'],
@@ -104,6 +106,16 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
 
       // Se for nova escola, criar primeiro
       if (isNewSchool && data.newSchoolName) {
+        if (!coordinates) {
+          toast({
+            title: 'Validação necessária',
+            description: 'Por favor, valide o endereço da nova escola.',
+            variant: 'destructive',
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
         const { data: newSchool, error: schoolError } = await supabase
           .from('schools')
           .insert({
@@ -111,8 +123,8 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             full_address: data.newSchoolAddress || '',
             neighborhood: data.newSchoolNeighborhood || '',
             nature: 'Pública',
-            latitude: 0,
-            longitude: 0,
+            latitude: coordinates.lat,
+            longitude: coordinates.lon,
             additional_info: data.additionalInfo || null,
           })
           .select()
@@ -360,7 +372,12 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                   <FormItem>
                     <FormLabel>Endereço Completo</FormLabel>
                     <FormControl>
-                      <Input placeholder="Rua, número, bairro, cidade" {...field} />
+                      <AddressAutocomplete
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        onCoordinatesChange={(lat, lon) => setCoordinates({ lat, lon })}
+                        placeholder="Rua, número, bairro, cidade"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

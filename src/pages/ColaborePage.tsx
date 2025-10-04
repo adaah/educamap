@@ -99,16 +99,9 @@ const ColaborePage = () => {
                           onOpenChange={(open) => setOpenDialog(open ? option.id : null)}
                         >
                           <DialogTrigger asChild>
-                            <Button
-                              variant="secondary"
-                              size="lg"
-                              className="mt-4 font-montserrat font-semibold shadow-button hover:shadow-lg transition-all"
-                            >
+                            <button className="mt-4 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
                               {option.buttonText}
-                              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </Button>
+                            </button>
                           </DialogTrigger>
                           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-subtle border-2">
                             <DialogHeader className="space-y-3 pb-6 border-b">
@@ -146,13 +139,13 @@ const ColaborePage = () => {
                   Nossa equipe está pronta para ajudar!
                 </p>
                 <a 
-                  href="mailto:contato@edumapsalvador.com" 
+                  href="mailto:idealab.ic.ufba@gmail.com" 
                   className="inline-flex items-center gap-2 font-montserrat font-semibold text-primary hover:text-secondary transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  contato@edumapsalvador.com
+                  idealab.ic.ufba@gmail.com
                 </a>
               </div>
             </Card>

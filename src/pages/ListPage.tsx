@@ -79,13 +79,13 @@ const ListPage = () => {
       <main className="flex-1 container py-8 px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary mb-4 shadow-elegant">
-            <GraduationCap className="w-8 h-8 text-white" />
+          <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
+            <GraduationCap className="w-12 h-12 text-primary" />
           </div>
-          <h1 className="font-poppins font-bold text-3xl sm:text-4xl text-foreground mb-2">
+          <h1 className="font-poppins font-bold text-4xl sm:text-5xl text-foreground mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Encontre sua Escola de Estágio
           </h1>
-          <p className="text-muted-foreground font-montserrat text-base sm:text-lg max-w-2xl mx-auto">
+          <p className="font-montserrat text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Descubra as melhores oportunidades de estágio supervisionado em Salvador
           </p>
         </div>

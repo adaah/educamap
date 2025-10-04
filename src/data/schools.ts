@@ -8,6 +8,7 @@ export interface School {
   phone?: string;
   website?: string;
   nature: 'Pública' | 'Particular';
+  additionalInfo?: string;
   periods: string[];
   subjects: string[];
   shift: string[];

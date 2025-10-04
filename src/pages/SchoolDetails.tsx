@@ -152,6 +152,23 @@ const SchoolDetails = () => {
               </CardContent>
             </Card>
 
+            {/* Additional Info */}
+            {school.additionalInfo && (
+              <Card className="shadow-card bg-gradient-to-br from-primary/5 to-secondary/5">
+                <CardHeader>
+                  <CardTitle className="font-poppins font-bold text-xl flex items-center">
+                    <MessageCircle className="w-5 h-5 mr-2 text-secondary" />
+                    Informações sobre Estágio
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="font-montserrat text-foreground leading-relaxed whitespace-pre-line">
+                    {school.additionalInfo}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Teaching Opportunities */}
             <Card className="shadow-card">
               <CardHeader>

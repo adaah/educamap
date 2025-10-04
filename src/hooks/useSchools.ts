@@ -33,6 +33,7 @@ export const useSchools = () => {
             phone: school.phone || undefined,
             website: school.website || undefined,
             nature: school.nature as 'Pública' | 'Particular',
+            additionalInfo: school.additional_info || undefined,
             periods: periods.data?.map(p => p.period) || [],
             subjects: subjects.data?.map(s => s.subject) || [],
             shift: shifts.data?.map(s => s.shift) || [],

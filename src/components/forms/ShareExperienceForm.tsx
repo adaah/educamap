@@ -49,6 +49,9 @@ const formSchema = z.object({
   instructorLinkedin: z.string().trim().max(255).optional().or(z.literal('')),
   instructorWhatsapp: z.string().trim().max(20).optional().or(z.literal('')),
   instructorInstagram: z.string().trim().max(100).optional().or(z.literal('')),
+  
+  // Informações adicionais
+  additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -90,6 +93,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       instructorLinkedin: '',
       instructorWhatsapp: '',
       instructorInstagram: '',
+      additionalInfo: '',
     },
   });
 
@@ -109,6 +113,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             nature: 'Pública',
             latitude: 0,
             longitude: 0,
+            additional_info: data.additionalInfo || null,
           })
           .select()
           .single();
@@ -472,6 +477,28 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
               )}
             />
           </div>
+        </div>
+
+        {/* Informações Adicionais */}
+        <div className="space-y-4">
+          <h3 className="font-poppins font-semibold text-lg">Informações Adicionais</h3>
+          <FormField
+            control={form.control}
+            name="additionalInfo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Informações sobre a escola (opcional)</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Compartilhe informações relevantes sobre a escola, oportunidades de estágio, processos seletivos, etc."
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>

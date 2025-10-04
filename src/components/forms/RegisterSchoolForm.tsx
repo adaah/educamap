@@ -34,6 +34,7 @@ const formSchema = z.object({
   shifts: z.array(z.string()).min(1, 'Selecione pelo menos um turno'),
   periods: z.array(z.string()).min(1, 'Selecione pelo menos um período'),
   subjects: z.array(z.string()).min(1, 'Selecione pelo menos uma disciplina'),
+  additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -73,6 +74,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
       shifts: [],
       periods: [],
       subjects: [],
+      additionalInfo: '',
     },
   });
 
@@ -89,6 +91,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
           nature: data.nature,
           latitude: 0, // Será atualizado posteriormente com geocoding
           longitude: 0,
+          additional_info: data.additionalInfo || null,
         })
         .select()
         .single();

@@ -119,6 +119,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             email: data.email || null,
             phone: data.phone || null,
             website: data.website || null,
+            additional_info: data.additionalInfo || null,
           })
           .select()
           .single();
@@ -133,6 +134,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             email: data.email || null,
             phone: data.phone || null,
             website: data.website || null,
+            additional_info: data.additionalInfo || null,
           })
           .eq('id', schoolId);
 

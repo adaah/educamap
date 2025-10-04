@@ -185,6 +185,7 @@ export type Database = {
       }
       schools: {
         Row: {
+          additional_info: string | null
           created_at: string | null
           email: string | null
           full_address: string
@@ -199,6 +200,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          additional_info?: string | null
           created_at?: string | null
           email?: string | null
           full_address: string
@@ -213,6 +215,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          additional_info?: string | null
           created_at?: string | null
           email?: string | null
           full_address?: string

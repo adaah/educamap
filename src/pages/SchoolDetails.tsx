@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { mockSchools } from '@/data/schools';
+import { useSchool } from '@/hooks/useSchools';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -24,8 +24,21 @@ import {
 const SchoolDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
-  const school = mockSchools.find(s => s.id === id);
+  const { data: school, isLoading } = useSchool(id || '');
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 container py-8">
+          <div className="text-center">
+            <p className="font-montserrat text-muted-foreground">Carregando...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!school) {
     return (

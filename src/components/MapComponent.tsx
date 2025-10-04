@@ -3,10 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import L, { Map as LeafletMap } from 'leaflet';
 import 'leaflet/dist/leaflet.css'; // Importa o CSS do Leaflet
 
-import { mockSchools, type School } from '@/data/schools';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Users, GraduationCap, ExternalLink } from 'lucide-react';
+import { type School } from '@/data/schools';
+import { useSchools } from '@/hooks/useSchools';
 import { useNavigate } from 'react-router-dom';
 
 // IMPORTANTE: Configuração de Ícone para corrigir o marcador padrão do Leaflet
@@ -27,10 +25,10 @@ interface MapComponentProps {
 
 const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
-    // Tipagem alterada para LeafletMap (L.Map)
     const map = useRef<LeafletMap | null>(null); 
     const [selectedPopup, setSelectedPopup] = useState<School | null>(null);
     const navigate = useNavigate();
+    const { data: schools = [], isLoading } = useSchools();
 
     // -------------------------------------------------------------------------
     // Função para renderizar o mapa (o coração da mudança)
@@ -86,7 +84,7 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
         };
 
         // 4. Adiciona marcadores para as escolas
-        mockSchools.forEach((school) => {
+        schools.forEach((school) => {
             // Cria um marcador com ícone customizado
             const marker = L.marker(school.coordinates as [number, number], {
                 icon: createCustomIcon(school)
@@ -146,7 +144,7 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
             map.current?.remove();
             map.current = null;
         };
-    }, [onSchoolSelect, navigate]); // Adicionado 'navigate' nas dependências
+    }, [schools, onSchoolSelect, navigate]);
 
     // -------------------------------------------------------------------------
     // Funções de Ação (Mantidas as suas funções originais de navegação)
@@ -165,12 +163,20 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
     // -------------------------------------------------------------------------
     // Renderização (Retirando o Mock Map e mantendo apenas o contêiner do Leaflet)
     // -------------------------------------------------------------------------
+    if (isLoading) {
+        return (
+            <div className="w-full h-full flex items-center justify-center">
+                <p className="font-montserrat text-muted-foreground">Carregando escolas...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="relative w-full h-full">
             {/* Contêiner REAL do Mapa Leaflet */}
             <div 
                 ref={mapContainer} 
-                id="leaflet-map-container" // ID útil para estilização específica
+                id="leaflet-map-container"
                 className="w-full h-full relative"
             >
                 {/* Aqui será onde o Leaflet injetará o mapa */}

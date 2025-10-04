@@ -4,11 +4,12 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FilterPanel, { type FilterState } from '@/components/FilterPanel';
 import SchoolCard from '@/components/SchoolCard';
-import { mockSchools } from '@/data/schools';
+import { useSchools } from '@/hooks/useSchools';
 import { Search } from 'lucide-react';
 
 const ListPage = () => {
   const navigate = useNavigate();
+  const { data: schools = [], isLoading } = useSchools();
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>({
     neighborhoods: [],
@@ -19,7 +20,7 @@ const ListPage = () => {
   });
 
   const filteredSchools = useMemo(() => {
-    return mockSchools.filter(school => {
+    return schools.filter(school => {
       // Search query filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -54,7 +55,7 @@ const ListPage = () => {
 
       return true;
     });
-  }, [searchQuery, filters]);
+  }, [schools, searchQuery, filters]);
 
   const handleClearFilters = () => {
     setFilters({
@@ -117,7 +118,11 @@ const ListPage = () => {
 
             {/* Results List */}
             <div className="space-y-4">
-              {filteredSchools.length > 0 ? (
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <p className="font-montserrat text-muted-foreground">Carregando escolas...</p>
+                </div>
+              ) : filteredSchools.length > 0 ? (
                 filteredSchools.map((school) => (
                   <SchoolCard 
                     key={school.id} 

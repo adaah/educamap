@@ -14,7 +14,220 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      former_students: {
+        Row: {
+          course: string
+          created_at: string | null
+          email: string | null
+          id: string
+          instagram: string | null
+          linkedin: string | null
+          name: string
+          school_id: string
+          university: string
+          whatsapp: string | null
+        }
+        Insert: {
+          course: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          name: string
+          school_id: string
+          university: string
+          whatsapp?: string | null
+        }
+        Update: {
+          course?: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          name?: string
+          school_id?: string
+          university?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "former_students_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instructors: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          instagram: string | null
+          linkedin: string | null
+          name: string
+          school_id: string
+          subject: string
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          name: string
+          school_id: string
+          subject: string
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          name?: string
+          school_id?: string
+          subject?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructors_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_periods: {
+        Row: {
+          id: string
+          period: string
+          school_id: string
+        }
+        Insert: {
+          id?: string
+          period: string
+          school_id: string
+        }
+        Update: {
+          id?: string
+          period?: string
+          school_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_periods_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_shifts: {
+        Row: {
+          id: string
+          school_id: string
+          shift: string
+        }
+        Insert: {
+          id?: string
+          school_id: string
+          shift: string
+        }
+        Update: {
+          id?: string
+          school_id?: string
+          shift?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_shifts_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      school_subjects: {
+        Row: {
+          id: string
+          school_id: string
+          subject: string
+        }
+        Insert: {
+          id?: string
+          school_id: string
+          subject: string
+        }
+        Update: {
+          id?: string
+          school_id?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_subjects_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schools: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_address: string
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          nature: string
+          neighborhood: string
+          phone: string | null
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_address: string
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+          nature: string
+          neighborhood: string
+          phone?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_address?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          nature?: string
+          neighborhood?: string
+          phone?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

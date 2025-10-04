@@ -20,9 +20,10 @@ interface FilterPanelProps {
   onClear: () => void;
   isExpanded?: boolean;
   onToggle?: () => void;
+  isMobileModal?: boolean;
 }
 
-const FilterPanel = ({ filters, onFiltersChange, onClear, isExpanded: externalExpanded, onToggle }: FilterPanelProps) => {
+const FilterPanel = ({ filters, onFiltersChange, onClear, isExpanded: externalExpanded, onToggle, isMobileModal = false }: FilterPanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(false);
   const isExpanded = externalExpanded !== undefined ? externalExpanded : internalExpanded;
   const handleToggle = onToggle || (() => setInternalExpanded(!internalExpanded));
@@ -150,40 +151,29 @@ const FilterPanel = ({ filters, onFiltersChange, onClear, isExpanded: externalEx
 
   return (
     <div className="w-full h-fit">
-      <Card className="max-h-[calc(100vh-8rem)] flex flex-col shadow-card">
-        <CardHeader className="pb-3 sm:pb-4 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={handleToggle}
-              className="flex items-center gap-2 flex-1 text-left"
-            >
-              <CardTitle className="font-poppins font-bold text-base sm:text-lg flex items-center gap-2">
-                <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                Filtros
-                {getTotalActiveFilters() > 0 && (
-                  <Badge variant="secondary" className="text-[10px] sm:text-xs">
-                    {getTotalActiveFilters()}
-                  </Badge>
-                )}
-              </CardTitle>
-              <span className="lg:hidden text-muted-foreground">
-                {isExpanded ? '▼' : '▶'}
-              </span>
-            </button>
+      {isMobileModal ? (
+        // Mobile Modal Version - No card wrapper
+        <div className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              {getTotalActiveFilters() > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {getTotalActiveFilters()} filtro(s) ativo(s)
+                </Badge>
+              )}
+            </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={onClear}
               className="text-muted-foreground hover:text-foreground text-xs h-8"
             >
-              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
-              <span className="hidden sm:inline">Limpar</span>
+              <RotateCcw className="w-4 h-4 mr-1" />
+              Limpar Tudo
             </Button>
           </div>
-        </CardHeader>
-        
-        {isExpanded && (
-          <CardContent className="overflow-y-auto flex-1 space-y-4 sm:space-y-6 pb-4 sm:pb-6">
+          
+          <div className="space-y-6">
             <FilterGroup 
               title="Bairro" 
               options={availableFilters.neighborhoods} 
@@ -213,9 +203,77 @@ const FilterPanel = ({ filters, onFiltersChange, onClear, isExpanded: externalEx
               options={availableFilters.shifts} 
               category="shifts" 
             />
-          </CardContent>
-        )}
-      </Card>
+          </div>
+        </div>
+      ) : (
+        // Desktop Version - Original with Card
+        <Card className="max-h-[calc(100vh-8rem)] flex flex-col shadow-card">
+          <CardHeader className="pb-3 sm:pb-4 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={handleToggle}
+                className="flex items-center gap-2 flex-1 text-left"
+              >
+                <CardTitle className="font-poppins font-bold text-base sm:text-lg flex items-center gap-2">
+                  <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                  Filtros
+                  {getTotalActiveFilters() > 0 && (
+                    <Badge variant="secondary" className="text-[10px] sm:text-xs">
+                      {getTotalActiveFilters()}
+                    </Badge>
+                  )}
+                </CardTitle>
+                <span className="lg:hidden text-muted-foreground">
+                  {isExpanded ? '▼' : '▶'}
+                </span>
+              </button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClear}
+                className="text-muted-foreground hover:text-foreground text-xs h-8"
+              >
+                <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                <span className="hidden sm:inline">Limpar</span>
+              </Button>
+            </div>
+          </CardHeader>
+          
+          {isExpanded && (
+            <CardContent className="overflow-y-auto flex-1 space-y-4 sm:space-y-6 pb-4 sm:pb-6">
+              <FilterGroup 
+                title="Bairro" 
+                options={availableFilters.neighborhoods} 
+                category="neighborhoods" 
+              />
+              
+              <FilterGroup 
+                title="Período de Ensino" 
+                options={availableFilters.periods} 
+                category="periods" 
+              />
+              
+              <FilterGroup 
+                title="Matérias/Áreas" 
+                options={availableFilters.subjects} 
+                category="subjects" 
+              />
+              
+              <FilterGroup 
+                title="Natureza" 
+                options={availableFilters.natures} 
+                category="natures" 
+              />
+              
+              <FilterGroup 
+                title="Turno" 
+                options={availableFilters.shifts} 
+                category="shifts" 
+              />
+            </CardContent>
+          )}
+        </Card>
+      )}
     </div>
   );
 };

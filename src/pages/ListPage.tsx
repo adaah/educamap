@@ -9,6 +9,12 @@ import { useSchools } from '@/hooks/useSchools';
 import { Search, GraduationCap, SlidersHorizontal } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const ListPage = () => {
   const navigate = useNavigate();
@@ -95,15 +101,15 @@ const ListPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 h-full">
-          {/* Filter Panel - Left Column */}
-          <div className="lg:col-span-1">
+          {/* Filter Panel - Desktop Only */}
+          <div className="hidden lg:block lg:col-span-1">
             <div className="lg:sticky lg:top-20">
               <FilterPanel 
                 filters={filters}
                 onFiltersChange={setFilters}
                 onClear={handleClearFilters}
-                isExpanded={showFilters}
-                onToggle={() => setShowFilters(!showFilters)}
+                isExpanded={true}
+                onToggle={() => {}}
               />
             </div>
           </div>
@@ -127,12 +133,39 @@ const ListPage = () => {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden h-[52px] w-[52px] flex-shrink-0 border-2 border-primary/20"
+                onClick={() => setShowFilters(true)}
+                className="lg:hidden h-[52px] w-[52px] flex-shrink-0 border-2 border-primary/20 relative"
               >
                 <SlidersHorizontal className="w-5 h-5 text-primary" />
+                {(filters.neighborhoods.length + filters.periods.length + filters.subjects.length + filters.natures.length + filters.shifts.length) > 0 && (
+                  <Badge variant="secondary" className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-[10px]">
+                    {filters.neighborhoods.length + filters.periods.length + filters.subjects.length + filters.natures.length + filters.shifts.length}
+                  </Badge>
+                )}
               </Button>
             </div>
+
+            {/* Mobile Filter Modal */}
+            <Dialog open={showFilters} onOpenChange={setShowFilters}>
+              <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[85vh] p-0">
+                <DialogHeader className="px-6 pt-6 pb-4 border-b">
+                  <DialogTitle className="font-poppins font-bold text-xl flex items-center gap-2">
+                    <SlidersHorizontal className="w-5 h-5 text-primary" />
+                    Filtros
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="overflow-y-auto px-6 pb-6">
+                  <FilterPanel 
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                    onClear={handleClearFilters}
+                    isExpanded={true}
+                    onToggle={() => {}}
+                    isMobileModal={true}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
 
             {/* Results List */}
             <div className="space-y-4">

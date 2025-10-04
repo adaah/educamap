@@ -9,13 +9,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-button font-poppins font-medium",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-hover-overlay hover:text-foreground font-montserrat",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-button font-poppins font-medium",
-        ghost: "hover:bg-hover-overlay hover:text-foreground font-montserrat",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-button font-poppins font-semibold",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 font-poppins font-semibold",
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground font-montserrat",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-button font-poppins font-semibold",
+        ghost: "hover:bg-accent hover:text-accent-foreground font-montserrat",
         link: "text-primary underline-offset-4 hover:underline font-montserrat",
-        hero: "bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-button font-poppins font-semibold",
         filter: "bg-filter-bg border border-border hover:bg-hover-overlay font-montserrat text-sm",
         map: "bg-background/95 backdrop-blur-sm border hover:bg-hover-overlay font-montserrat shadow-sm",
       },

@@ -119,16 +119,11 @@ const ListPage = () => {
             </div>
 
             {/* Results Header */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-2 bg-gradient-to-r from-primary/10 to-secondary/10 p-4 rounded-xl">
-              <h2 className="font-poppins font-bold text-xl sm:text-2xl text-foreground">
-                Escolas Disponíveis
-              </h2>
-              <div className="flex items-center gap-2">
-                <div className="bg-primary/20 px-4 py-2 rounded-lg">
-                  <p className="font-poppins font-semibold text-foreground">
-                    {filteredSchools.length} {filteredSchools.length === 1 ? 'escola' : 'escolas'}
-                  </p>
-                </div>
+            <div className="flex justify-end items-center mb-6">
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 px-5 py-3 rounded-xl shadow-sm">
+                <p className="font-poppins font-semibold text-foreground">
+                  {filteredSchools.length} {filteredSchools.length === 1 ? 'escola' : 'escolas'}
+                </p>
               </div>
             </div>
 

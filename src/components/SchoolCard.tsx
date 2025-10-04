@@ -78,8 +78,8 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
         <div className="flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={handleViewDetails}
-            variant="hero"
-            className="flex-1"
+            variant="secondary"
+            className="flex-1 font-poppins font-semibold"
           >
             <ExternalLink className="w-4 h-4 mr-2" />
             Ver Detalhes

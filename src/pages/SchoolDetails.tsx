@@ -47,7 +47,7 @@ const SchoolDetails = () => {
         <main className="flex-1 container py-8">
           <div className="text-center">
             <h1 className="font-poppins font-bold text-2xl mb-4">Escola não encontrada</h1>
-            <Button onClick={() => navigate('/')} variant="hero">
+            <Button onClick={() => navigate('/')} variant="secondary" className="font-poppins font-semibold">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar ao Mapa
             </Button>
@@ -277,7 +277,7 @@ const SchoolDetails = () => {
                 <CardTitle className="font-poppins font-bold text-lg">Ações Rápidas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="hero" className="w-full" onClick={() => navigate('/')}>
+                <Button variant="secondary" className="w-full font-poppins font-semibold" onClick={() => navigate('/')}>
                   <MapPin className="w-4 h-4 mr-2" />
                   Ver no Mapa
                 </Button>

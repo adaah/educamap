@@ -6,7 +6,9 @@ import BottomNav from '@/components/BottomNav';
 import FilterPanel, { type FilterState } from '@/components/FilterPanel';
 import SchoolCard from '@/components/SchoolCard';
 import { useSchools } from '@/hooks/useSchools';
-import { Search, GraduationCap } from 'lucide-react';
+import { Search, GraduationCap, SlidersHorizontal } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const ListPage = () => {
   const navigate = useNavigate();
@@ -95,11 +97,34 @@ const ListPage = () => {
           {/* Filter Panel - Left Column */}
           <div className="lg:col-span-1">
             <div className="lg:sticky lg:top-20">
-              <FilterPanel 
-                filters={filters}
-                onFiltersChange={setFilters}
-                onClear={handleClearFilters}
-              />
+              {/* Mobile: Show icon button */}
+              <div className="lg:hidden mb-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const filterCard = document.querySelector('[data-filter-card]');
+                    if (filterCard) {
+                      filterCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <SlidersHorizontal className="w-4 h-4" />
+                  <span>Filtros</span>
+                  {(filters.neighborhoods.length + filters.periods.length + filters.subjects.length + filters.natures.length + filters.shifts.length) > 0 && (
+                    <Badge variant="secondary" className="text-xs">
+                      {filters.neighborhoods.length + filters.periods.length + filters.subjects.length + filters.natures.length + filters.shifts.length}
+                    </Badge>
+                  )}
+                </Button>
+              </div>
+              <div data-filter-card>
+                <FilterPanel 
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  onClear={handleClearFilters}
+                />
+              </div>
             </div>
           </div>
 
@@ -116,15 +141,6 @@ const ListPage = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 border-2 border-primary/20 rounded-xl bg-background font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all"
                 />
-              </div>
-            </div>
-
-            {/* Results Header */}
-            <div className="flex justify-end items-center mb-6">
-              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 px-5 py-3 rounded-xl shadow-sm">
-                <p className="font-poppins font-semibold text-foreground">
-                  {filteredSchools.length} {filteredSchools.length === 1 ? 'escola' : 'escolas'}
-                </p>
               </div>
             </div>
 

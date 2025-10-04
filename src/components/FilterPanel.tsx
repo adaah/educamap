@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { RotateCcw, Filter } from 'lucide-react';
+import { RotateCcw, Filter, SlidersHorizontal } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface FilterState {

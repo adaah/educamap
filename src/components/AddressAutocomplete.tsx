@@ -9,6 +9,7 @@ interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
   onCoordinatesChange: (lat: number, lon: number) => void;
+  onNeighborhoodChange?: (neighborhood: string) => void;
   placeholder?: string;
   className?: string;
 }
@@ -17,6 +18,7 @@ export const AddressAutocomplete = ({
   value,
   onChange,
   onCoordinatesChange,
+  onNeighborhoodChange,
   placeholder = 'Digite o endereço completo',
   className,
 }: AddressAutocompleteProps) => {
@@ -43,6 +45,17 @@ export const AddressAutocomplete = ({
   const handleSelectSuggestion = (suggestion: any) => {
     onChange(suggestion.display_name);
     onCoordinatesChange(parseFloat(suggestion.lat), parseFloat(suggestion.lon));
+    
+    // Extract neighborhood from address
+    const neighborhood = suggestion.address?.suburb || 
+                        suggestion.address?.neighbourhood || 
+                        suggestion.address?.quarter || 
+                        suggestion.address?.city_district || 
+                        '';
+    if (neighborhood && onNeighborhoodChange) {
+      onNeighborhoodChange(neighborhood);
+    }
+    
     setShowSuggestions(false);
     setSuggestions([]);
   };

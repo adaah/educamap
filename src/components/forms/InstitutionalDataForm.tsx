@@ -305,6 +305,9 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
                         value={field.value || ''}
                         onChange={field.onChange}
                         onCoordinatesChange={(lat, lon) => setCoordinates({ lat, lon })}
+                        onNeighborhoodChange={(neighborhood) => {
+                          form.setValue('newSchoolNeighborhood', neighborhood);
+                        }}
                         placeholder="Rua, número, complemento"
                       />
                     </FormControl>
@@ -321,7 +324,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
                     <FormItem>
                       <FormLabel>Bairro</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nome do bairro" {...field} />
+                        <Input placeholder="Nome do bairro" {...field} disabled />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -68,6 +68,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -197,6 +198,10 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
                     value={field.value}
                     onChange={field.onChange}
                     onCoordinatesChange={(lat, lon) => setCoordinates({ lat, lon })}
+                    onNeighborhoodChange={(neighborhood) => {
+                      form.setValue('neighborhood', neighborhood);
+                      setSelectedNeighborhood(neighborhood);
+                    }}
                     placeholder="Rua, número, complemento, cidade, estado"
                   />
                 </FormControl>
@@ -212,7 +217,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
               <FormItem>
                 <FormLabel>Bairro *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nome do bairro" {...field} />
+                  <Input placeholder="Nome do bairro" {...field} disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>

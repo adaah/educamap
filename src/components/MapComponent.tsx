@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css'; // Importa o CSS do Leaflet
 import { type School } from '@/data/schools';
 import { useSchools } from '@/hooks/useSchools';
 import { useNavigate } from 'react-router-dom';
+import { MapSearch } from './MapSearch';
 
 // IMPORTANTE: Configuração de Ícone para corrigir o marcador padrão do Leaflet
 // Isso é necessário pois o Webpack/Vite tem dificuldade em encontrar os ícones padrão
@@ -171,6 +172,14 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
         );
     }
 
+    const handleSchoolSearch = (school: School) => {
+        if (map.current) {
+            map.current.setView(school.coordinates as [number, number], 16);
+        }
+        onSchoolSelect?.(school);
+        setSelectedPopup(school);
+    };
+
     return (
         <div className="relative w-full h-full">
             {/* Contêiner REAL do Mapa Leaflet */}
@@ -182,16 +191,12 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                 {/* Aqui será onde o Leaflet injetará o mapa */}
             </div>
 
-            {/* A Barra de Busca e os Botões de Zoom do Mapbox foram adaptados: */}
-            {/* Map Search Bar - Mantido, é apenas um componente de UI sobreposto */}
-            <div className="absolute top-4 left-4 right-4 z-[401]">
-                <div className="max-w-md">
-                    <input
-                        type="text"
-                        placeholder="Buscar escolas..."
-                        className="w-full px-3 py-2 rounded-lg border bg-white/95 backdrop-blur-sm shadow-sm font-montserrat text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                </div>
+            {/* Map Search Bar - No canto direito */}
+            <div className="absolute top-4 right-4 z-[401]">
+                <MapSearch 
+                    schools={schools}
+                    onSchoolSelect={handleSchoolSearch}
+                />
             </div>
 
             {/* Map Controls removed as requested - using native Leaflet controls */}

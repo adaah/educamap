@@ -26,7 +26,7 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
     neighborhoods: [] as string[],
     periods: [] as string[],
     subjects: [] as string[],
-    natures: ['Pública', 'Particular'],
+    natures: [] as string[],
     shifts: [] as string[],
   });
 
@@ -72,11 +72,20 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
         shiftsData?.map(s => s.shift).filter(Boolean) || []
       )].sort();
 
+      // Buscar naturezas únicas
+      const { data: naturesData } = await supabase
+        .from('schools')
+        .select('nature');
+      
+      const uniqueNatures = [...new Set(
+        naturesData?.map(n => n.nature).filter(Boolean) || []
+      )].sort();
+
       setAvailableFilters({
         neighborhoods: uniqueNeighborhoods,
         periods: uniquePeriods,
         subjects: uniqueSubjects,
-        natures: ['Pública', 'Particular'],
+        natures: uniqueNatures,
         shifts: uniqueShifts,
       });
     };

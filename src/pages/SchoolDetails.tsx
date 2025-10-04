@@ -113,33 +113,45 @@ const SchoolDetails = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Contact Information */}
-            <Card className="shadow-card">
+            <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                  <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-secondary" />
+                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                    <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
                   Informações de Contato
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {school.email && (
+                {school.email ? (
                   <div className="flex items-center font-montserrat text-xs sm:text-sm">
                     <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-3 text-muted-foreground flex-shrink-0" />
                     <a href={`mailto:${school.email}`} className="text-primary hover:underline break-all">
                       {school.email}
                     </a>
                   </div>
+                ) : (
+                  <div className="flex items-center font-montserrat text-xs sm:text-sm text-muted-foreground">
+                    <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-3 flex-shrink-0" />
+                    <span>Sem informações de email</span>
+                  </div>
                 )}
                 
-                {school.phone && (
+                {school.phone ? (
                   <div className="flex items-center font-montserrat text-xs sm:text-sm">
                     <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-3 text-muted-foreground flex-shrink-0" />
                     <a href={`tel:${school.phone}`} className="text-primary hover:underline">
                       {school.phone}
                     </a>
                   </div>
+                ) : (
+                  <div className="flex items-center font-montserrat text-xs sm:text-sm text-muted-foreground">
+                    <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-3 flex-shrink-0" />
+                    <span>Sem informações de telefone</span>
+                  </div>
                 )}
                 
-                {school.website && (
+                {school.website ? (
                   <div className="flex items-start font-montserrat text-xs sm:text-sm">
                     <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-3 mt-0.5 text-muted-foreground flex-shrink-0" />
                     <a 
@@ -150,6 +162,11 @@ const SchoolDetails = () => {
                     >
                       {school.website}
                     </a>
+                  </div>
+                ) : (
+                  <div className="flex items-center font-montserrat text-xs sm:text-sm text-muted-foreground">
+                    <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-3 flex-shrink-0" />
+                    <span>Sem informações de website</span>
                   </div>
                 )}
               </CardContent>
@@ -173,10 +190,12 @@ const SchoolDetails = () => {
             )}
 
             {/* Teaching Opportunities */}
-            <Card className="shadow-card">
+            <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                  <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-primary" />
+                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                    <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
                   Oportunidades de Estágio
                 </CardTitle>
               </CardHeader>
@@ -220,10 +239,12 @@ const SchoolDetails = () => {
             </Card>
 
             {/* Instructors */}
-            <Card className="shadow-card">
+            <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                  <Users className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-primary" />
+                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                    <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
                   Professores Instrutores
                 </CardTitle>
               </CardHeader>
@@ -275,15 +296,18 @@ const SchoolDetails = () => {
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6">
             {/* Quick Actions */}
-            <Card className="shadow-card">
+            <Card className="shadow-card border-2 hover:border-primary/20 transition-all bg-gradient-to-br from-primary/5 to-secondary/5">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-lg">Ações Rápidas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="secondary" className="w-full font-poppins font-semibold text-xs sm:text-sm" onClick={() => navigate('/')}>
+                <button 
+                  className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center"
+                  onClick={() => navigate('/')}
+                >
                   <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Ver no Mapa
-                </Button>
+                </button>
                 <Button variant="outline" className="w-full text-xs sm:text-sm" onClick={() => navigate('/lista')}>
                   Ver Outras Escolas
                 </Button>
@@ -291,10 +315,12 @@ const SchoolDetails = () => {
             </Card>
 
             {/* Former Students */}
-            <Card className="shadow-card">
+            <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-lg flex items-center">
-                  <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-secondary" />
+                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-secondary mr-2">
+                    <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
                   Ex-Alunos Estagiários
                 </CardTitle>
               </CardHeader>
@@ -347,7 +373,7 @@ const SchoolDetails = () => {
             </Card>
 
             {/* Location Map */}
-            <Card className="shadow-card">
+            <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-lg">Localização</CardTitle>
               </CardHeader>

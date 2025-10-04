@@ -637,20 +637,20 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
 
         {/* Submit Button */}
         <div className="flex justify-end gap-4">
-          <Button
+          <button
             type="submit"
             disabled={isSubmitting}
-            className="min-w-[120px]"
+            className="min-w-[120px] px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
                 Enviando...
               </>
             ) : (
               'Enviar'
             )}
-          </Button>
+          </button>
         </div>
       </form>
     </Form>

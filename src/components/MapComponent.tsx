@@ -103,16 +103,20 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                     <div class="space-y-1 mb-3">
                         <div class="flex items-center text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-2"><path d="M4 19.5a2.5 2.5 0 0 1 2.5-2.5h15"></path><path d="M21.5 7.5a2.5 2.5 0 0 0-2.5-2.5h-15"></path></svg>
-                            <span>${school.periods.slice(0, 2).join(', ')}</span>
+                            <span>${school.periods.length > 0 ? school.periods.slice(0, 2).join(', ') : 'Sem informações de períodos'}</span>
                         </div>
                         <div class="text-sm">
                             <div class="font-semibold" style="color: #FF8C00;">Professores Instrutores:</div>
                             <div class="text-xs max-h-12 overflow-y-auto pl-4">
-                                ${school.instructors.map(i => `<div>${i.name} - ${i.subject}</div>`).join('')}
+                                ${school.instructors.length > 0 ? school.instructors.map(i => `<div>${i.name} - ${i.subject}</div>`).join('') : '<div style="color: #888;">Sem informações de instrutores</div>'}
                             </div>
                         </div>
+                        <div class="text-xs" style="color: #888;">
+                            ${school.email ? `<div>Email: ${school.email}</div>` : '<div>Sem informações de contato</div>'}
+                            ${school.phone ? `<div>Tel: ${school.phone}</div>` : ''}
+                        </div>
                     </div>
-                    <button id="details-btn-${school.id}" class="w-full px-3 py-2 rounded-lg font-poppins font-semibold" style="background-color: #FFC700; color: #000; border: none; cursor: pointer;">
+                    <button id="details-btn-${school.id}" class="w-full px-3 py-2 rounded-lg font-poppins font-semibold" style="background: linear-gradient(to right, #FF8C00, #FFC700); color: #fff; border: none; cursor: pointer; transition: all 0.3s;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-2"><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path><path d="M18 19H6c-1.1 0-2-.9-2 2V7c0-1.1.9-2 2-2h5"></path></svg>
                         Ver Detalhes
                     </button>

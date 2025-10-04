@@ -21,7 +21,7 @@ interface FilterPanelProps {
 }
 
 const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false); // Changed to false for mobile collapsed by default
   const [availableFilters, setAvailableFilters] = useState({
     neighborhoods: [] as string[],
     periods: [] as string[],
@@ -148,15 +148,23 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
       <Card className="max-h-[calc(100vh-8rem)] flex flex-col shadow-card">
         <CardHeader className="pb-3 sm:pb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <CardTitle className="font-poppins font-bold text-base sm:text-lg flex items-center gap-2">
-              <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-              Filtros
-              {getTotalActiveFilters() > 0 && (
-                <Badge variant="secondary" className="text-[10px] sm:text-xs">
-                  {getTotalActiveFilters()}
-                </Badge>
-              )}
-            </CardTitle>
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-2 flex-1 text-left lg:cursor-default"
+            >
+              <CardTitle className="font-poppins font-bold text-base sm:text-lg flex items-center gap-2">
+                <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                Filtros
+                {getTotalActiveFilters() > 0 && (
+                  <Badge variant="secondary" className="text-[10px] sm:text-xs">
+                    {getTotalActiveFilters()}
+                  </Badge>
+                )}
+              </CardTitle>
+              <span className="lg:hidden text-muted-foreground">
+                {isExpanded ? '▼' : '▶'}
+              </span>
+            </button>
             <Button
               variant="ghost"
               size="sm"
@@ -169,37 +177,39 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
           </div>
         </CardHeader>
         
-        <CardContent className="overflow-y-auto flex-1 space-y-4 sm:space-y-6 pb-4 sm:pb-6">
-          <FilterGroup 
-            title="Bairro" 
-            options={availableFilters.neighborhoods} 
-            category="neighborhoods" 
-          />
-          
-          <FilterGroup 
-            title="Período de Ensino" 
-            options={availableFilters.periods} 
-            category="periods" 
-          />
-          
-          <FilterGroup 
-            title="Matérias/Áreas" 
-            options={availableFilters.subjects} 
-            category="subjects" 
-          />
-          
-          <FilterGroup 
-            title="Natureza" 
-            options={availableFilters.natures} 
-            category="natures" 
-          />
-          
-          <FilterGroup 
-            title="Turno" 
-            options={availableFilters.shifts} 
-            category="shifts" 
-          />
-        </CardContent>
+        {isExpanded && (
+          <CardContent className="overflow-y-auto flex-1 space-y-4 sm:space-y-6 pb-4 sm:pb-6">
+            <FilterGroup 
+              title="Bairro" 
+              options={availableFilters.neighborhoods} 
+              category="neighborhoods" 
+            />
+            
+            <FilterGroup 
+              title="Período de Ensino" 
+              options={availableFilters.periods} 
+              category="periods" 
+            />
+            
+            <FilterGroup 
+              title="Matérias/Áreas" 
+              options={availableFilters.subjects} 
+              category="subjects" 
+            />
+            
+            <FilterGroup 
+              title="Natureza" 
+              options={availableFilters.natures} 
+              category="natures" 
+            />
+            
+            <FilterGroup 
+              title="Turno" 
+              options={availableFilters.shifts} 
+              category="shifts" 
+            />
+          </CardContent>
+        )}
       </Card>
     </div>
   );

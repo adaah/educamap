@@ -18,7 +18,7 @@ const Header = () => {
           </div>
           <div className="flex flex-col">
             <span className="font-poppins font-bold text-sm sm:text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">EduMap Salvador</span>
-            <span className="font-montserrat text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Estágio em instituições de ensino</span>
+            <span className="font-montserrat text-[10px] sm:text-xs text-muted-foreground">Estágio em instituições de ensino</span>
           </div>
         </Link>
 
@@ -27,31 +27,31 @@ const Header = () => {
           <Button
             variant={location.pathname === '/' ? 'default' : 'ghost'}
             asChild
-            className="font-montserrat text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
+            className="font-montserrat text-sm h-10 px-4"
           >
-            <Link to="/" className="flex items-center space-x-1 sm:space-x-2">
-              <Map className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Mapa</span>
+            <Link to="/" className="flex items-center space-x-2">
+              <Map className="w-4 h-4" />
+              <span>Mapa de Escolas</span>
             </Link>
           </Button>
           
           <Button
             variant={location.pathname === '/lista' ? 'default' : 'ghost'}
             asChild
-            className="font-montserrat text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
+            className="font-montserrat text-sm h-10 px-4"
           >
-            <Link to="/lista" className="flex items-center space-x-1 sm:space-x-2">
-              <List className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Lista</span>
+            <Link to="/lista" className="flex items-center space-x-2">
+              <List className="w-4 h-4" />
+              <span>Lista e Filtros</span>
             </Link>
           </Button>
 
           <Button
             variant={location.pathname === '/colabore' ? 'default' : 'ghost'}
             asChild
-            className="font-montserrat text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
+            className="font-montserrat text-sm h-10 px-4"
           >
-            <Link to="/colabore" className="flex items-center space-x-1 sm:space-x-2">
+            <Link to="/colabore" className="flex items-center space-x-2">
               <span>Colabore</span>
             </Link>
           </Button>

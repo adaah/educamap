@@ -35,9 +35,9 @@ export const MapSearch = ({ schools, onSchoolSelect }: MapSearchProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-md">
+    <div className="relative w-full max-w-lg">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           type="text"
           placeholder="Buscar por nome, bairro ou endereço..."
@@ -47,14 +47,14 @@ export const MapSearch = ({ schools, onSchoolSelect }: MapSearchProps) => {
             setShowResults(true);
           }}
           onFocus={() => setShowResults(true)}
-          className="pl-10 pr-10 bg-white/95 backdrop-blur-sm shadow-lg border-primary/20"
+          className="pl-12 pr-12 py-6 text-base bg-white/95 backdrop-blur-sm shadow-lg border-primary/20 rounded-xl"
         />
         {searchQuery && (
           <button
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         )}
       </div>

@@ -110,16 +110,21 @@ const ColaborePage = () => {
                               </svg>
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle className="font-poppins text-2xl">
+                          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-subtle border-2">
+                            <DialogHeader className="space-y-3 pb-6 border-b">
+                              <div className="inline-flex p-3 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl text-primary w-fit">
+                                {icons[index]}
+                              </div>
+                              <DialogTitle className="font-poppins text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                                 {option.title}
                               </DialogTitle>
-                              <DialogDescription className="font-montserrat">
+                              <DialogDescription className="font-montserrat text-base text-muted-foreground">
                                 {option.description}
                               </DialogDescription>
                             </DialogHeader>
-                            <FormComponent onSuccess={() => setOpenDialog(null)} />
+                            <div className="pt-6">
+                              <FormComponent onSuccess={() => setOpenDialog(null)} />
+                            </div>
                           </DialogContent>
                         </Dialog>
                       </div>

@@ -11,12 +11,15 @@ const Header = () => {
         {/* Logo/Brand */}
         <Link 
           to="/" 
-          className="flex items-center space-x-2 font-poppins font-bold text-xl"
+          className="flex items-center space-x-2"
         >
           <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center">
             <Map className="w-5 h-5 text-white" />
           </div>
-          <span>EduMap Salvador</span>
+          <div className="flex flex-col">
+            <span className="font-poppins font-bold text-xl">EduMap Salvador</span>
+            <span className="font-montserrat text-xs text-muted-foreground">Estágio em instituições de ensino</span>
+          </div>
         </Link>
 
         {/* Navigation Menu */}

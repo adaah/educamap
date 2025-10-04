@@ -7,62 +7,55 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+      <div className="container flex h-14 sm:h-16 items-center px-3 sm:px-4">
         {/* Logo/Brand */}
         <Link 
           to="/" 
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-2 mr-2 sm:mr-0"
         >
-          <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center">
-            <Map className="w-5 h-5 text-white" />
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0">
+            <Map className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-poppins font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">EduMap Salvador</span>
-            <span className="font-montserrat text-xs text-muted-foreground">Estágio em instituições de ensino</span>
+            <span className="font-poppins font-bold text-sm sm:text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">EduMap Salvador</span>
+            <span className="font-montserrat text-[10px] sm:text-xs text-muted-foreground hidden sm:block">Estágio em instituições de ensino</span>
           </div>
         </Link>
 
         {/* Navigation Menu */}
-        <nav className="flex items-center space-x-1 ml-8">
+        <nav className="flex items-center space-x-1 ml-auto sm:ml-8">
           <Button
             variant={location.pathname === '/' ? 'default' : 'ghost'}
             asChild
-            className="font-montserrat text-sm sm:text-base"
+            className="font-montserrat text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
           >
-            <Link to="/" className="flex items-center space-x-2">
-              <Map className="w-4 h-4" />
-              <span className="hidden sm:inline">Mapa de Escolas</span>
-              <span className="sm:hidden">Mapa</span>
+            <Link to="/" className="flex items-center space-x-1 sm:space-x-2">
+              <Map className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Mapa</span>
             </Link>
           </Button>
           
           <Button
             variant={location.pathname === '/lista' ? 'default' : 'ghost'}
             asChild
-            className="font-montserrat text-sm sm:text-base"
+            className="font-montserrat text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
           >
-            <Link to="/lista" className="flex items-center space-x-2">
-              <List className="w-4 h-4" />
-              <span className="hidden sm:inline">Lista e Filtros</span>
-              <span className="sm:hidden">Lista</span>
+            <Link to="/lista" className="flex items-center space-x-1 sm:space-x-2">
+              <List className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Lista</span>
             </Link>
           </Button>
 
           <Button
             variant={location.pathname === '/colabore' ? 'default' : 'ghost'}
             asChild
-            className="font-montserrat text-sm sm:text-base"
+            className="font-montserrat text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4"
           >
-            <Link to="/colabore" className="flex items-center space-x-2">
+            <Link to="/colabore" className="flex items-center space-x-1 sm:space-x-2">
               <span>Colabore</span>
             </Link>
           </Button>
         </nav>
-
-        {/* Right side - Reserved for future use */}
-        <div className="ml-auto">
-          {/* Content removed as requested */}
-        </div>
       </div>
     </header>
   );

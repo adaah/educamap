@@ -37,42 +37,42 @@ export const MapSearch = ({ schools, onSchoolSelect }: MapSearchProps) => {
   return (
     <div className="relative w-full max-w-lg">
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Buscar por nome, bairro ou endereço..."
+          placeholder="Buscar por nome, bairro..."
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
             setShowResults(true);
           }}
           onFocus={() => setShowResults(true)}
-          className="pl-12 pr-12 py-6 text-base bg-white/95 backdrop-blur-sm shadow-lg border-primary/20 rounded-xl"
+          className="pl-10 sm:pl-12 pr-10 sm:pr-12 py-4 sm:py-6 text-sm sm:text-base bg-white/95 backdrop-blur-sm shadow-lg border-primary/20 rounded-xl"
         />
         {searchQuery && (
           <button
             onClick={handleClear}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         )}
       </div>
 
       {showResults && searchQuery && (
-        <Card className="absolute top-full mt-2 w-full max-h-96 overflow-y-auto bg-white shadow-xl z-50">
+        <Card className="absolute top-full mt-2 w-full max-h-[60vh] sm:max-h-96 overflow-y-auto bg-white shadow-xl z-50">
           {filteredSchools.length > 0 ? (
             <div className="divide-y">
               {filteredSchools.map((school) => (
                 <button
                   key={school.id}
                   onClick={() => handleSelectSchool(school)}
-                  className="w-full text-left p-3 hover:bg-accent transition-colors"
+                  className="w-full text-left p-3 sm:p-4 hover:bg-accent transition-colors"
                 >
-                  <div className="font-poppins font-semibold text-sm text-foreground">
+                  <div className="font-poppins font-semibold text-xs sm:text-sm text-foreground">
                     {school.name}
                   </div>
-                  <div className="text-xs text-muted-foreground font-montserrat mt-1">
+                  <div className="text-[10px] sm:text-xs text-muted-foreground font-montserrat mt-1 line-clamp-1">
                     {school.neighborhood} - {school.fullAddress}
                   </div>
                 </button>
@@ -80,7 +80,7 @@ export const MapSearch = ({ schools, onSchoolSelect }: MapSearchProps) => {
             </div>
           ) : (
             <div className="p-4 text-center">
-              <p className="text-sm text-muted-foreground font-montserrat">
+              <p className="text-xs sm:text-sm text-muted-foreground font-montserrat">
                 Nenhuma escola encontrada
               </p>
             </div>

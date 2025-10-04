@@ -76,24 +76,24 @@ const ListPage = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-primary/5">
       <Header />
       
-      <main className="flex-1 container py-8 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 container py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <div className="mb-8 text-center">
-          <div className="inline-block p-3 bg-primary/10 rounded-full mb-4">
-            <GraduationCap className="w-12 h-12 text-primary" />
+        <div className="mb-6 sm:mb-8 text-center">
+          <div className="inline-block p-2 sm:p-3 bg-primary/10 rounded-full mb-3 sm:mb-4">
+            <GraduationCap className="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
           </div>
-          <h1 className="font-poppins font-bold text-4xl sm:text-5xl text-foreground mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-4 sm:mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">
             Encontre sua Escola de Estágio
           </h1>
-          <p className="font-montserrat text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="font-montserrat text-sm sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
             Descubra as melhores oportunidades de estágio supervisionado em Salvador
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6 h-full">
           {/* Filter Panel - Left Column */}
           <div className="lg:col-span-1">
-            <div className="sticky top-20">
+            <div className="lg:sticky lg:top-20">
               <FilterPanel 
                 filters={filters}
                 onFiltersChange={setFilters}
@@ -105,15 +105,15 @@ const ListPage = () => {
           {/* Results Column */}
           <div className="lg:col-span-3">
             {/* Search Bar */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 sm:w-5 sm:h-5" />
                 <input
                   type="text"
                   placeholder="Buscar escolas por nome, bairro ou endereço..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 border-2 border-primary/20 rounded-xl bg-background font-montserrat text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all"
+                  className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 border-2 border-primary/20 rounded-xl bg-background font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all"
                 />
               </div>
             </div>

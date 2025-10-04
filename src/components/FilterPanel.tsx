@@ -118,9 +118,9 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
     options: string[]; 
     category: keyof FilterState;
   }) => (
-    <div className="space-y-3">
-      <h3 className="font-poppins font-semibold text-sm text-foreground">{title}</h3>
-      <div className="space-y-2 max-h-48 overflow-y-auto">
+    <div className="space-y-2 sm:space-y-3">
+      <h3 className="font-poppins font-semibold text-xs sm:text-sm text-foreground">{title}</h3>
+      <div className="space-y-1.5 sm:space-y-2 max-h-40 sm:max-h-48 overflow-y-auto">
         {options.map((option) => (
           <div key={option} className="flex items-center space-x-2">
             <Checkbox
@@ -129,10 +129,11 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
               onCheckedChange={(checked) => 
                 handleFilterChange(category, option, checked as boolean)
               }
+              className="h-4 w-4"
             />
             <label 
               htmlFor={`${category}-${option}`}
-              className="text-sm font-montserrat cursor-pointer flex-1"
+              className="text-xs sm:text-sm font-montserrat cursor-pointer flex-1 leading-tight"
             >
               {option}
             </label>
@@ -145,13 +146,13 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
   return (
     <div className="w-full h-fit">
       <Card className="max-h-[calc(100vh-8rem)] flex flex-col shadow-card">
-        <CardHeader className="pb-4 flex-shrink-0">
+        <CardHeader className="pb-3 sm:pb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <CardTitle className="font-poppins font-bold text-lg flex items-center gap-2">
-              <Filter className="w-5 h-5 text-primary" />
+            <CardTitle className="font-poppins font-bold text-base sm:text-lg flex items-center gap-2">
+              <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               Filtros
               {getTotalActiveFilters() > 0 && (
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-[10px] sm:text-xs">
                   {getTotalActiveFilters()}
                 </Badge>
               )}
@@ -160,15 +161,15 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
               variant="ghost"
               size="sm"
               onClick={onClear}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground text-xs h-8"
             >
-              <RotateCcw className="w-4 h-4 mr-1" />
-              Limpar
+              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+              <span className="hidden sm:inline">Limpar</span>
             </Button>
           </div>
         </CardHeader>
         
-        <CardContent className="overflow-y-auto flex-1 space-y-6 pb-6">
+        <CardContent className="overflow-y-auto flex-1 space-y-4 sm:space-y-6 pb-4 sm:pb-6">
           <FilterGroup 
             title="Bairro" 
             options={availableFilters.neighborhoods} 

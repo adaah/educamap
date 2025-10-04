@@ -24,22 +24,22 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
 
   return (
     <Card className="shadow-card hover:shadow-lg transition-shadow">
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         {/* Header */}
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex-1">
-            <h3 className="font-poppins font-bold text-lg text-foreground mb-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-poppins font-bold text-base sm:text-lg text-foreground mb-2 break-words">
               {school.name}
             </h3>
-            <div className="flex items-center text-muted-foreground text-sm font-montserrat mb-2">
-              <MapPin className="w-4 h-4 mr-1" />
-              <span>{school.neighborhood} - {school.fullAddress.split(' - ')[0]}</span>
+            <div className="flex items-start text-muted-foreground text-xs sm:text-sm font-montserrat mb-2">
+              <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 mt-0.5 flex-shrink-0" />
+              <span className="break-words line-clamp-2">{school.neighborhood} - {school.fullAddress.split(' - ')[0]}</span>
             </div>
           </div>
           
           <Badge 
             variant="outline" 
-            className={`font-montserrat ${school.nature === 'Pública' ? 'bg-badge-public border-badge-public text-muted-foreground' : ''}`}
+            className={`font-montserrat text-xs self-start sm:self-auto flex-shrink-0 ${school.nature === 'Pública' ? 'bg-badge-public border-badge-public text-muted-foreground' : ''}`}
           >
             <Building2 className="w-3 h-3 mr-1" />
             {school.nature}
@@ -48,18 +48,18 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
 
         {/* Main Opportunities */}
         <div className="mb-4">
-          <h4 className="font-poppins font-semibold text-sm text-foreground mb-2 flex items-center">
-            <GraduationCap className="w-4 h-4 mr-1 text-primary" />
+          <h4 className="font-poppins font-semibold text-xs sm:text-sm text-foreground mb-2 flex items-center">
+            <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-primary" />
             Principais Oportunidades
           </h4>
           <div className="flex flex-wrap gap-1">
             {school.periods.slice(0, 3).map((period) => (
-              <Badge key={period} variant="outline" className="text-xs font-montserrat">
+              <Badge key={period} variant="outline" className="text-[10px] sm:text-xs font-montserrat">
                 {period}
               </Badge>
             ))}
             {school.periods.length > 3 && (
-              <Badge variant="outline" className="text-xs font-montserrat">
+              <Badge variant="outline" className="text-[10px] sm:text-xs font-montserrat">
                 +{school.periods.length - 3} mais
               </Badge>
             )}
@@ -68,20 +68,20 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
 
         {/* Subjects */}
         <div className="mb-4">
-          <p className="text-sm text-muted-foreground font-montserrat mb-2">
+          <p className="text-xs sm:text-sm text-muted-foreground font-montserrat mb-2 break-words">
             <strong>Matérias:</strong> {school.subjects.slice(0, 4).join(', ')}
             {school.subjects.length > 4 && ` (+${school.subjects.length - 4} mais)`}
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <Button 
             onClick={handleViewDetails}
             variant="secondary"
-            className="flex-1 font-poppins font-semibold"
+            className="flex-1 font-poppins font-semibold text-xs sm:text-sm h-9 sm:h-10"
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
+            <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             Ver Detalhes
           </Button>
           
@@ -89,11 +89,10 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
             onClick={handleViewOnMap}
             variant="outline"
             size="default"
-            className="sm:w-auto"
+            className="sm:w-auto text-xs sm:text-sm h-9 sm:h-10"
           >
-            <Eye className="w-4 h-4 mr-2" />
-            <span className="sm:inline">Ver no Mapa</span>
-            <span className="sm:hidden">Mapa</span>
+            <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+            Ver no Mapa
           </Button>
         </div>
       </CardContent>

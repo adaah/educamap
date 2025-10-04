@@ -86,8 +86,11 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
 
         // 4. Adiciona marcadores para as escolas
         schools.forEach((school) => {
+            // Leaflet usa [latitude, longitude], então invertemos as coordenadas
+            const latLng: [number, number] = [school.coordinates[1], school.coordinates[0]];
+            
             // Cria um marcador com ícone customizado
-            const marker = L.marker(school.coordinates as [number, number], {
+            const marker = L.marker(latLng, {
                 icon: createCustomIcon(school)
             })
             .addTo(map.current!);
@@ -174,7 +177,9 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
 
     const handleSchoolSearch = (school: School) => {
         if (map.current) {
-            map.current.setView(school.coordinates as [number, number], 16);
+            // Leaflet usa [latitude, longitude]
+            const latLng: [number, number] = [school.coordinates[1], school.coordinates[0]];
+            map.current.setView(latLng, 16);
         }
         onSchoolSelect?.(school);
         setSelectedPopup(school);

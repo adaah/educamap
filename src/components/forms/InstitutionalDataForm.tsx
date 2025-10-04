@@ -619,16 +619,20 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
           />
         </div>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <button 
+          type="submit" 
+          className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
+          disabled={isSubmitting}
+        >
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
               Atualizando...
             </>
           ) : (
             'Atualizar Dados'
           )}
-        </Button>
+        </button>
       </form>
     </Form>
   );

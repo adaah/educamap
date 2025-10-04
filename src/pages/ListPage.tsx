@@ -78,8 +78,8 @@ const ListPage = () => {
     setSearchQuery('');
   };
 
-  const handleViewOnMap = (schoolId: string) => {
-    navigate(`/?school=${schoolId}`);
+  const handleViewOnMap = (school: any) => {
+    navigate(`/?school=${school.id}`, { state: { selectedSchool: school } });
   };
 
   return (

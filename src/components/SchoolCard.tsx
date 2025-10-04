@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface SchoolCardProps {
   school: School;
-  onViewOnMap: (schoolId: string) => void;
+  onViewOnMap: (school: School) => void;
 }
 
 const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
@@ -18,7 +18,7 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
   };
 
   const handleViewOnMap = () => {
-    onViewOnMap(school.id);
+    onViewOnMap(school);
     navigate('/');
   };
 
@@ -39,7 +39,11 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
           
           <Badge 
             variant="outline" 
-            className={`font-montserrat text-xs self-start sm:self-auto flex-shrink-0 ${school.nature === 'Pública' ? 'bg-badge-public border-badge-public text-muted-foreground' : ''}`}
+            className={`font-montserrat text-xs self-start sm:self-auto flex-shrink-0 ${
+              school.nature === 'Pública' 
+                ? 'bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-500/40 text-blue-700 dark:text-blue-300' 
+                : 'bg-gradient-to-br from-amber-500/20 to-amber-600/20 border-amber-500/40 text-amber-700 dark:text-amber-300'
+            }`}
           >
             <Building2 className="w-3 h-3 mr-1" />
             {school.nature}

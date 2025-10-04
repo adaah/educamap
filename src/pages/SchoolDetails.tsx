@@ -99,8 +99,8 @@ const SchoolDetails = () => {
               variant="outline" 
               className={`text-xs sm:text-sm self-start sm:self-auto ${
                 school.nature === 'Pública' 
-                  ? 'bg-badge-public border-badge-public text-foreground' 
-                  : 'bg-badge-private border-badge-private text-foreground'
+                  ? 'bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-500/40 text-blue-700 dark:text-blue-300' 
+                  : 'bg-gradient-to-br from-amber-500/20 to-amber-600/20 border-amber-500/40 text-amber-700 dark:text-amber-300'
               }`}
             >
               <Building2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />

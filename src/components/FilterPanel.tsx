@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { RotateCcw, Filter } from 'lucide-react';
-import { neighborhoods, subjects, periods, shifts, natures } from '@/data/schools';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FilterState {
   neighborhoods: string[];
@@ -22,6 +22,67 @@ interface FilterPanelProps {
 
 const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [availableFilters, setAvailableFilters] = useState({
+    neighborhoods: [] as string[],
+    periods: [] as string[],
+    subjects: [] as string[],
+    natures: ['Pública', 'Particular'],
+    shifts: [] as string[],
+  });
+
+  useEffect(() => {
+    const fetchAvailableFilters = async () => {
+      // Buscar bairros únicos
+      const { data: neighborhoodsData } = await supabase
+        .from('schools')
+        .select('neighborhood')
+        .order('neighborhood');
+      
+      const uniqueNeighborhoods = [...new Set(
+        neighborhoodsData?.map(s => s.neighborhood).filter(Boolean) || []
+      )].sort();
+
+      // Buscar períodos únicos
+      const { data: periodsData } = await supabase
+        .from('school_periods')
+        .select('period')
+        .order('period');
+      
+      const uniquePeriods = [...new Set(
+        periodsData?.map(p => p.period).filter(Boolean) || []
+      )].sort();
+
+      // Buscar disciplinas únicas
+      const { data: subjectsData } = await supabase
+        .from('school_subjects')
+        .select('subject')
+        .order('subject');
+      
+      const uniqueSubjects = [...new Set(
+        subjectsData?.map(s => s.subject).filter(Boolean) || []
+      )].sort();
+
+      // Buscar turnos únicos
+      const { data: shiftsData } = await supabase
+        .from('school_shifts')
+        .select('shift')
+        .order('shift');
+      
+      const uniqueShifts = [...new Set(
+        shiftsData?.map(s => s.shift).filter(Boolean) || []
+      )].sort();
+
+      setAvailableFilters({
+        neighborhoods: uniqueNeighborhoods,
+        periods: uniquePeriods,
+        subjects: uniqueSubjects,
+        natures: ['Pública', 'Particular'],
+        shifts: uniqueShifts,
+      });
+    };
+
+    fetchAvailableFilters();
+  }, []);
 
   const handleFilterChange = (category: keyof FilterState, value: string, checked: boolean) => {
     const currentValues = filters[category];
@@ -101,31 +162,31 @@ const FilterPanel = ({ filters, onFiltersChange, onClear }: FilterPanelProps) =>
         <CardContent className="overflow-y-auto flex-1 space-y-6 pb-6">
           <FilterGroup 
             title="Bairro" 
-            options={neighborhoods} 
+            options={availableFilters.neighborhoods} 
             category="neighborhoods" 
           />
           
           <FilterGroup 
             title="Período de Ensino" 
-            options={periods} 
+            options={availableFilters.periods} 
             category="periods" 
           />
           
           <FilterGroup 
             title="Matérias/Áreas" 
-            options={subjects} 
+            options={availableFilters.subjects} 
             category="subjects" 
           />
           
           <FilterGroup 
             title="Natureza" 
-            options={natures} 
+            options={availableFilters.natures} 
             category="natures" 
           />
           
           <FilterGroup 
             title="Turno" 
-            options={shifts} 
+            options={availableFilters.shifts} 
             category="shifts" 
           />
         </CardContent>

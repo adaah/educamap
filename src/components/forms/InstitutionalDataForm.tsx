@@ -41,7 +41,9 @@ const formSchema = z.object({
   
   shifts: z.array(z.string()).optional(),
   periods: z.array(z.string()).optional(),
+  customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
   subjects: z.array(z.string()).optional(),
+  customSubject: z.string().trim().max(100).optional().or(z.literal('')),
   
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
 });
@@ -53,7 +55,7 @@ interface InstitutionalDataFormProps {
 }
 
 const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
-const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio'];
+const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
 const availableSubjects = [
   'Matemática',
   'Português',
@@ -95,7 +97,9 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       website: '',
       shifts: [],
       periods: [],
+      customPeriod: '',
       subjects: [],
+      customSubject: '',
       additionalInfo: '',
     },
   });
@@ -167,7 +171,11 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       if (data.periods && data.periods.length > 0) {
         await supabase.from('school_periods').delete().eq('school_id', schoolId);
         
-        const periodsPromises = data.periods.map((period) =>
+        const allPeriods = [...data.periods];
+        if (data.customPeriod && data.periods.includes('Outros')) {
+          allPeriods.push(data.customPeriod);
+        }
+        const periodsPromises = allPeriods.map((period) =>
           supabase.from('school_periods').insert({
             school_id: schoolId,
             period,
@@ -180,7 +188,11 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       if (data.subjects && data.subjects.length > 0) {
         await supabase.from('school_subjects').delete().eq('school_id', schoolId);
         
-        const subjectsPromises = data.subjects.map((subject) =>
+        const allSubjects = [...data.subjects];
+        if (data.customSubject && data.subjects.includes('Outros')) {
+          allSubjects.push(data.customSubject);
+        }
+        const subjectsPromises = allSubjects.map((subject) =>
           supabase.from('school_subjects').insert({
             school_id: schoolId,
             subject,
@@ -443,10 +455,48 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
                       )}
                     />
                   ))}
+                  <FormField
+                    key="Outros"
+                    control={form.control}
+                    name="periods"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes('Outros')}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...(field.value || []), 'Outros'])
+                                : field.onChange(
+                                    field.value?.filter((value) => value !== 'Outros')
+                                  );
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">Outros</FormLabel>
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </FormItem>
             )}
           />
+          
+          {form.watch('periods')?.includes('Outros') && (
+            <FormField
+              control={form.control}
+              name="customPeriod"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Especifique o período</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Digite o período" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
 
         <div className="space-y-4">
@@ -481,10 +531,48 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
                       )}
                     />
                   ))}
+                  <FormField
+                    key="Outros"
+                    control={form.control}
+                    name="subjects"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes('Outros')}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...(field.value || []), 'Outros'])
+                                : field.onChange(
+                                    field.value?.filter((value) => value !== 'Outros')
+                                  );
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal text-sm">Outros</FormLabel>
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </FormItem>
             )}
           />
+          
+          {form.watch('subjects')?.includes('Outros') && (
+            <FormField
+              control={form.control}
+              name="customSubject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Especifique a disciplina/área</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Digite a disciplina ou área" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
 
         <div className="space-y-4">

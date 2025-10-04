@@ -22,8 +22,8 @@ const Header = () => {
           </div>
         </Link>
 
-        {/* Navigation Menu */}
-        <nav className="flex items-center space-x-1 ml-auto sm:ml-8">
+        {/* Navigation Menu - Hidden on mobile, shown on desktop */}
+        <nav className="hidden md:flex items-center space-x-1 ml-auto sm:ml-8">
           <Button
             variant={location.pathname === '/' ? 'default' : 'ghost'}
             asChild

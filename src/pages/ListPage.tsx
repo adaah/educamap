@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BottomNav from '@/components/BottomNav';
 import FilterPanel, { type FilterState } from '@/components/FilterPanel';
 import SchoolCard from '@/components/SchoolCard';
 import { useSchools } from '@/hooks/useSchools';
@@ -73,16 +74,16 @@ const ListPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-primary/5">
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-primary/5 pb-16 md:pb-0">
       <Header />
       
       <main className="flex-1 container py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="mb-6 sm:mb-8 text-center">
-          <div className="inline-block p-2 sm:p-3 bg-primary/10 rounded-full mb-3 sm:mb-4">
+          <div className="inline-block p-2 sm:p-3 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mb-3 sm:mb-4">
             <GraduationCap className="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
           </div>
-          <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-4 sm:mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">
+          <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-2 sm:mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">
             Encontre sua Escola de Estágio
           </h1>
           <p className="font-montserrat text-sm sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
@@ -169,6 +170,7 @@ const ListPage = () => {
       </main>
       
       <Footer />
+      <BottomNav />
     </div>
   );
 };

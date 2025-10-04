@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSchool } from '@/hooks/useSchools';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +29,7 @@ const SchoolDetails = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col pb-16 md:pb-0">
         <Header />
         <main className="flex-1 container py-8">
           <div className="text-center">
@@ -36,13 +37,14 @@ const SchoolDetails = () => {
           </div>
         </main>
         <Footer />
+        <BottomNav />
       </div>
     );
   }
 
   if (!school) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col pb-16 md:pb-0">
         <Header />
         <main className="flex-1 container py-8">
           <div className="text-center">
@@ -54,12 +56,13 @@ const SchoolDetails = () => {
           </div>
         </main>
         <Footer />
+        <BottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col pb-16 md:pb-0">
       <Header />
       
       <main className="flex-1 container py-4 sm:py-8 px-3 sm:px-6">
@@ -374,6 +377,7 @@ const SchoolDetails = () => {
       </main>
       
       <Footer />
+      <BottomNav />
     </div>
   );
 };

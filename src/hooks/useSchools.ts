@@ -37,6 +37,7 @@ export const useSchools = () => {
             website: school.website || undefined,
             nature: school.nature as 'Pública' | 'Particular',
             additionalInfo: school.additional_info || undefined,
+            contributor_name: school.contributor_name || undefined,
             periods: periods.data?.map(p => p.period) || [],
             subjects: subjects.data?.map(s => s.subject) || [],
             shift: shifts.data?.map(s => s.shift) || [],
@@ -47,6 +48,7 @@ export const useSchools = () => {
               linkedin: i.linkedin || undefined,
               whatsapp: i.whatsapp || undefined,
               instagram: i.instagram || undefined,
+              contributor_name: i.contributor_name || undefined,
             })) || [],
             formerStudents: formerStudents.data?.map(f => ({
               name: f.name,
@@ -56,6 +58,7 @@ export const useSchools = () => {
               linkedin: f.linkedin || undefined,
               instagram: f.instagram || undefined,
               whatsapp: f.whatsapp || undefined,
+              contributor_name: f.contributor_name || undefined,
             })) || [],
           };
         })
@@ -121,6 +124,8 @@ export const useSchool = (id: string) => {
         phone: school.phone || undefined,
         website: school.website || undefined,
         nature: school.nature as 'Pública' | 'Particular',
+        additionalInfo: school.additional_info || undefined,
+        contributor_name: school.contributor_name || undefined,
         periods: periods.data?.map(p => p.period) || [],
         subjects: subjects.data?.map(s => s.subject) || [],
         shift: shifts.data?.map(s => s.shift) || [],
@@ -131,6 +136,7 @@ export const useSchool = (id: string) => {
           linkedin: i.linkedin || undefined,
           whatsapp: i.whatsapp || undefined,
           instagram: i.instagram || undefined,
+          contributor_name: i.contributor_name || undefined,
         })) || [],
         formerStudents: formerStudents.data?.map(f => ({
           name: f.name,
@@ -140,6 +146,7 @@ export const useSchool = (id: string) => {
           linkedin: f.linkedin || undefined,
           instagram: f.instagram || undefined,
           whatsapp: f.whatsapp || undefined,
+          contributor_name: f.contributor_name || undefined,
         })) || [],
       } as School;
     },

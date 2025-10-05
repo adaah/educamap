@@ -48,6 +48,9 @@ const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
 const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
 
 const formSchema = z.object({
+  // Dados do contribuidor
+  contributorName: z.string().trim().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100),
+  
   // Dados do ex-estagiário
   studentName: z.string().trim().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100),
   university: z.string().trim().min(3, 'Universidade deve ter pelo menos 3 caracteres').max(100),
@@ -107,6 +110,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      contributorName: '',
       studentName: '',
       university: '',
       course: '',
@@ -155,6 +159,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             latitude: coordinates.lat,
             longitude: coordinates.lon,
             additional_info: data.additionalInfo || null,
+            contributor_name: data.contributorName,
           })
           .select()
           .single();
@@ -210,6 +215,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           linkedin: data.studentLinkedin || null,
           instagram: data.studentInstagram || null,
           whatsapp: data.studentWhatsapp || null,
+          contributor_name: data.contributorName,
         });
 
       if (studentError) throw studentError;
@@ -234,6 +240,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             linkedin: data.instructorLinkedin || null,
             whatsapp: data.instructorWhatsapp || null,
             instagram: data.instructorInstagram || null,
+            contributor_name: data.contributorName,
           });
 
         if (instructorError) throw instructorError;
@@ -270,9 +277,27 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Identificação do Contribuidor */}
+        <div className="space-y-4">
+          <h3 className="font-poppins font-semibold text-lg">Identificação</h3>
+          <FormField
+            control={form.control}
+            name="contributorName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Seu Nome *</FormLabel>
+                <FormControl>
+                  <Input placeholder="Como deseja ser identificado" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         {/* Dados do Ex-Estagiário */}
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Seus Dados</h3>
+          <h3 className="font-poppins font-semibold text-lg">Seus Dados como Ex-Estagiário</h3>
           
           <FormField
             control={form.control}

@@ -84,24 +84,29 @@ const SchoolDetails = () => {
 
         {/* Header */}
         <div className="mb-6 sm:mb-8 px-1">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
-            <div className="flex-1">
-              <h1 className="font-poppins font-bold text-xl sm:text-3xl text-foreground mb-2">
+          <div className="flex flex-col gap-3 mb-3 sm:mb-4">
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="font-poppins font-bold text-xl sm:text-3xl text-foreground">
                 {school.name}
               </h1>
-              <div className="flex items-start text-muted-foreground font-montserrat text-xs sm:text-sm">
-                <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2 mt-0.5 flex-shrink-0" />
-                <span className="break-words">{school.fullAddress}</span>
-              </div>
+              
+              <Badge 
+                variant={school.nature === 'Pública' ? 'default' : 'secondary'} 
+                className={`flex-shrink-0 px-3 py-1.5 text-xs sm:text-sm font-semibold shadow-md ${
+                  school.nature === 'Pública' 
+                    ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white border-0' 
+                    : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0'
+                }`}
+              >
+                <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                {school.nature}
+              </Badge>
             </div>
             
-            <Badge 
-              variant={school.nature === 'Pública' ? 'default' : 'secondary'} 
-              className={school.nature === 'Pública' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white border-0' : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0'}
-            >
-              <Building2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-              {school.nature}
-            </Badge>
+            <div className="flex items-start text-muted-foreground font-montserrat text-xs sm:text-sm">
+              <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2 mt-0.5 flex-shrink-0" />
+              <span className="break-words">{school.fullAddress}</span>
+            </div>
           </div>
         </div>
 
@@ -168,7 +173,7 @@ const SchoolDetails = () => {
               </CardContent>
             </Card>
 
-            {/* Additional Info */}
+            {/* Additional Info - Moved here after Contact */}
             {school.additionalInfo && (
               <Card className="shadow-card bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-primary/20">
                 <CardHeader>
@@ -180,12 +185,12 @@ const SchoolDetails = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="font-montserrat text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-line bg-white/50 p-3 rounded-lg">
+                  <div className="font-montserrat text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-line bg-white/50 p-3 sm:p-4 rounded-lg">
                     {school.additionalInfo}
                   </div>
-                  <div className="flex items-center text-xs text-muted-foreground italic border-t pt-2">
-                    <Users className="w-3 h-3 mr-1" />
-                    Compartilhado por: {school.contributor_name || 'Contribuidor'}
+                  <div className="flex items-center text-xs sm:text-sm text-muted-foreground italic border-t pt-3">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 flex-shrink-0" />
+                    <span className="break-words">Compartilhado por: {school.contributor_name || 'Contribuidor'}</span>
                   </div>
                 </CardContent>
               </Card>

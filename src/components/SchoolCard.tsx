@@ -18,8 +18,7 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
   };
 
   const handleViewOnMap = () => {
-    onViewOnMap(school);
-    navigate('/');
+    navigate('/', { state: { selectedSchool: school } });
   };
 
   return (

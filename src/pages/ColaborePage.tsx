@@ -130,7 +130,32 @@ const ColaborePage = () => {
           </div>
 
           {/* Additional Info */}
-          <div className="mt-12 sm:mt-16">
+          <div className="mt-12 sm:mt-16 space-y-6">
+            <Card className="p-6 sm:p-8 bg-gradient-to-br from-destructive/5 to-destructive/10 border-2 border-destructive/20">
+              <div className="text-center">
+                <div className="inline-block p-3 bg-destructive/10 rounded-full mb-4">
+                  <svg className="w-8 h-8 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="font-poppins font-bold text-xl sm:text-2xl text-foreground mb-3">
+                  Encontrou algum erro?
+                </h3>
+                <p className="font-montserrat text-base sm:text-lg text-muted-foreground mb-6">
+                  Nos ajude a manter as informações precisas. Solicite a correção ou remoção de dados incorretos.
+                </p>
+                <a 
+                  href="mailto:idealab.ic.ufba@gmail.com?subject=Solicitação de Correção/Remoção - EduMap Salvador" 
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-destructive to-destructive/80 text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  Solicitar Correção/Remoção
+                </a>
+              </div>
+            </Card>
+
             <Card className="p-6 sm:p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/10">
               <div className="text-center">
                 <h3 className="font-poppins font-bold text-xl sm:text-2xl text-foreground mb-3">

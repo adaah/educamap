@@ -96,12 +96,8 @@ const SchoolDetails = () => {
             </div>
             
             <Badge 
-              variant="outline" 
-              className={`text-xs sm:text-sm self-start sm:self-auto ${
-                school.nature === 'Pública' 
-                  ? 'bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-500/40 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gradient-to-br from-amber-500/20 to-amber-600/20 border-amber-500/40 text-amber-700 dark:text-amber-300'
-              }`}
+              variant={school.nature === 'Pública' ? 'default' : 'secondary'} 
+              className={school.nature === 'Pública' ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white border-0' : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0'}
             >
               <Building2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
               {school.nature}

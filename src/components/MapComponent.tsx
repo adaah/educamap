@@ -56,7 +56,7 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
 
         // 3. Criar ícones customizados para as escolas
         const createCustomIcon = (school: any) => {
-            const color = school.nature === 'Pública' ? '#FFC700' : '#ff9900'; // Yellow for public, orange for private
+            const color = school.nature === 'Pública' ? '#fbbf24' : '#f97316'; // Amber for public, Orange for private
             
             return L.divIcon({
                 className: 'custom-pin',
@@ -96,28 +96,44 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
             .addTo(map.current!);
 
             // Cria o HTML do popup (igual à sua estrutura de Card, mas em string)
+            const natureBadge = school.nature === 'Pública' 
+                ? '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: linear-gradient(to right, #fbbf24, #f59e0b); color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Pública</span>'
+                : '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: linear-gradient(to right, #f97316, #ea580c); color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Particular</span>';
+            
             const popupContent = `
-                <div class="p-2 font-montserrat" style="max-width: 250px;">
-                    <h3 class="font-poppins font-bold text-lg" style="color: #000;">${school.name}</h3>
-                    <p class="text-sm mb-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF8C00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> ${school.neighborhood}</p>
-                    <div class="space-y-1 mb-3">
-                        <div class="flex items-center text-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFC700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-2"><path d="M4 19.5a2.5 2.5 0 0 1 2.5-2.5h15"></path><path d="M21.5 7.5a2.5 2.5 0 0 0-2.5-2.5h-15"></path></svg>
-                            <span>${school.periods.length > 0 ? school.periods.slice(0, 2).join(', ') : 'Sem informações de períodos'}</span>
-                        </div>
-                        <div class="text-sm">
-                            <div class="font-semibold" style="color: #FF8C00;">Professores Instrutores:</div>
-                            <div class="text-xs max-h-12 overflow-y-auto pl-4">
-                                ${school.instructors.length > 0 ? school.instructors.map(i => `<div>${i.name} - ${i.subject}</div>`).join('') : '<div style="color: #888;">Sem informações de instrutores</div>'}
-                            </div>
-                        </div>
-                        <div class="text-xs" style="color: #888;">
-                            ${school.email ? `<div>Email: ${school.email}</div>` : '<div>Sem informações de contato</div>'}
-                            ${school.phone ? `<div>Tel: ${school.phone}</div>` : ''}
+                <div class="p-3 font-montserrat" style="max-width: 280px;">
+                    <h3 class="font-poppins font-bold text-lg mb-1" style="color: #000;">${school.name}</h3>
+                    ${natureBadge}
+                    <p class="text-sm mb-3 flex items-center" style="color: #666;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        ${school.neighborhood}
+                    </p>
+                    
+                    <div style="background: linear-gradient(to bottom, #fef3c7, #fed7aa); padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                        <div style="font-size: 0.75rem; font-weight: 600; color: #92400e; margin-bottom: 0.25rem;">📚 Períodos:</div>
+                        <div style="font-size: 0.75rem; color: #451a03;">
+                            ${school.periods.length > 0 ? school.periods.slice(0, 2).join(', ') + (school.periods.length > 2 ? '...' : '') : 'Sem informações'}
                         </div>
                     </div>
-                    <button id="details-btn-${school.id}" class="w-full px-3 py-2 rounded-lg font-poppins font-semibold" style="background: linear-gradient(to right, #FF8C00, #FFC700); color: #fff; border: none; cursor: pointer; transition: all 0.3s;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline mr-2"><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path><path d="M18 19H6c-1.1 0-2-.9-2 2V7c0-1.1.9-2 2-2h5"></path></svg>
+                    
+                    <div style="background: linear-gradient(to bottom, #dbeafe, #bfdbfe); padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                        <div style="font-size: 0.75rem; font-weight: 600; color: #1e3a8a; margin-bottom: 0.25rem;">👨‍🏫 Instrutores:</div>
+                        <div style="font-size: 0.75rem; color: #1e40af; max-height: 60px; overflow-y: auto;">
+                            ${school.instructors.length > 0 ? school.instructors.slice(0, 2).map(i => `<div>• ${i.name} (${i.subject})</div>`).join('') + (school.instructors.length > 2 ? '<div style="font-style: italic;">...e mais</div>' : '') : 'Sem informações'}
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 0.75rem; color: #666; margin-bottom: 0.75rem; padding: 0.5rem; background: #f9fafb; border-radius: 0.375rem;">
+                        <div style="margin-bottom: 0.25rem;">
+                            📧 ${school.email ? school.email : 'Sem informações de email'}
+                        </div>
+                        <div>
+                            📞 ${school.phone ? school.phone : 'Sem informações de telefone'}
+                        </div>
+                    </div>
+                    
+                    <button id="details-btn-${school.id}" style="width: 100%; padding: 0.625rem; border-radius: 0.5rem; font-family: Poppins, sans-serif; font-weight: 600; background: linear-gradient(to right, #f97316, #fbbf24); color: white; border: none; cursor: pointer; transition: all 0.3s; font-size: 0.875rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 0.375rem; vertical-align: middle;"><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path><path d="M18 19H6c-1.1 0-2-.9-2 2V7c0-1.1.9-2 2-2h5"></path></svg>
                         Ver Detalhes
                     </button>
                 </div>

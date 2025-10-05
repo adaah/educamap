@@ -121,9 +121,40 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      let schoolId = data.schoolId;
+      // Preparar dados dos instrutores
+      const instructorsData = instructors
+        .filter(i => i.name && i.subjects.length > 0)
+        .map(instructor => {
+          const finalSubjects = [...instructor.subjects];
+          const showCustom = instructor.subjects.includes('Outros');
+          if (showCustom && instructor.customSubject) {
+            const index = finalSubjects.indexOf('Outros');
+            if (index > -1) {
+              finalSubjects[index] = instructor.customSubject;
+            }
+          }
+          return {
+            name: instructor.name,
+            subjects: finalSubjects,
+            email: instructor.email || null,
+            linkedin: instructor.linkedin ? `https://linkedin.com/in/${instructor.linkedin}` : null,
+            whatsapp: instructor.whatsapp || null,
+            instagram: instructor.instagram ? `https://www.instagram.com/${instructor.instagram}` : null,
+          };
+        });
 
-      // Se for nova escola, criar primeiro
+      // Preparar períodos
+      const allPeriods = data.periods || [];
+      if (data.customPeriod && data.periods?.includes('Outros')) {
+        allPeriods.push(data.customPeriod);
+      }
+
+      // Preparar disciplinas
+      const allSubjects = data.subjects || [];
+      if (data.customSubject && data.subjects?.includes('Outros')) {
+        allSubjects.push(data.customSubject);
+      }
+
       if (isNewSchool && data.newSchoolName) {
         if (!coordinates) {
           toast({
@@ -135,8 +166,9 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
           return;
         }
 
-        const { data: newSchool, error: schoolError } = await supabase
-          .from('schools')
+        // Inserir nova escola na tabela pending
+        const { error: schoolError } = await supabase
+          .from('pending_schools')
           .insert({
             name: data.newSchoolName,
             full_address: data.newSchoolAddress || '',
@@ -149,29 +181,40 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             website: data.website || null,
             additional_info: data.additionalInfo || null,
             contributor_name: `${data.contributorName} - ${data.contributorPosition}`,
-          })
-          .select()
-          .single();
+            periods: allPeriods,
+            subjects: allSubjects,
+            shifts: data.shifts || [],
+            instructors: instructorsData,
+            consent_to_share_data: data.consentToShareData,
+          });
 
         if (schoolError) throw schoolError;
-        schoolId = newSchool.id;
-      } else if (schoolId) {
-        // Atualizar dados de contato da escola existente
-        const { error: updateError } = await supabase
-          .from('schools')
-          .update({
-            email: data.email || null,
-            phone: data.phone || null,
-            website: data.website || null,
-            additional_info: data.additionalInfo || null,
+
+        toast({
+          title: 'Sucesso!',
+          description: 'Dados enviados e aguardando aprovação. Obrigado pela contribuição!',
+        });
+      } else if (data.schoolId) {
+        // Enviar atualização de escola existente para instructor pending
+        for (const instructor of instructorsData) {
+          await supabase.from('pending_instructors').insert({
+            name: instructor.name,
+            subject: instructor.subjects.join(', '),
+            email: instructor.email,
+            linkedin: instructor.linkedin,
+            whatsapp: instructor.whatsapp,
+            instagram: instructor.instagram,
+            school_id: data.schoolId,
             contributor_name: `${data.contributorName} - ${data.contributorPosition}`,
-          })
-          .eq('id', schoolId);
+            consent_to_share_data: data.consentToShareData,
+          });
+        }
 
-        if (updateError) throw updateError;
-      }
-
-      if (!schoolId) {
+        toast({
+          title: 'Sucesso!',
+          description: 'Informações enviadas e aguardando aprovação. Obrigado pela contribuição!',
+        });
+      } else {
         toast({
           title: 'Erro',
           description: 'Selecione uma escola ou cadastre uma nova',
@@ -180,85 +223,6 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         return;
       }
 
-      // Atualizar turnos
-      if (data.shifts && data.shifts.length > 0) {
-        await supabase.from('school_shifts').delete().eq('school_id', schoolId);
-        
-        const shiftsPromises = data.shifts.map((shift) =>
-          supabase.from('school_shifts').insert({
-            school_id: schoolId,
-            shift,
-          })
-        );
-        await Promise.all(shiftsPromises);
-      }
-
-      // Atualizar períodos
-      if (data.periods && data.periods.length > 0) {
-        await supabase.from('school_periods').delete().eq('school_id', schoolId);
-        
-        const allPeriods = [...data.periods];
-        if (data.customPeriod && data.periods.includes('Outros')) {
-          allPeriods.push(data.customPeriod);
-        }
-        const periodsPromises = allPeriods.map((period) =>
-          supabase.from('school_periods').insert({
-            school_id: schoolId,
-            period,
-          })
-        );
-        await Promise.all(periodsPromises);
-      }
-
-      // Atualizar disciplinas
-      if (data.subjects && data.subjects.length > 0) {
-        await supabase.from('school_subjects').delete().eq('school_id', schoolId);
-        
-        const allSubjects = [...data.subjects];
-        if (data.customSubject && data.subjects.includes('Outros')) {
-          allSubjects.push(data.customSubject);
-        }
-        const subjectsPromises = allSubjects.map((subject) =>
-          supabase.from('school_subjects').insert({
-            school_id: schoolId,
-            subject,
-          })
-        );
-        await Promise.all(subjectsPromises);
-      }
-
-      // Inserir instrutores opcionais
-      for (const instructor of instructors) {
-        if (!instructor.name || instructor.subjects.length === 0) continue;
-
-        const finalSubjects = [...instructor.subjects];
-        const showCustom = instructor.subjects.includes('Outros');
-        if (showCustom && instructor.customSubject) {
-          const index = finalSubjects.indexOf('Outros');
-          if (index > -1) {
-            finalSubjects[index] = instructor.customSubject;
-          }
-        }
-
-        for (const subject of finalSubjects) {
-          await supabase.from('instructors').insert({
-            school_id: schoolId,
-            name: instructor.name,
-            subject: subject,
-            email: instructor.email || null,
-            linkedin: instructor.linkedin ? `https://linkedin.com/in/${instructor.linkedin}` : null,
-            whatsapp: instructor.whatsapp || null,
-            instagram: instructor.instagram ? `https://www.instagram.com/${instructor.instagram}` : null,
-            contributor_name: `${data.contributorName} - ${data.contributorPosition}`,
-          });
-        }
-      }
-
-      toast({
-        title: 'Sucesso!',
-        description: 'Dados institucionais atualizados com sucesso.',
-      });
-
       form.reset();
       setInstructors([]);
       onSuccess();
@@ -266,7 +230,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       console.error('Error submitting form:', error);
       toast({
         title: 'Erro',
-        description: 'Ocorreu um erro ao atualizar os dados. Tente novamente.',
+        description: 'Ocorreu um erro ao enviar os dados. Tente novamente.',
         variant: 'destructive',
       });
     } finally {

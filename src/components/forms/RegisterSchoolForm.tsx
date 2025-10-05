@@ -101,9 +101,43 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
 
     setIsSubmitting(true);
     try {
-      // Inserir escola
-      const { data: school, error: schoolError } = await supabase
-        .from('schools')
+      // Preparar dados de instrutores
+      const instructorsData = instructors
+        .filter(i => i.name && i.subjects.length > 0)
+        .map(instructor => {
+          const finalSubjects = [...instructor.subjects];
+          const showCustom = instructor.subjects.includes('Outros');
+          if (showCustom && instructor.customSubject) {
+            const index = finalSubjects.indexOf('Outros');
+            if (index > -1) {
+              finalSubjects[index] = instructor.customSubject;
+            }
+          }
+          return {
+            name: instructor.name,
+            subjects: finalSubjects,
+            email: instructor.email || null,
+            linkedin: instructor.linkedin ? `https://linkedin.com/in/${instructor.linkedin}` : null,
+            whatsapp: instructor.whatsapp || null,
+            instagram: instructor.instagram ? `https://www.instagram.com/${instructor.instagram}` : null,
+          };
+        });
+
+      // Preparar períodos
+      const allPeriods = [...data.periods];
+      if (data.customPeriod && data.periods.includes('Outros')) {
+        allPeriods.push(data.customPeriod);
+      }
+
+      // Preparar disciplinas
+      const allSubjects = [...data.subjects];
+      if (data.customSubject && data.subjects.includes('Outros')) {
+        allSubjects.push(data.customSubject);
+      }
+
+      // Inserir na tabela pending
+      const { error: schoolError } = await supabase
+        .from('pending_schools')
         .insert({
           name: data.name,
           full_address: data.fullAddress,
@@ -112,75 +146,18 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
           latitude: coordinates.lat,
           longitude: coordinates.lon,
           additional_info: data.additionalInfo || null,
-        })
-        .select()
-        .single();
+          periods: allPeriods,
+          subjects: allSubjects,
+          shifts: data.shifts,
+          instructors: instructorsData,
+          consent_to_share_data: data.consentToShareData,
+        });
 
       if (schoolError) throw schoolError;
 
-      // Inserir turnos
-      const shiftsPromises = data.shifts.map((shift) =>
-        supabase.from('school_shifts').insert({
-          school_id: school.id,
-          shift,
-        })
-      );
-
-      // Inserir períodos
-      const allPeriods = [...data.periods];
-      if (data.customPeriod && data.periods.includes('Outros')) {
-        allPeriods.push(data.customPeriod);
-      }
-      const periodsPromises = allPeriods.map((period) =>
-        supabase.from('school_periods').insert({
-          school_id: school.id,
-          period,
-        })
-      );
-
-      // Inserir disciplinas
-      const allSubjects = [...data.subjects];
-      if (data.customSubject && data.subjects.includes('Outros')) {
-        allSubjects.push(data.customSubject);
-      }
-      const subjectsPromises = allSubjects.map((subject) =>
-        supabase.from('school_subjects').insert({
-          school_id: school.id,
-          subject,
-        })
-      );
-
-      await Promise.all([...shiftsPromises, ...periodsPromises, ...subjectsPromises]);
-
-      // Inserir instrutores opcionais
-      for (const instructor of instructors) {
-        if (!instructor.name || instructor.subjects.length === 0) continue;
-
-        const finalSubjects = [...instructor.subjects];
-        const showCustom = instructor.subjects.includes('Outros');
-        if (showCustom && instructor.customSubject) {
-          const index = finalSubjects.indexOf('Outros');
-          if (index > -1) {
-            finalSubjects[index] = instructor.customSubject;
-          }
-        }
-
-        for (const subject of finalSubjects) {
-          await supabase.from('instructors').insert({
-            school_id: school.id,
-            name: instructor.name,
-            subject: subject,
-            email: instructor.email || null,
-            linkedin: instructor.linkedin ? `https://linkedin.com/in/${instructor.linkedin}` : null,
-            whatsapp: instructor.whatsapp || null,
-            instagram: instructor.instagram ? `https://www.instagram.com/${instructor.instagram}` : null,
-          });
-        }
-      }
-
       toast({
         title: 'Sucesso!',
-        description: 'Escola cadastrada com sucesso. Em breve será adicionada ao mapa.',
+        description: 'Escola enviada e aguardando aprovação. Em breve será adicionada ao mapa. Obrigado pela contribuição!',
       });
 
       form.reset();

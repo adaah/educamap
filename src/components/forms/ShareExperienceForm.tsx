@@ -156,79 +156,10 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
 
     setIsSubmitting(true);
     try {
-      let schoolId = data.schoolId;
-
-      // Se for nova escola, criar primeiro
-      if (isNewSchool && data.newSchoolName) {
-        if (!coordinates) {
-          toast({
-            title: 'Validação necessária',
-            description: 'Por favor, valide o endereço da nova escola.',
-            variant: 'destructive',
-          });
-          setIsSubmitting(false);
-          return;
-        }
-
-        const { data: newSchool, error: schoolError } = await supabase
-          .from('schools')
-          .insert({
-            name: data.newSchoolName,
-            full_address: data.newSchoolAddress || '',
-            neighborhood: data.newSchoolNeighborhood || '',
-            nature: data.newSchoolNature || 'Pública',
-            latitude: coordinates.lat,
-            longitude: coordinates.lon,
-            additional_info: data.additionalInfo || null,
-            contributor_name: data.studentName,
-          })
-          .select()
-          .single();
-
-        if (schoolError) throw schoolError;
-        schoolId = newSchool.id;
-
-        // Inserir turnos da nova escola
-        if (data.newSchoolShifts && data.newSchoolShifts.length > 0) {
-          const shiftsPromises = data.newSchoolShifts.map((shift) =>
-            supabase.from('school_shifts').insert({
-              school_id: schoolId,
-              shift,
-            })
-          );
-          await Promise.all(shiftsPromises);
-        }
-
-        // Inserir períodos da nova escola
-        if (data.newSchoolPeriods && data.newSchoolPeriods.length > 0) {
-          const allPeriods = [...data.newSchoolPeriods];
-          if (data.customPeriod && data.newSchoolPeriods.includes('Outros')) {
-            allPeriods.push(data.customPeriod);
-          }
-          const periodsPromises = allPeriods.map((period) =>
-            supabase.from('school_periods').insert({
-              school_id: schoolId,
-              period,
-            })
-          );
-          await Promise.all(periodsPromises);
-        }
-      }
-
-      if (!schoolId) {
-        toast({
-          title: 'Erro',
-          description: 'Selecione uma escola ou cadastre uma nova',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // Inserir dados do ex-estagiário
+      // Inserir ex-estagiário na tabela pending
       const { error: studentError } = await supabase
-        .from('former_students')
+        .from('pending_former_students')
         .insert({
-          school_id: schoolId,
           name: data.studentName,
           university: data.university,
           course: data.course,
@@ -237,53 +168,14 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           instagram: data.studentInstagram ? `https://www.instagram.com/${data.studentInstagram}` : null,
           whatsapp: data.studentWhatsapp || null,
           contributor_name: data.studentName,
+          consent_to_share_data: data.consentToShareData,
         });
 
       if (studentError) throw studentError;
 
-      // Inserir dados dos instrutores
-      for (const instructor of instructors) {
-        if (!instructor.name || instructor.subjects.length === 0) continue;
-
-        const finalSubjects = [...instructor.subjects];
-        const showCustom = instructor.subjects.includes('Outros');
-        if (showCustom && instructor.customSubject) {
-          const index = finalSubjects.indexOf('Outros');
-          if (index > -1) {
-            finalSubjects[index] = instructor.customSubject;
-          }
-        }
-
-        for (const subject of finalSubjects) {
-          const { error: instructorError } = await supabase
-            .from('instructors')
-            .insert({
-              school_id: schoolId,
-              name: instructor.name,
-              subject: subject,
-              email: instructor.email || null,
-              linkedin: instructor.linkedin ? `https://linkedin.com/in/${instructor.linkedin}` : null,
-              whatsapp: instructor.whatsapp || null,
-              instagram: instructor.instagram ? `https://www.instagram.com/${instructor.instagram}` : null,
-              contributor_name: data.studentName,
-            });
-
-          if (instructorError) throw instructorError;
-
-          const { error: subjectError } = await supabase
-            .from('school_subjects')
-            .insert({
-              school_id: schoolId,
-              subject: subject,
-            });
-
-          if (subjectError && subjectError.code !== '23505') throw subjectError;
-        }
-      }
-
       toast({
         title: 'Sucesso!',
-        description: 'Sua experiência foi compartilhada com sucesso.',
+        description: 'Sua experiência foi enviada e está aguardando aprovação. Obrigado pela contribuição!',
       });
 
       form.reset();

@@ -111,6 +111,183 @@ export type Database = {
           },
         ]
       }
+      pending_former_students: {
+        Row: {
+          consent_to_share_data: boolean | null
+          contributor_name: string | null
+          course: string
+          email: string | null
+          id: string
+          instagram: string | null
+          linkedin: string | null
+          name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          submitted_at: string | null
+          university: string
+          whatsapp: string | null
+        }
+        Insert: {
+          consent_to_share_data?: boolean | null
+          contributor_name?: string | null
+          course: string
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          university: string
+          whatsapp?: string | null
+        }
+        Update: {
+          consent_to_share_data?: boolean | null
+          contributor_name?: string | null
+          course?: string
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          university?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      pending_instructors: {
+        Row: {
+          consent_to_share_data: boolean | null
+          contributor_name: string | null
+          email: string | null
+          id: string
+          instagram: string | null
+          linkedin: string | null
+          name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          school_id: string | null
+          school_name: string | null
+          status: string | null
+          subject: string
+          submitted_at: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          consent_to_share_data?: boolean | null
+          contributor_name?: string | null
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_id?: string | null
+          school_name?: string | null
+          status?: string | null
+          subject: string
+          submitted_at?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          consent_to_share_data?: boolean | null
+          contributor_name?: string | null
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          linkedin?: string | null
+          name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_id?: string | null
+          school_name?: string | null
+          status?: string | null
+          subject?: string
+          submitted_at?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      pending_schools: {
+        Row: {
+          additional_info: string | null
+          consent_to_share_data: boolean | null
+          contributor_name: string | null
+          email: string | null
+          full_address: string
+          id: string
+          instructors: Json | null
+          latitude: number
+          longitude: number
+          name: string
+          nature: string
+          neighborhood: string
+          periods: string[] | null
+          phone: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          shifts: string[] | null
+          status: string | null
+          subjects: string[] | null
+          submitted_at: string | null
+          website: string | null
+        }
+        Insert: {
+          additional_info?: string | null
+          consent_to_share_data?: boolean | null
+          contributor_name?: string | null
+          email?: string | null
+          full_address: string
+          id?: string
+          instructors?: Json | null
+          latitude: number
+          longitude: number
+          name: string
+          nature: string
+          neighborhood: string
+          periods?: string[] | null
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          shifts?: string[] | null
+          status?: string | null
+          subjects?: string[] | null
+          submitted_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          additional_info?: string | null
+          consent_to_share_data?: boolean | null
+          contributor_name?: string | null
+          email?: string | null
+          full_address?: string
+          id?: string
+          instructors?: Json | null
+          latitude?: number
+          longitude?: number
+          name?: string
+          nature?: string
+          neighborhood?: string
+          periods?: string[] | null
+          phone?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          shifts?: string[] | null
+          status?: string | null
+          subjects?: string[] | null
+          submitted_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       school_periods: {
         Row: {
           id: string
@@ -240,15 +417,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -375,6 +579,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

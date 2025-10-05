@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Map, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const Header = () => {
   const location = useLocation();
@@ -56,6 +57,13 @@ const Header = () => {
             </Link>
           </Button>
         </nav>
+
+        {/* Beta Badge */}
+        <div className="ml-auto md:ml-4">
+          <Badge variant="secondary" className="bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 font-poppins font-semibold">
+            BETA
+          </Badge>
+        </div>
       </div>
     </header>
   );

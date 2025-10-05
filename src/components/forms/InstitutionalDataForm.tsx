@@ -30,6 +30,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
+  // Dados do contribuidor (Gestor/Secretaria)
+  contributorName: z.string().trim().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100),
+  contributorPosition: z.string().trim().min(3, 'Cargo deve ter pelo menos 3 caracteres').max(100),
+  
   schoolId: z.string().optional(),
   newSchoolName: z.string().trim().max(200).optional(),
   newSchoolAddress: z.string().trim().max(500).optional(),
@@ -94,6 +98,8 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      contributorName: '',
+      contributorPosition: '',
       email: '',
       phone: '',
       website: '',
@@ -136,6 +142,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             phone: data.phone || null,
             website: data.website || null,
             additional_info: data.additionalInfo || null,
+            contributor_name: `${data.contributorName} - ${data.contributorPosition}`,
           })
           .select()
           .single();
@@ -151,6 +158,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             phone: data.phone || null,
             website: data.website || null,
             additional_info: data.additionalInfo || null,
+            contributor_name: `${data.contributorName} - ${data.contributorPosition}`,
           })
           .eq('id', schoolId);
 
@@ -235,6 +243,41 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Identificação do Gestor/Secretaria */}
+        <div className="space-y-4">
+          <h3 className="font-poppins font-semibold text-lg">Seus Dados</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="contributorName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Seu nome" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="contributorPosition"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cargo *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: Diretor, Coordenador" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Identificação da Escola</h3>
           

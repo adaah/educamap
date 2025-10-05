@@ -39,6 +39,7 @@ const formSchema = z.object({
   subjects: z.array(z.string()).min(1, 'Selecione pelo menos uma disciplina'),
   customSubject: z.string().trim().max(100).optional().or(z.literal('')),
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
+  consentToShareData: z.boolean().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -84,6 +85,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
       subjects: [],
       customSubject: '',
       additionalInfo: '',
+      consentToShareData: false,
     },
   });
 
@@ -511,7 +513,36 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
           )}
         </div>
 
-        <button 
+        {/* Consentimento (se forneceram dados de contato de professores) */}
+        {instructors.some(i => i.email || i.linkedin || i.whatsapp || i.instagram) && (
+          <div className="space-y-4 bg-muted/50 p-4 rounded-lg border border-border">
+            <FormField
+              control={form.control}
+              name="consentToShareData"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="text-sm font-medium">
+                      Concordo em compartilhar os dados de contato dos professores publicamente
+                    </FormLabel>
+                    <p className="text-xs text-muted-foreground">
+                      Os dados de contato dos professores fornecidos ficarão públicos no mapa e poderão ser visualizados por qualquer pessoa. Você pode solicitar a remoção desses dados a qualquer momento entrando em contato conosco.
+                    </p>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
+        <button
           type="submit" 
           className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
           disabled={isSubmitting}

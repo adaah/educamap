@@ -80,6 +80,11 @@ const formSchema = z.object({
   
   // Informações adicionais
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
+  
+  // Consentimento
+  consentToShareData: z.boolean().refine((val) => val === true, {
+    message: 'Você deve concordar em compartilhar seus dados publicamente',
+  }),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -118,6 +123,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       studentInstagram: '',
       studentWhatsapp: '',
       additionalInfo: '',
+      consentToShareData: false,
     },
   });
 
@@ -694,6 +700,33 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           )}
         </div>
 
+        {/* Consentimento */}
+        <div className="space-y-4 bg-muted/50 p-4 rounded-lg border border-border">
+          <FormField
+            control={form.control}
+            name="consentToShareData"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="text-sm font-medium">
+                    Concordo em compartilhar meus dados de contato publicamente *
+                  </FormLabel>
+                  <p className="text-xs text-muted-foreground">
+                    Seus dados de contato (email, WhatsApp, LinkedIn, Instagram) ficarão públicos no mapa e poderão ser visualizados por qualquer pessoa. Você pode solicitar a remoção desses dados a qualquer momento entrando em contato conosco.
+                  </p>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+        </div>
+
         {/* Informações Adicionais */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Informações Adicionais (Opcional)</h3>
@@ -716,7 +749,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           />
         </div>
 
-        <button 
+        <button
           type="submit" 
           className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
           disabled={isSubmitting}

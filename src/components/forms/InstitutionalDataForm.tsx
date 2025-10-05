@@ -52,6 +52,9 @@ const formSchema = z.object({
   customSubject: z.string().trim().max(100).optional().or(z.literal('')),
   
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
+  
+  // Consentimento (opcional para gestores, mas necessário se preencherem dados de contato)
+  consentToShareData: z.boolean().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -111,6 +114,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       subjects: [],
       customSubject: '',
       additionalInfo: '',
+      consentToShareData: false,
     },
   });
 
@@ -710,6 +714,35 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
           )}
         </div>
 
+        {/* Consentimento (se forneceram dados de contato) */}
+        {(form.watch('email') || form.watch('phone') || instructors.some(i => i.email || i.linkedin || i.whatsapp || i.instagram)) && (
+          <div className="space-y-4 bg-muted/50 p-4 rounded-lg border border-border">
+            <FormField
+              control={form.control}
+              name="consentToShareData"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="text-sm font-medium">
+                      Concordo em compartilhar os dados de contato fornecidos publicamente
+                    </FormLabel>
+                    <p className="text-xs text-muted-foreground">
+                      Os dados de contato fornecidos (email, telefone, dados dos professores) ficarão públicos no mapa e poderão ser visualizados por qualquer pessoa. Você pode solicitar a remoção desses dados a qualquer momento entrando em contato conosco.
+                    </p>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Informações Adicionais</h3>
           <FormField
@@ -734,7 +767,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
           />
         </div>
 
-        <button 
+        <button
           type="submit" 
           className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
           disabled={isSubmitting}

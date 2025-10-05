@@ -1,13 +1,20 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Map, List, UserPlus } from 'lucide-react';
+import { Map, List, UserPlus, User, LogIn } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const BottomNav = () => {
   const location = useLocation();
+  const { user } = useAuth();
 
   const navItems = [
     { path: '/', icon: Map, label: 'Mapa' },
     { path: '/lista', icon: List, label: 'Lista' },
     { path: '/colabore', icon: UserPlus, label: 'Colabore' },
+    { 
+      path: user ? '/minha-conta' : '/auth', 
+      icon: user ? User : LogIn, 
+      label: user ? 'Conta' : 'Login' 
+    },
   ];
 
   return (

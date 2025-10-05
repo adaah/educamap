@@ -50,6 +50,7 @@ export const useSchools = () => {
               whatsapp: i.whatsapp || undefined,
               instagram: i.instagram || undefined,
               contributorName: i.contributor_name || undefined,
+              userId: i.user_id || undefined,
             })) || [],
             formerStudents: formerStudents.data?.map(f => ({
               id: f.id,
@@ -61,6 +62,7 @@ export const useSchools = () => {
               instagram: f.instagram || undefined,
               whatsapp: f.whatsapp || undefined,
               contributorName: f.contributor_name || undefined,
+              userId: f.user_id || undefined,
             })) || [],
           };
         })
@@ -140,6 +142,7 @@ export const useSchool = (id: string) => {
           whatsapp: i.whatsapp || undefined,
           instagram: i.instagram || undefined,
           contributorName: i.contributor_name || undefined,
+          userId: i.user_id || undefined,
         })) || [],
         formerStudents: formerStudents.data?.map(f => ({
           id: f.id,
@@ -151,6 +154,7 @@ export const useSchool = (id: string) => {
           instagram: f.instagram || undefined,
           whatsapp: f.whatsapp || undefined,
           contributorName: f.contributor_name || undefined,
+          userId: f.user_id || undefined,
         })) || [],
       } as School;
     },

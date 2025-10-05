@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_requests: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          id: string
+          message: string | null
+          owner_user_id: string | null
+          requester_email: string
+          requester_name: string | null
+          requester_user_id: string
+          responded_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_name: string
+          entity_type: string
+          id?: string
+          message?: string | null
+          owner_user_id?: string | null
+          requester_email: string
+          requester_name?: string | null
+          requester_user_id: string
+          responded_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_name?: string
+          entity_type?: string
+          id?: string
+          message?: string | null
+          owner_user_id?: string | null
+          requester_email?: string
+          requester_name?: string | null
+          requester_user_id?: string
+          responded_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       contact_view_logs: {
         Row: {
           contact_fields_viewed: string[]
@@ -65,6 +110,7 @@ export type Database = {
           name: string
           school_id: string
           university: string
+          user_id: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -78,6 +124,7 @@ export type Database = {
           name: string
           school_id: string
           university: string
+          user_id?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -91,6 +138,7 @@ export type Database = {
           name?: string
           school_id?: string
           university?: string
+          user_id?: string | null
           whatsapp?: string | null
         }
         Relationships: [
@@ -114,6 +162,7 @@ export type Database = {
           name: string
           school_id: string
           subject: string
+          user_id: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -126,6 +175,7 @@ export type Database = {
           name: string
           school_id: string
           subject: string
+          user_id?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -138,6 +188,7 @@ export type Database = {
           name?: string
           school_id?: string
           subject?: string
+          user_id?: string | null
           whatsapp?: string | null
         }
         Relationships: [

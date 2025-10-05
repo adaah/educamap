@@ -2,9 +2,13 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Lock, Mail, Phone, Linkedin, Instagram } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Lock, Mail, Phone, Linkedin, Instagram, Send, Check, X, Clock } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface ContactData {
   email?: string | null;
@@ -19,6 +23,7 @@ interface ProtectedContactInfoProps {
   entityName: string;
   contactData: ContactData;
   contributorName?: string | null;
+  ownerUserId?: string | null;
 }
 
 export const ProtectedContactInfo = ({
@@ -27,21 +32,68 @@ export const ProtectedContactInfo = ({
   entityName,
   contactData,
   contributorName,
+  ownerUserId,
 }: ProtectedContactInfoProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [hasViewed, setHasViewed] = useState(false);
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [requestMessage, setRequestMessage] = useState("");
+  const [requesterName, setRequesterName] = useState("");
 
   const hasAnyContact = contactData.email || contactData.whatsapp || contactData.linkedin || contactData.instagram;
 
-  useEffect(() => {
-    // Log contact view when user is authenticated and contacts are available
-    if (user && hasAnyContact && !hasViewed) {
-      logContactView();
-      setHasViewed(true);
+  // Check if user already has an approved request or is the owner
+  const { data: existingRequest } = useQuery({
+    queryKey: ["contact-request", entityId, user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase
+        .from("contact_requests")
+        .select("*")
+        .eq("entity_id", entityId)
+        .eq("requester_user_id", user.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const isOwner = user && ownerUserId && user.id === ownerUserId;
+  const hasApprovedAccess = existingRequest?.status === "approved" || isOwner;
+
+  const handleRequestAccess = async () => {
+    if (!user || !requesterName.trim()) {
+      toast.error("Por favor, preencha seu nome");
+      return;
     }
-  }, [user, hasAnyContact]);
+
+    try {
+      const { error } = await supabase.from("contact_requests").insert({
+        requester_user_id: user.id,
+        requester_email: user.email || "",
+        requester_name: requesterName,
+        owner_user_id: ownerUserId,
+        entity_type: entityType,
+        entity_id: entityId,
+        entity_name: entityName,
+        message: requestMessage || null,
+      });
+
+      if (error) throw error;
+
+      toast.success("Solicitação enviada com sucesso!");
+      setShowRequestForm(false);
+      setRequestMessage("");
+      setRequesterName("");
+    } catch (error: any) {
+      if (error.code === "23505") {
+        toast.error("Você já enviou uma solicitação para este contato");
+      } else {
+        toast.error("Erro ao enviar solicitação: " + error.message);
+      }
+    }
+  };
 
   const logContactView = async () => {
     if (!user) return;
@@ -66,6 +118,12 @@ export const ProtectedContactInfo = ({
     }
   };
 
+  useEffect(() => {
+    if (hasApprovedAccess && hasAnyContact) {
+      logContactView();
+    }
+  }, [hasApprovedAccess, hasAnyContact]);
+
   if (!hasAnyContact) {
     return null;
   }
@@ -78,7 +136,7 @@ export const ProtectedContactInfo = ({
           <div>
             <h3 className="font-semibold text-lg mb-2">Dados de Contato Protegidos</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Para visualizar informações de contato, você precisa fazer login ou criar uma conta.
+              Para solicitar acesso às informações de contato, você precisa fazer login ou criar uma conta.
             </p>
           </div>
           <Button
@@ -92,11 +150,94 @@ export const ProtectedContactInfo = ({
     );
   }
 
+  // User is logged in but doesn't have access yet
+  if (!hasApprovedAccess) {
+    const requestStatus = existingRequest?.status;
+
+    return (
+      <Card className="p-6 space-y-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Lock className="h-5 w-5 text-muted-foreground" />
+          <h3 className="font-semibold text-lg">Informações de Contato Protegidas</h3>
+        </div>
+
+        {requestStatus === "pending" && (
+          <div className="flex items-center gap-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900 rounded-lg">
+            <Clock className="h-5 w-5 text-yellow-600" />
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              Sua solicitação está pendente. Aguarde a aprovação do proprietário dos dados.
+            </p>
+          </div>
+        )}
+
+        {requestStatus === "denied" && (
+          <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg">
+            <X className="h-5 w-5 text-red-600" />
+            <p className="text-sm text-red-800 dark:text-red-200">
+              Sua solicitação foi negada.
+            </p>
+          </div>
+        )}
+
+        {(!requestStatus || requestStatus === "denied") && !showRequestForm && (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Para visualizar os dados de contato de <strong>{entityName}</strong>, você precisa solicitar acesso.
+            </p>
+            <Button onClick={() => setShowRequestForm(true)} className="w-full">
+              <Send className="mr-2 h-4 w-4" />
+              Solicitar Acesso
+            </Button>
+          </div>
+        )}
+
+        {showRequestForm && (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Seu Nome</label>
+              <Input
+                placeholder="Como você gostaria de ser identificado"
+                value={requesterName}
+                onChange={(e) => setRequesterName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Mensagem (opcional)</label>
+              <Textarea
+                placeholder="Explique por que você gostaria de acessar essas informações..."
+                value={requestMessage}
+                onChange={(e) => setRequestMessage(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleRequestAccess} className="flex-1">
+                <Send className="mr-2 h-4 w-4" />
+                Enviar Solicitação
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowRequestForm(false);
+                  setRequestMessage("");
+                  setRequesterName("");
+                }}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        )}
+      </Card>
+    );
+  }
+
+  // User has approved access - show contact info
   return (
     <Card className="p-6 space-y-4">
       <div className="flex items-center gap-2 mb-4">
+        <Check className="h-5 w-5 text-green-600" />
         <h3 className="font-semibold text-lg">Informações de Contato</h3>
-        <Lock className="h-4 w-4 text-green-600" />
       </div>
 
       {contributorName && (
@@ -162,7 +303,7 @@ export const ProtectedContactInfo = ({
       </div>
 
       <p className="text-xs text-muted-foreground mt-4">
-        ℹ️ Sua visualização destes dados foi registrada para fins de auditoria
+        ℹ️ Acesso autorizado • Sua visualização foi registrada
       </p>
     </Card>
   );

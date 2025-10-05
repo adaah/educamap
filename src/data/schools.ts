@@ -22,6 +22,7 @@ export interface School {
     whatsapp?: string;
     instagram?: string;
     contributorName?: string;
+    userId?: string;
   }[];
   formerStudents: {
     id: string;
@@ -33,6 +34,7 @@ export interface School {
     instagram?: string;
     whatsapp?: string;
     contributorName?: string;
+    userId?: string;
   }[];
 }
 

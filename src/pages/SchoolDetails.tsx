@@ -273,6 +273,7 @@ const SchoolDetails = () => {
                           instagram: instructor.instagram,
                         }}
                         contributorName={instructor.contributorName}
+                        ownerUserId={instructor.userId}
                       />
                     </div>
                   ))}
@@ -333,6 +334,7 @@ const SchoolDetails = () => {
                           instagram: student.instagram,
                         }}
                         contributorName={student.contributorName}
+                        ownerUserId={student.userId}
                       />
                     </div>
                   ))}

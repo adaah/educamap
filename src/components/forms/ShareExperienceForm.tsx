@@ -217,8 +217,8 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           university: data.university,
           course: data.course,
           email: data.studentEmail || null,
-          linkedin: data.studentLinkedin || null,
-          instagram: data.studentInstagram || null,
+          linkedin: data.studentLinkedin ? `https://linkedin.com/in/${data.studentLinkedin}` : null,
+          instagram: data.studentInstagram ? `https://www.instagram.com/${data.studentInstagram}` : null,
           whatsapp: data.studentWhatsapp || null,
           contributor_name: data.studentName,
         });
@@ -246,9 +246,9 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
               name: instructor.name,
               subject: subject,
               email: instructor.email || null,
-              linkedin: instructor.linkedin || null,
+              linkedin: instructor.linkedin ? `https://linkedin.com/in/${instructor.linkedin}` : null,
               whatsapp: instructor.whatsapp || null,
-              instagram: instructor.instagram || null,
+              instagram: instructor.instagram ? `https://www.instagram.com/${instructor.instagram}` : null,
               contributor_name: data.studentName,
             });
 
@@ -374,7 +374,18 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 <FormItem>
                   <FormLabel>LinkedIn (opcional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="linkedin.com/in/..." {...field} />
+                    <div className="flex items-center">
+                      <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">linkedin.com/in/</span>
+                      <Input 
+                        placeholder="seu-perfil" 
+                        {...field}
+                        onChange={(e) => {
+                          let value = e.target.value;
+                          value = value.replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//i, '');
+                          field.onChange(value);
+                        }}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -388,7 +399,19 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 <FormItem>
                   <FormLabel>Instagram (opcional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="@usuario" {...field} />
+                    <div className="flex items-center">
+                      <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">instagram.com/</span>
+                      <Input 
+                        placeholder="usuario" 
+                        {...field}
+                        onChange={(e) => {
+                          let value = e.target.value;
+                          value = value.replace(/^@/, '');
+                          value = value.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '');
+                          field.onChange(value);
+                        }}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -637,16 +660,24 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
 
         {/* Instrutores */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-poppins font-semibold text-lg">Professores Instrutores (Opcional)</h3>
-            <Button type="button" variant="outline" size="sm" onClick={addInstructor}>
-              <Plus className="w-4 h-4 mr-1" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                Recomende um ou mais professores instrutores que você teve durante o estágio
+              </p>
+            </div>
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={addInstructor}
+              className="w-full sm:w-auto text-xs sm:text-sm"
+            >
+              <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
               Adicionar Instrutor
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Recomende um ou mais professores instrutores que você teve durante o estágio
-          </p>
 
           <InstructorFields
             instructors={instructors}

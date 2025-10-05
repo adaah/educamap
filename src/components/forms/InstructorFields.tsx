@@ -32,12 +32,12 @@ export const InstructorFields = ({
 }: InstructorFieldsProps) => {
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="font-poppins font-semibold text-lg">Professores Instrutores</h3>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores</h3>
         <button
           type="button"
           onClick={onAdd}
-          className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-sm rounded-lg hover:shadow-lg transition-all"
+          className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all"
         >
           + Adicionar Instrutor
         </button>
@@ -179,7 +179,19 @@ export const InstructorFields = ({
                   <FormItem>
                     <FormLabel>LinkedIn</FormLabel>
                     <FormControl>
-                      <Input placeholder="linkedin.com/in/..." {...field} />
+                      <div className="flex items-center">
+                        <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">linkedin.com/in/</span>
+                        <Input 
+                          placeholder="seu-perfil" 
+                          {...field}
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            // Remove o prefixo se o usuário colar o link completo
+                            value = value.replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//i, '');
+                            field.onChange(value);
+                          }}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -193,7 +205,21 @@ export const InstructorFields = ({
                   <FormItem>
                     <FormLabel>Instagram</FormLabel>
                     <FormControl>
-                      <Input placeholder="@usuario" {...field} />
+                      <div className="flex items-center">
+                        <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">instagram.com/</span>
+                        <Input 
+                          placeholder="usuario" 
+                          {...field}
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            // Remove @ se o usuário digitar
+                            value = value.replace(/^@/, '');
+                            // Remove o prefixo se o usuário colar o link completo
+                            value = value.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '');
+                            field.onChange(value);
+                          }}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

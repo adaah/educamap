@@ -81,10 +81,8 @@ const formSchema = z.object({
   // Informações adicionais
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
   
-  // Consentimento
-  consentToShareData: z.boolean().refine((val) => val === true, {
-    message: 'Você deve concordar em compartilhar seus dados publicamente',
-  }),
+  // Consentimento - removido pois não é mais necessário
+  consentToShareData: z.boolean().optional().default(true),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -592,31 +590,21 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           )}
         </div>
 
-        {/* Consentimento */}
-        <div className="space-y-4 bg-muted/50 p-4 rounded-lg border border-border">
-          <FormField
-            control={form.control}
-            name="consentToShareData"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="text-sm font-medium">
-                    Concordo em compartilhar meus dados de contato publicamente *
-                  </FormLabel>
-                  <p className="text-xs text-muted-foreground">
-                    Seus dados de contato (email, WhatsApp, LinkedIn, Instagram) ficarão públicos no mapa e poderão ser visualizados por qualquer pessoa. Você pode solicitar a remoção desses dados a qualquer momento entrando em contato conosco.
-                  </p>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
+        {/* Aviso sobre dados pessoais */}
+        <div className="space-y-4 bg-primary/5 p-4 rounded-lg border border-primary/20">
+          <div className="flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span className="text-xs text-primary">ℹ️</span>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">
+                Dados de contato protegidos
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Se você preencher algum dado pessoal (Email, WhatsApp, LinkedIn ou Instagram), será necessário fazer login. Essas informações ficarão protegidas e só serão visíveis para outros usuários caso você permita quando receberem uma solicitação de contato.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Informações Adicionais */}

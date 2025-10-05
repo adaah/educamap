@@ -118,8 +118,6 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
             subjects: finalSubjects,
             email: instructor.email || null,
             linkedin: instructor.linkedin ? `https://linkedin.com/in/${instructor.linkedin}` : null,
-            whatsapp: instructor.whatsapp || null,
-            instagram: instructor.instagram ? `https://www.instagram.com/${instructor.instagram}` : null,
           };
         });
 
@@ -463,8 +461,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
               customSubject: '',
               email: '',
               linkedin: '',
-              whatsapp: '',
-              instagram: '',
+              saved: false,
             }])}
             className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all"
           >
@@ -480,10 +477,14 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
                 customSubject: '',
                 email: '',
                 linkedin: '',
-                whatsapp: '',
-                instagram: '',
+                saved: false,
               }])}
               onRemove={(index) => setInstructors(instructors.filter((_, i) => i !== index))}
+              onSave={(index) => {
+                const updatedInstructors = [...instructors];
+                updatedInstructors[index].saved = true;
+                setInstructors(updatedInstructors);
+              }}
               form={form}
               availableSubjects={availableSubjects}
             />
@@ -491,7 +492,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
         </div>
 
         {/* Consentimento (se forneceram dados de contato de professores) */}
-        {instructors.some(i => i.email || i.linkedin || i.whatsapp || i.instagram) && (
+        {instructors.some(i => i.email || i.linkedin) && (
           <div className="space-y-4 bg-muted/50 p-4 rounded-lg border border-border">
             <FormField
               control={form.control}

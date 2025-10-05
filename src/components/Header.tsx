@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Map, List, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
 
   return (
@@ -64,7 +65,11 @@ const Header = () => {
         <div className="ml-auto md:ml-4 flex items-center gap-2">
           {user ? (
             <div className="hidden sm:flex items-center gap-2">
-              <Badge variant="outline" className="font-montserrat text-xs">
+              <Badge 
+                variant="outline" 
+                className="font-montserrat text-xs cursor-pointer hover:bg-accent transition-colors"
+                onClick={() => navigate('/minha-conta')}
+              >
                 <User className="w-3 h-3 mr-1" />
                 {user.email}
               </Badge>

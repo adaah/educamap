@@ -20,13 +20,14 @@ L.Icon.Default.mergeOptions({
 // Fim da correção do ícone
 
 interface MapComponentProps {
-  selectedSchool?: string;
+  selectedSchool?: School | null;
   onSchoolSelect?: (school: School) => void;
 }
 
 const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => {
     const mapContainer = useRef<HTMLDivElement>(null);
-    const map = useRef<LeafletMap | null>(null); 
+    const map = useRef<LeafletMap | null>(null);
+    const markersRef = useRef<Map<string, L.Marker>>(new Map());
     const [selectedPopup, setSelectedPopup] = useState<School | null>(null);
     const navigate = useNavigate();
     const { data: schools = [], isLoading } = useSchools();
@@ -94,6 +95,9 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                 icon: createCustomIcon(school)
             })
             .addTo(map.current!);
+
+            // Armazena referência ao marcador
+            markersRef.current.set(school.id, marker);
 
             // Cria o HTML do popup (igual à sua estrutura de Card, mas em string)
             const natureBadge = school.nature === 'Pública' 
@@ -169,6 +173,29 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
             map.current = null;
         };
     }, [schools, onSchoolSelect, navigate]);
+
+    // Efeito para abrir popup quando selectedSchool mudar
+    useEffect(() => {
+        if (selectedSchool && map.current && markersRef.current.has(selectedSchool.id)) {
+            const marker = markersRef.current.get(selectedSchool.id);
+            if (marker) {
+                // Move o mapa para a escola
+                const latLng: [number, number] = [selectedSchool.coordinates[1], selectedSchool.coordinates[0]];
+                map.current.setView(latLng, 16);
+                
+                // Abre o popup
+                marker.openPopup();
+                
+                // Adiciona listener ao botão
+                setTimeout(() => {
+                    const detailButton = document.getElementById(`details-btn-${selectedSchool.id}`);
+                    if (detailButton) {
+                        detailButton.onclick = () => handleViewDetails(selectedSchool.id);
+                    }
+                }, 100);
+            }
+        }
+    }, [selectedSchool]);
 
     // -------------------------------------------------------------------------
     // Funções de Ação (Mantidas as suas funções originais de navegação)

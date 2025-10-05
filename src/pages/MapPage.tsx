@@ -37,7 +37,7 @@ const MapPage = () => {
       <main className="flex-1">
         <div className="h-[calc(100vh-4rem)]">
           <MapComponent 
-            selectedSchool={selectedSchool?.id}
+            selectedSchool={selectedSchool}
             onSchoolSelect={setSelectedSchool}
           />
         </div>

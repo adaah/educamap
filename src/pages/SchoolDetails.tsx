@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSchool } from '@/hooks/useSchools';
+import { useTrackSchoolView } from '@/hooks/useTrackSchoolView';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BottomNav from '@/components/BottomNav';
@@ -25,6 +26,9 @@ const SchoolDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: school, isLoading } = useSchool(id || '');
+  
+  // Track school view for logged in users
+  useTrackSchoolView(id);
 
   if (isLoading) {
     return (

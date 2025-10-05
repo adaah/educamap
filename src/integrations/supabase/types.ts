@@ -486,6 +486,35 @@ export type Database = {
           },
         ]
       }
+      school_views: {
+        Row: {
+          id: string
+          school_id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          school_id: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          school_id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "school_views_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       schools: {
         Row: {
           additional_info: string | null

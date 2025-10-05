@@ -109,26 +109,26 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                         ${school.neighborhood}
                     </p>
                     
-                    <div style="background: linear-gradient(to bottom, #fef3c7, #fed7aa); padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;">
-                        <div style="font-size: 0.75rem; font-weight: 600; color: #92400e; margin-bottom: 0.25rem;">📚 Períodos:</div>
-                        <div style="font-size: 0.75rem; color: #451a03;">
+                    <div style="padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
+                        <div style="font-size: 0.75rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Períodos:</div>
+                        <div style="font-size: 0.75rem; color: #6b7280;">
                             ${school.periods.length > 0 ? school.periods.slice(0, 2).join(', ') + (school.periods.length > 2 ? '...' : '') : 'Sem informações'}
                         </div>
                     </div>
                     
-                    <div style="background: linear-gradient(to bottom, #dbeafe, #bfdbfe); padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;">
-                        <div style="font-size: 0.75rem; font-weight: 600; color: #1e3a8a; margin-bottom: 0.25rem;">👨‍🏫 Instrutores:</div>
-                        <div style="font-size: 0.75rem; color: #1e40af; max-height: 60px; overflow-y: auto;">
+                    <div style="padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
+                        <div style="font-size: 0.75rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">Instrutores:</div>
+                        <div style="font-size: 0.75rem; color: #6b7280; max-height: 60px; overflow-y: auto;">
                             ${school.instructors.length > 0 ? school.instructors.slice(0, 2).map(i => `<div>• ${i.name} (${i.subject})</div>`).join('') + (school.instructors.length > 2 ? '<div style="font-style: italic;">...e mais</div>' : '') : 'Sem informações'}
                         </div>
                     </div>
                     
-                    <div style="font-size: 0.75rem; color: #666; margin-bottom: 0.75rem; padding: 0.5rem; background: #f9fafb; border-radius: 0.375rem;">
-                        <div style="margin-bottom: 0.25rem;">
-                            📧 ${school.email ? school.email : 'Sem informações de email'}
+                    <div style="font-size: 0.75rem; color: #6b7280; padding: 0.75rem 0;">
+                        <div style="margin-bottom: 0.5rem;">
+                            ${school.email ? school.email : 'Sem informações de email'}
                         </div>
                         <div>
-                            📞 ${school.phone ? school.phone : 'Sem informações de telefone'}
+                            ${school.phone ? school.phone : 'Sem informações de telefone'}
                         </div>
                     </div>
                     

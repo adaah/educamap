@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AddressAutocomplete } from '@/components/AddressAutocomplete';
+import { InstructorFields } from '@/components/forms/InstructorFields';
 import {
   Form,
   FormControl,
@@ -26,7 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus } from 'lucide-react';
 
 const availableSubjects = [
   'Matemática',
@@ -46,6 +47,16 @@ const availableSubjects = [
 
 const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
 const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
+
+interface Instructor {
+  name: string;
+  subjects: string[];
+  customSubject?: string;
+  email?: string;
+  linkedin?: string;
+  whatsapp?: string;
+  instagram?: string;
+}
 
 const formSchema = z.object({
   // Dados do ex-estagiário
@@ -67,15 +78,6 @@ const formSchema = z.object({
   newSchoolPeriods: z.array(z.string()).optional(),
   customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
   
-  // Dados do instrutor
-  instructorName: z.string().trim().min(3, 'Nome do instrutor deve ter pelo menos 3 caracteres').max(100),
-  subjects: z.array(z.string()).min(1, 'Selecione pelo menos uma disciplina'),
-  customSubject: z.string().trim().max(100).optional().or(z.literal('')),
-  instructorEmail: z.string().trim().email('Email inválido').max(255).optional().or(z.literal('')),
-  instructorLinkedin: z.string().trim().max(255).optional().or(z.literal('')),
-  instructorWhatsapp: z.string().trim().max(20).optional().or(z.literal('')),
-  instructorInstagram: z.string().trim().max(100).optional().or(z.literal('')),
-  
   // Informações adicionais
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
 });
@@ -91,6 +93,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNewSchool, setIsNewSchool] = useState(false);
   const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
+  const [instructors, setInstructors] = useState<Instructor[]>([]);
 
   const { data: schools, isLoading: schoolsLoading } = useQuery({
     queryKey: ['schools-list'],
@@ -114,19 +117,25 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       studentLinkedin: '',
       studentInstagram: '',
       studentWhatsapp: '',
-      instructorName: '',
-      subjects: [],
-      customSubject: '',
-      instructorEmail: '',
-      instructorLinkedin: '',
-      instructorWhatsapp: '',
-      instructorInstagram: '',
       additionalInfo: '',
     },
   });
 
-  const selectedSubjects = form.watch('subjects');
-  const showCustomSubject = selectedSubjects.includes('Outros');
+  const addInstructor = () => {
+    setInstructors([...instructors, {
+      name: '',
+      subjects: [],
+      customSubject: '',
+      email: '',
+      linkedin: '',
+      whatsapp: '',
+      instagram: '',
+    }]);
+  };
+
+  const removeInstructor = (index: number) => {
+    setInstructors(instructors.filter((_, i) => i !== index));
+  };
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -216,39 +225,44 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
 
       if (studentError) throw studentError;
 
-      // Inserir dados do instrutor e disciplinas
-      const finalSubjects = [...data.subjects];
-      if (showCustomSubject && data.customSubject) {
-        const index = finalSubjects.indexOf('Outros');
-        if (index > -1) {
-          finalSubjects[index] = data.customSubject;
+      // Inserir dados dos instrutores
+      for (const instructor of instructors) {
+        if (!instructor.name || instructor.subjects.length === 0) continue;
+
+        const finalSubjects = [...instructor.subjects];
+        const showCustom = instructor.subjects.includes('Outros');
+        if (showCustom && instructor.customSubject) {
+          const index = finalSubjects.indexOf('Outros');
+          if (index > -1) {
+            finalSubjects[index] = instructor.customSubject;
+          }
         }
-      }
 
-      for (const subject of finalSubjects) {
-        const { error: instructorError } = await supabase
-          .from('instructors')
-          .insert({
-            school_id: schoolId,
-            name: data.instructorName,
-            subject: subject,
-            email: data.instructorEmail || null,
-            linkedin: data.instructorLinkedin || null,
-            whatsapp: data.instructorWhatsapp || null,
-            instagram: data.instructorInstagram || null,
-            contributor_name: data.studentName,
-          });
+        for (const subject of finalSubjects) {
+          const { error: instructorError } = await supabase
+            .from('instructors')
+            .insert({
+              school_id: schoolId,
+              name: instructor.name,
+              subject: subject,
+              email: instructor.email || null,
+              linkedin: instructor.linkedin || null,
+              whatsapp: instructor.whatsapp || null,
+              instagram: instructor.instagram || null,
+              contributor_name: data.studentName,
+            });
 
-        if (instructorError) throw instructorError;
+          if (instructorError) throw instructorError;
 
-        const { error: subjectError } = await supabase
-          .from('school_subjects')
-          .insert({
-            school_id: schoolId,
-            subject: subject,
-          });
+          const { error: subjectError } = await supabase
+            .from('school_subjects')
+            .insert({
+              school_id: schoolId,
+              subject: subject,
+            });
 
-        if (subjectError && subjectError.code !== '23505') throw subjectError;
+          if (subjectError && subjectError.code !== '23505') throw subjectError;
+        }
       }
 
       toast({
@@ -257,6 +271,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       });
 
       form.reset();
+      setInstructors([]);
       onSuccess();
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -435,7 +450,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                   <FormItem>
                     <FormLabel>Nome da Escola *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome da escola" {...field} />
+                      <Input placeholder="Nome completo da escola" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -456,7 +471,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                         onNeighborhoodChange={(neighborhood) => {
                           form.setValue('newSchoolNeighborhood', neighborhood);
                         }}
-                        placeholder="Rua, número, bairro, cidade"
+                        placeholder="Rua, número, complemento"
                       />
                     </FormControl>
                     <FormMessage />
@@ -464,42 +479,45 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="newSchoolNeighborhood"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bairro</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Bairro" {...field} disabled />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="newSchoolNature"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Natureza da Escola</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="newSchoolNeighborhood"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bairro</FormLabel>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
-                        </SelectTrigger>
+                        <Input placeholder="Nome do bairro" {...field} disabled />
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Pública">Pública</SelectItem>
-                        <SelectItem value="Particular">Particular</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
+                <FormField
+                  control={form.control}
+                  name="newSchoolNature"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Natureza</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Pública">Pública</SelectItem>
+                          <SelectItem value="Particular">Particular</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Turnos e Períodos apenas para nova escola */}
               <div className="space-y-4">
                 <h4 className="font-poppins font-semibold text-sm">Turnos Disponíveis</h4>
                 <FormField
@@ -507,7 +525,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                   name="newSchoolShifts"
                   render={() => (
                     <FormItem>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-2 gap-4">
                         {availableShifts.map((shift) => (
                           <FormField
                             key={shift}
@@ -527,7 +545,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                                     }}
                                   />
                                 </FormControl>
-                                <FormLabel className="font-normal text-sm">{shift}</FormLabel>
+                                <FormLabel className="font-normal">{shift}</FormLabel>
                               </FormItem>
                             )}
                           />
@@ -545,7 +563,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                   name="newSchoolPeriods"
                   render={() => (
                     <FormItem>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {availablePeriods.map((period) => (
                           <FormField
                             key={period}
@@ -565,7 +583,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                                     }}
                                   />
                                 </FormControl>
-                                <FormLabel className="font-normal text-sm">{period}</FormLabel>
+                                <FormLabel className="font-normal">{period}</FormLabel>
                               </FormItem>
                             )}
                           />
@@ -588,7 +606,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                                   }}
                                 />
                               </FormControl>
-                              <FormLabel className="font-normal text-sm">Outros</FormLabel>
+                              <FormLabel className="font-normal">Outros</FormLabel>
                             </FormItem>
                           )}
                         />
@@ -596,7 +614,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                     </FormItem>
                   )}
                 />
-
+                
                 {form.watch('newSchoolPeriods')?.includes('Outros') && (
                   <FormField
                     control={form.control}
@@ -617,186 +635,40 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           )}
         </div>
 
-        {/* Dados do Instrutor */}
+        {/* Instrutores */}
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Dados do Instrutor</h3>
-          
-          <FormField
-            control={form.control}
-            name="instructorName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nome do Instrutor *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nome completo" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="subjects"
-            render={() => (
-              <FormItem>
-                <FormLabel>Disciplinas/Áreas *</FormLabel>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {availableSubjects.map((subject) => (
-                    <FormField
-                      key={subject}
-                      control={form.control}
-                      name="subjects"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={subject}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(subject)}
-                                onCheckedChange={(checked) => {
-                                  return checked
-                                    ? field.onChange([...field.value, subject])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          (value) => value !== subject
-                                        )
-                                      )
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="font-normal text-sm cursor-pointer">
-                              {subject}
-                            </FormLabel>
-                          </FormItem>
-                        )
-                      }}
-                    />
-                  ))}
-                  
-                  <FormField
-                    control={form.control}
-                    name="subjects"
-                    render={({ field }) => {
-                      return (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes('Outros')}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, 'Outros'])
-                                  : field.onChange(
-                                      field.value?.filter((value) => value !== 'Outros')
-                                    )
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal text-sm cursor-pointer">
-                            Outros
-                          </FormLabel>
-                        </FormItem>
-                      )
-                    }}
-                  />
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {showCustomSubject && (
-            <FormField
-              control={form.control}
-              name="customSubject"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Especifique a disciplina</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Digite a disciplina" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="instructorEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email (opcional)</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="email@exemplo.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="instructorWhatsapp"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>WhatsApp (opcional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="(71) 99999-9999" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <div className="flex items-center justify-between">
+            <h3 className="font-poppins font-semibold text-lg">Professores Instrutores (Opcional)</h3>
+            <Button type="button" variant="outline" size="sm" onClick={addInstructor}>
+              <Plus className="w-4 h-4 mr-1" />
+              Adicionar Instrutor
+            </Button>
           </div>
+          <p className="text-sm text-muted-foreground">
+            Recomende um ou mais professores instrutores que você teve durante o estágio
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="instructorLinkedin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>LinkedIn (opcional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="linkedin.com/in/..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="instructorInstagram"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Instagram (opcional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="@usuario" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <InstructorFields
+            instructors={instructors}
+            onAdd={addInstructor}
+            onRemove={removeInstructor}
+            form={form}
+            availableSubjects={availableSubjects}
+          />
         </div>
 
         {/* Informações Adicionais */}
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Informações sobre Estágio (opcional)</h3>
-          
+          <h3 className="font-poppins font-semibold text-lg">Informações Adicionais (Opcional)</h3>
           <FormField
             control={form.control}
             name="additionalInfo"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Conte um pouco sobre sua experiência</FormLabel>
+                <FormLabel>Compartilhe sua experiência</FormLabel>
                 <FormControl>
-                  <Textarea 
-                    placeholder="Descreva sua experiência, dicas, contatos importantes..."
+                  <Textarea
+                    placeholder="Como foi sua experiência de estágio nesta escola? Alguma dica para futuros estagiários?"
                     className="min-h-[100px]"
                     {...field}
                   />
@@ -807,24 +679,22 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           />
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end gap-4">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="min-w-[120px] px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
-                Enviando...
-              </>
-            ) : (
-              'Enviar'
-            )}
-          </button>
-        </div>
+        <button 
+          type="submit" 
+          className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />
+              Enviando...
+            </>
+          ) : (
+            'Compartilhar Experiência'
+          )}
+        </button>
       </form>
     </Form>
   );
 };
+

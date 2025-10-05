@@ -138,6 +138,16 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
   };
 
   const onSubmit = async (data: FormData) => {
+    // Validar que pelo menos um instrutor foi adicionado
+    if (instructors.length === 0 || !instructors.some(i => i.name && i.subjects.length > 0)) {
+      toast({
+        title: 'Instrutor obrigatório',
+        description: 'Você deve adicionar pelo menos um professor instrutor.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       let schoolId = data.schoolId;
@@ -660,32 +670,28 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
 
         {/* Instrutores */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                Recomende um ou mais professores instrutores que você teve durante o estágio
-              </p>
-            </div>
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="sm" 
-              onClick={addInstructor}
-              className="w-full sm:w-auto text-xs sm:text-sm"
-            >
-              <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-              Adicionar Instrutor
-            </Button>
-          </div>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores *</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Recomende um ou mais professores instrutores que você teve durante o estágio
+          </p>
+          
+          <button
+            type="button"
+            onClick={addInstructor}
+            className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all"
+          >
+            + Adicionar Instrutor
+          </button>
 
-          <InstructorFields
-            instructors={instructors}
-            onAdd={addInstructor}
-            onRemove={removeInstructor}
-            form={form}
-            availableSubjects={availableSubjects}
-          />
+          {instructors.length > 0 && (
+            <InstructorFields
+              instructors={instructors}
+              onAdd={addInstructor}
+              onRemove={removeInstructor}
+              form={form}
+              availableSubjects={availableSubjects}
+            />
+          )}
         </div>
 
         {/* Informações Adicionais */}

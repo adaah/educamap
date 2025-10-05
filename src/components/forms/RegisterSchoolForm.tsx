@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AddressAutocomplete } from '@/components/AddressAutocomplete';
+import { InstructorFields, type Instructor } from '@/components/forms/InstructorFields';
 import {
   Form,
   FormControl,
@@ -69,6 +70,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
+  const [instructors, setInstructors] = useState<Instructor[]>([]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -148,12 +150,39 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
 
       await Promise.all([...shiftsPromises, ...periodsPromises, ...subjectsPromises]);
 
+      // Inserir instrutores opcionais
+      for (const instructor of instructors) {
+        if (!instructor.name || instructor.subjects.length === 0) continue;
+
+        const finalSubjects = [...instructor.subjects];
+        const showCustom = instructor.subjects.includes('Outros');
+        if (showCustom && instructor.customSubject) {
+          const index = finalSubjects.indexOf('Outros');
+          if (index > -1) {
+            finalSubjects[index] = instructor.customSubject;
+          }
+        }
+
+        for (const subject of finalSubjects) {
+          await supabase.from('instructors').insert({
+            school_id: school.id,
+            name: instructor.name,
+            subject: subject,
+            email: instructor.email || null,
+            linkedin: instructor.linkedin ? `https://linkedin.com/in/${instructor.linkedin}` : null,
+            whatsapp: instructor.whatsapp || null,
+            instagram: instructor.instagram ? `https://www.instagram.com/${instructor.instagram}` : null,
+          });
+        }
+      }
+
       toast({
         title: 'Sucesso!',
         description: 'Escola cadastrada com sucesso. Em breve será adicionada ao mapa.',
       });
 
       form.reset();
+      setInstructors([]);
       onSuccess();
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -436,6 +465,48 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
                   <FormMessage />
                 </FormItem>
               )}
+            />
+          )}
+        </div>
+
+        {/* Instrutores (Opcional) */}
+        <div className="space-y-4">
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores (Opcional)</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Liste professores que podem ser contatos para estágio
+          </p>
+          
+          <button
+            type="button"
+            onClick={() => setInstructors([...instructors, {
+              name: '',
+              subjects: [],
+              customSubject: '',
+              email: '',
+              linkedin: '',
+              whatsapp: '',
+              instagram: '',
+            }])}
+            className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all"
+          >
+            + Adicionar Instrutor
+          </button>
+
+          {instructors.length > 0 && (
+            <InstructorFields
+              instructors={instructors}
+              onAdd={() => setInstructors([...instructors, {
+                name: '',
+                subjects: [],
+                customSubject: '',
+                email: '',
+                linkedin: '',
+                whatsapp: '',
+                instagram: '',
+              }])}
+              onRemove={(index) => setInstructors(instructors.filter((_, i) => i !== index))}
+              form={form}
+              availableSubjects={availableSubjects}
             />
           )}
         </div>

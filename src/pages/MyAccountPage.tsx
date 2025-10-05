@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Mail, ArrowLeft, Bell, FileText, Eye, User as UserIcon } from "lucide-react";
+import { LogOut, Mail, ArrowLeft, Bell, FileText, Eye, User as UserIcon, Trash2 } from "lucide-react";
 import { ContactRequestsPanel } from "@/components/ContactRequestsPanel";
 import { SchoolViewHistory } from "@/components/account/SchoolViewHistory";
 import { SubmissionHistory } from "@/components/account/SubmissionHistory";
@@ -11,11 +11,25 @@ import { ProfileInfo } from "@/components/account/ProfileInfo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNav from "@/components/BottomNav";
-import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const MyAccountPage = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,6 +40,28 @@ const MyAccountPage = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      // Chamar edge function para deletar a conta
+      const { error } = await supabase.functions.invoke('delete-user-account');
+      
+      if (error) throw error;
+      
+      toast.success("Conta deletada com sucesso");
+      await signOut();
+      navigate("/");
+    } catch (error: any) {
+      console.error("Erro ao deletar conta:", error);
+      toast.error("Erro ao deletar conta: " + error.message);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (loading) {
@@ -123,6 +159,56 @@ const MyAccountPage = () => {
                 <SubmissionHistory />
               </TabsContent>
             </Tabs>
+
+            {/* Danger Zone - Delete Account */}
+            <Card className="border-destructive/50 bg-destructive/5">
+              <CardHeader>
+                <CardTitle className="text-destructive flex items-center gap-2">
+                  <Trash2 className="h-5 w-5" />
+                  Zona de Perigo
+                </CardTitle>
+                <CardDescription>
+                  Ações irreversíveis relacionadas à sua conta
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="w-full sm:w-auto">
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Apagar Minha Conta
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-2">
+                        <p>Esta ação não pode ser desfeita. Isso irá permanentemente:</p>
+                        <ul className="list-disc list-inside space-y-1 text-sm">
+                          <li>Deletar sua conta</li>
+                          <li>Remover todos os seus dados pessoais</li>
+                          <li>Deletar seu histórico de visualizações</li>
+                          <li>Remover suas contribuições pendentes</li>
+                        </ul>
+                        <p className="font-semibold text-destructive mt-4">
+                          Esta ação é irreversível!
+                        </p>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteAccount}
+                        disabled={isDeleting}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        {isDeleting ? "Deletando..." : "Sim, apagar minha conta"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

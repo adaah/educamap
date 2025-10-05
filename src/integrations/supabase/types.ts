@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_view_logs: {
+        Row: {
+          contact_fields_viewed: string[]
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          viewed_at: string
+          viewed_entity_id: string
+          viewed_entity_name: string
+          viewed_entity_type: string
+          viewer_email: string
+          viewer_user_id: string
+        }
+        Insert: {
+          contact_fields_viewed: string[]
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          viewed_at?: string
+          viewed_entity_id: string
+          viewed_entity_name: string
+          viewed_entity_type: string
+          viewer_email: string
+          viewer_user_id: string
+        }
+        Update: {
+          contact_fields_viewed?: string[]
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          viewed_at?: string
+          viewed_entity_id?: string
+          viewed_entity_name?: string
+          viewed_entity_type?: string
+          viewer_email?: string
+          viewer_user_id?: string
+        }
+        Relationships: []
+      }
       former_students: {
         Row: {
           contributor_name: string | null

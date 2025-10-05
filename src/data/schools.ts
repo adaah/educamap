@@ -14,15 +14,17 @@ export interface School {
   subjects: string[];
   shift: string[];
   instructors: {
+    id: string;
     name: string;
     subject: string;
     email?: string;
     linkedin?: string;
     whatsapp?: string;
     instagram?: string;
-    contributor_name?: string;
+    contributorName?: string;
   }[];
   formerStudents: {
+    id: string;
     name: string;
     university: string;
     course: string;
@@ -30,7 +32,7 @@ export interface School {
     linkedin?: string;
     instagram?: string;
     whatsapp?: string;
-    contributor_name?: string;
+    contributorName?: string;
   }[];
 }
 

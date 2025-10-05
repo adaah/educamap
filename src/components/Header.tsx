@@ -1,10 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Map, List } from 'lucide-react';
+import { Map, List, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -58,8 +60,33 @@ const Header = () => {
           </Button>
         </nav>
 
-        {/* Beta Badge */}
-        <div className="ml-auto md:ml-4">
+        {/* Auth Status & Beta Badge */}
+        <div className="ml-auto md:ml-4 flex items-center gap-2">
+          {user ? (
+            <div className="hidden sm:flex items-center gap-2">
+              <Badge variant="outline" className="font-montserrat text-xs">
+                <User className="w-3 h-3 mr-1" />
+                {user.email}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => signOut()}
+                className="h-8"
+              >
+                <LogOut className="w-4 h-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="hidden sm:flex h-8 font-montserrat"
+            >
+              <Link to="/auth">Login</Link>
+            </Button>
+          )}
           <Badge variant="secondary" className="bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 font-poppins font-semibold">
             BETA
           </Badge>

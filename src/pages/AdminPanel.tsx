@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Check, X, Trash2 } from "lucide-react";
+import { LogOut, Check, X, Trash2, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const AdminPanel = () => {
   const { user, isAdmin, loading, signOut } = useAdminAuth();
@@ -28,6 +30,20 @@ const AdminPanel = () => {
   } = usePendingSubmissions();
 
   const { data: schools = [] } = useSchools();
+
+  const { data: contactLogs = [] } = useQuery({
+    queryKey: ["contactLogs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("contact_view_logs")
+        .select("*")
+        .order("viewed_at", { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+      return data;
+    },
+  });
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -100,6 +116,12 @@ const AdminPanel = () => {
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="existing">Dados Existentes</TabsTrigger>
+            <TabsTrigger value="logs">
+              Logs de Visualização
+              <Badge variant="secondary" className="ml-2">
+                {contactLogs.length}
+              </Badge>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending" className="space-y-4">
@@ -250,6 +272,59 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="logs" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Histórico de Visualizações de Contatos</CardTitle>
+                <CardDescription>
+                  Registro de todos os usuários que visualizaram dados de contato
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {contactLogs.map((log) => (
+                    <div key={log.id} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3 flex-1">
+                          <Eye className="h-5 w-5 text-muted-foreground mt-0.5" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm">
+                              {log.viewer_email}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              visualizou dados de contato de{" "}
+                              <span className="font-medium">{log.viewed_entity_name}</span>
+                              {" "}({log.viewed_entity_type === "former_student" ? "Ex-estagiário" : 
+                                 log.viewed_entity_type === "instructor" ? "Professor" : "Escola"})
+                            </p>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {log.contact_fields_viewed.map((field: string) => (
+                                <Badge key={field} variant="outline" className="text-xs">
+                                  {field}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground whitespace-nowrap">
+                          {formatDistanceToNow(new Date(log.viewed_at), {
+                            addSuffix: true,
+                            locale: ptBR,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {contactLogs.length === 0 && (
+                    <p className="text-muted-foreground text-center py-8">
+                      Nenhuma visualização registrada ainda
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

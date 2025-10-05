@@ -6,6 +6,7 @@ import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ProtectedContactInfo } from '@/components/ProtectedContactInfo';
 import { 
   ArrowLeft, 
   MapPin, 
@@ -17,9 +18,7 @@ import {
   UserCheck,
   Building2,
   Clock,
-  MessageCircle,
-  Instagram,
-  Linkedin
+  MessageCircle
 } from 'lucide-react';
 
 const SchoolDetails = () => {
@@ -258,41 +257,23 @@ const SchoolDetails = () => {
               <CardContent>
                 <div className="space-y-3 sm:space-y-4">
                   {school.instructors.map((instructor, index) => (
-                    <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 bg-filter-bg rounded-lg">
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-poppins font-semibold text-xs sm:text-sm truncate">{instructor.name}</h4>
-                        <p className="text-muted-foreground font-montserrat text-xs sm:text-sm truncate">{instructor.subject}</p>
+                    <div key={index} className="space-y-3">
+                      <div className="p-3 bg-filter-bg rounded-lg">
+                        <h4 className="font-poppins font-semibold text-xs sm:text-sm">{instructor.name}</h4>
+                        <p className="text-muted-foreground font-montserrat text-xs sm:text-sm">{instructor.subject}</p>
                       </div>
-                      <div className="flex gap-2 flex-shrink-0">
-                        {instructor.email && (
-                          <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
-                            <a href={`mailto:${instructor.email}`} title="E-mail">
-                              <Mail className="w-3 h-3" />
-                            </a>
-                          </Button>
-                        )}
-                        {instructor.linkedin && (
-                          <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
-                            <a href={instructor.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn">
-                              <Linkedin className="w-3 h-3" />
-                            </a>
-                          </Button>
-                        )}
-                        {instructor.whatsapp && (
-                          <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
-                            <a href={`https://wa.me/${instructor.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" title="WhatsApp">
-                              <MessageCircle className="w-3 h-3" />
-                            </a>
-                          </Button>
-                        )}
-                        {instructor.instagram && (
-                          <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
-                            <a href={instructor.instagram} target="_blank" rel="noopener noreferrer" title="Instagram">
-                              <Instagram className="w-3 h-3" />
-                            </a>
-                          </Button>
-                        )}
-                      </div>
+                      <ProtectedContactInfo
+                        entityType="instructor"
+                        entityId={instructor.id}
+                        entityName={instructor.name}
+                        contactData={{
+                          email: instructor.email,
+                          whatsapp: instructor.whatsapp,
+                          linkedin: instructor.linkedin,
+                          instagram: instructor.instagram,
+                        }}
+                        contributorName={instructor.contributorName}
+                      />
                     </div>
                   ))}
                 </div>
@@ -334,45 +315,25 @@ const SchoolDetails = () => {
               <CardContent>
                 <div className="space-y-3">
                   {school.formerStudents.map((student, index) => (
-                    <div key={index} className="p-3 bg-filter-bg rounded-lg">
-                      <div className="flex flex-col sm:flex-row sm:items-start gap-3">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-poppins font-semibold text-xs sm:text-sm truncate">{student.name}</h4>
-                          <p className="text-muted-foreground font-montserrat text-xs break-words">
-                            {student.university} - {student.course}
-                          </p>
-                        </div>
-                        <div className="flex gap-1 flex-shrink-0">
-                          {student.email && (
-                            <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
-                              <a href={`mailto:${student.email}`} title="E-mail">
-                                <Mail className="w-3 h-3" />
-                              </a>
-                            </Button>
-                          )}
-                          {student.linkedin && (
-                            <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
-                              <a href={student.linkedin} target="_blank" rel="noopener noreferrer" title="LinkedIn">
-                                <Linkedin className="w-3 h-3" />
-                              </a>
-                            </Button>
-                          )}
-                          {student.whatsapp && (
-                            <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
-                              <a href={`https://wa.me/${student.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" title="WhatsApp">
-                                <MessageCircle className="w-3 h-3" />
-                              </a>
-                            </Button>
-                          )}
-                          {student.instagram && (
-                            <Button variant="outline" size="sm" asChild className="h-7 w-7 sm:h-8 sm:w-8 p-0">
-                              <a href={student.instagram} target="_blank" rel="noopener noreferrer" title="Instagram">
-                                <Instagram className="w-3 h-3" />
-                              </a>
-                            </Button>
-                          )}
-                        </div>
+                    <div key={index} className="space-y-3">
+                      <div className="p-3 bg-filter-bg rounded-lg">
+                        <h4 className="font-poppins font-semibold text-xs sm:text-sm">{student.name}</h4>
+                        <p className="text-muted-foreground font-montserrat text-xs">
+                          {student.university} - {student.course}
+                        </p>
                       </div>
+                      <ProtectedContactInfo
+                        entityType="former_student"
+                        entityId={student.id}
+                        entityName={student.name}
+                        contactData={{
+                          email: student.email,
+                          whatsapp: student.whatsapp,
+                          linkedin: student.linkedin,
+                          instagram: student.instagram,
+                        }}
+                        contributorName={student.contributorName}
+                      />
                     </div>
                   ))}
                 </div>

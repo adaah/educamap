@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       former_students: {
         Row: {
+          contributor_name: string | null
           course: string
           created_at: string | null
           email: string | null
@@ -28,6 +29,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          contributor_name?: string | null
           course: string
           created_at?: string | null
           email?: string | null
@@ -40,6 +42,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          contributor_name?: string | null
           course?: string
           created_at?: string | null
           email?: string | null
@@ -63,6 +66,7 @@ export type Database = {
       }
       instructors: {
         Row: {
+          contributor_name: string | null
           created_at: string | null
           email: string | null
           id: string
@@ -74,6 +78,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          contributor_name?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
@@ -85,6 +90,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          contributor_name?: string | null
           created_at?: string | null
           email?: string | null
           id?: string
@@ -186,6 +192,7 @@ export type Database = {
       schools: {
         Row: {
           additional_info: string | null
+          contributor_name: string | null
           created_at: string | null
           email: string | null
           full_address: string
@@ -201,6 +208,7 @@ export type Database = {
         }
         Insert: {
           additional_info?: string | null
+          contributor_name?: string | null
           created_at?: string | null
           email?: string | null
           full_address: string
@@ -216,6 +224,7 @@ export type Database = {
         }
         Update: {
           additional_info?: string | null
+          contributor_name?: string | null
           created_at?: string | null
           email?: string | null
           full_address?: string

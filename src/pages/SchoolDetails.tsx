@@ -170,17 +170,23 @@ const SchoolDetails = () => {
 
             {/* Additional Info */}
             {school.additionalInfo && (
-              <Card className="shadow-card bg-gradient-to-br from-primary/5 to-secondary/5">
+              <Card className="shadow-card bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-primary/20">
                 <CardHeader>
                   <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                    <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-secondary" />
-                    Informações sobre Estágio
+                    <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                    Informações Adicionais
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="font-montserrat text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-line">
+                <CardContent className="space-y-3">
+                  <div className="font-montserrat text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-line bg-white/50 p-3 rounded-lg">
                     {school.additionalInfo}
-                  </p>
+                  </div>
+                  <div className="flex items-center text-xs text-muted-foreground italic border-t pt-2">
+                    <Users className="w-3 h-3 mr-1" />
+                    Compartilhado por: {school.contributor_name || 'Contribuidor'}
+                  </div>
                 </CardContent>
               </Card>
             )}

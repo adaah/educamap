@@ -3,17 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Mail, ArrowLeft, Bell, FileText, Eye, User as UserIcon, Trash2 } from "lucide-react";
+import { LogOut, Mail, ArrowLeft, Bell, FileText, Eye, User as UserIcon, Trash2, Lock } from "lucide-react";
 import { ContactRequestsPanel } from "@/components/ContactRequestsPanel";
 import { SchoolViewHistory } from "@/components/account/SchoolViewHistory";
 import { SubmissionHistory } from "@/components/account/SubmissionHistory";
 import { ProfileInfo } from "@/components/account/ProfileInfo";
+import PasswordReset from "@/components/account/PasswordReset";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNav from "@/components/BottomNav";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,12 +32,22 @@ const MyAccountPage = () => {
   const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
     }
   }, [user, loading, navigate]);
+
+  // Check for tab parameter in URL
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "redefinir-senha") {
+      setActiveTab("password-reset");
+    }
+  }, [searchParams]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -115,27 +127,69 @@ const MyAccountPage = () => {
             </Card>
 
             {/* Main Content Tabs */}
-            <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              {/* Mobile Tabs - Scrollable horizontal */}
+              <div className="block lg:hidden mb-6">
+                <TabsList className="flex overflow-x-auto scrollbar-hide space-x-2 pb-2 px-1 w-full">
+                  <TabsTrigger 
+                    value="overview" 
+                    className="flex-shrink-0 gap-1 px-4 py-3 text-xs font-medium rounded-lg min-w-fit whitespace-nowrap"
+                  >
+                    <UserIcon className="h-3.5 w-3.5" />
+                    <span>Geral</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="requests" 
+                    className="flex-shrink-0 gap-1 px-4 py-3 text-xs font-medium rounded-lg min-w-fit whitespace-nowrap"
+                  >
+                    <Bell className="h-3.5 w-3.5" />
+                    <span>Avisos</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="history" 
+                    className="flex-shrink-0 gap-1 px-4 py-3 text-xs font-medium rounded-lg min-w-fit whitespace-nowrap"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    <span>Visto</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="contributions" 
+                    className="flex-shrink-0 gap-1 px-4 py-3 text-xs font-medium rounded-lg min-w-fit whitespace-nowrap"
+                  >
+                    <FileText className="h-3.5 w-3.5" />
+                    <span>Envios</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="password-reset" 
+                    className="flex-shrink-0 gap-1 px-4 py-3 text-xs font-medium rounded-lg min-w-fit whitespace-nowrap"
+                  >
+                    <Lock className="h-3.5 w-3.5" />
+                    <span>Senha</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              {/* Desktop Tabs */}
+              <TabsList className="hidden lg:grid w-full grid-cols-5 mb-6">
                 <TabsTrigger value="overview" className="gap-2">
                   <UserIcon className="h-4 w-4" />
-                  <span className="hidden sm:inline">Visão Geral</span>
-                  <span className="sm:hidden">Geral</span>
+                  <span>Visão Geral</span>
                 </TabsTrigger>
                 <TabsTrigger value="requests" className="gap-2">
                   <Bell className="h-4 w-4" />
-                  <span className="hidden sm:inline">Solicitações</span>
-                  <span className="sm:hidden">Avisos</span>
+                  <span>Solicitações</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="gap-2">
                   <Eye className="h-4 w-4" />
-                  <span className="hidden sm:inline">Histórico</span>
-                  <span className="sm:hidden">Visto</span>
+                  <span>Histórico</span>
                 </TabsTrigger>
                 <TabsTrigger value="contributions" className="gap-2">
                   <FileText className="h-4 w-4" />
-                  <span className="hidden sm:inline">Contribuições</span>
-                  <span className="sm:hidden">Envios</span>
+                  <span>Contribuições</span>
+                </TabsTrigger>
+                <TabsTrigger value="password-reset" className="gap-2">
+                  <Lock className="h-4 w-4" />
+                  <span>Redefinir Senha</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -145,6 +199,56 @@ const MyAccountPage = () => {
                   <SchoolViewHistory />
                   <SubmissionHistory />
                 </div>
+                
+                {/* Danger Zone - Delete Account - Only in overview tab */}
+                <Card className="border-destructive/50 bg-destructive/5">
+                  <CardHeader>
+                    <CardTitle className="text-destructive flex items-center gap-2">
+                      <Trash2 className="h-5 w-5" />
+                      Zona de Perigo
+                    </CardTitle>
+                    <CardDescription>
+                      Ações irreversíveis relacionadas à sua conta
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" className="w-full sm:w-auto">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Apagar Minha Conta
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
+                          <AlertDialogDescription className="space-y-2">
+                            <p>Esta ação não pode ser desfeita. Isso irá permanentemente:</p>
+                            <ul className="list-disc list-inside space-y-1 text-sm">
+                              <li>Deletar sua conta</li>
+                              <li>Remover todos os seus dados pessoais</li>
+                              <li>Deletar seu histórico de visualizações</li>
+                              <li>Remover suas contribuições pendentes</li>
+                            </ul>
+                            <p className="font-semibold text-destructive mt-4">
+                              Esta ação é irreversível!
+                            </p>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDeleteAccount}
+                            disabled={isDeleting}
+                            className="bg-destructive hover:bg-destructive/90"
+                          >
+                            {isDeleting ? "Deletando..." : "Sim, apagar minha conta"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               <TabsContent value="requests">
@@ -158,57 +262,11 @@ const MyAccountPage = () => {
               <TabsContent value="contributions">
                 <SubmissionHistory />
               </TabsContent>
-            </Tabs>
 
-            {/* Danger Zone - Delete Account */}
-            <Card className="border-destructive/50 bg-destructive/5">
-              <CardHeader>
-                <CardTitle className="text-destructive flex items-center gap-2">
-                  <Trash2 className="h-5 w-5" />
-                  Zona de Perigo
-                </CardTitle>
-                <CardDescription>
-                  Ações irreversíveis relacionadas à sua conta
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="w-full sm:w-auto">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Apagar Minha Conta
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Tem certeza absoluta?</AlertDialogTitle>
-                      <AlertDialogDescription className="space-y-2">
-                        <p>Esta ação não pode ser desfeita. Isso irá permanentemente:</p>
-                        <ul className="list-disc list-inside space-y-1 text-sm">
-                          <li>Deletar sua conta</li>
-                          <li>Remover todos os seus dados pessoais</li>
-                          <li>Deletar seu histórico de visualizações</li>
-                          <li>Remover suas contribuições pendentes</li>
-                        </ul>
-                        <p className="font-semibold text-destructive mt-4">
-                          Esta ação é irreversível!
-                        </p>
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={handleDeleteAccount}
-                        disabled={isDeleting}
-                        className="bg-destructive hover:bg-destructive/90"
-                      >
-                        {isDeleting ? "Deletando..." : "Sim, apagar minha conta"}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </CardContent>
-            </Card>
+              <TabsContent value="password-reset">
+                <PasswordReset />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

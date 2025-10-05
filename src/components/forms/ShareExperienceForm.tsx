@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, Plus } from 'lucide-react';
+import { useAuth, useUserProfile } from '@/hooks/useAuth';
 
 const availableSubjects = [
   'Matemática',
@@ -53,10 +54,27 @@ interface Instructor {
   name: string;
   subjects: string[];
   customSubject?: string;
+  shifts?: string[];
+  periods?: string[];
   email?: string;
   linkedin?: string;
+  instagram?: string;
+  whatsapp?: string;
   saved?: boolean;
 }
+
+const instructorSchema = z.object({
+  name: z.string(),
+  subjects: z.array(z.string()),
+  customSubject: z.string(),
+  shifts: z.array(z.string()).optional(),
+  periods: z.array(z.string()).optional(),
+  email: z.string(),
+  linkedin: z.string(),
+  instagram: z.string(),
+  whatsapp: z.string(),
+  saved: z.boolean(),
+});
 
 const formSchema = z.object({
   // Dados do ex-estagiário
@@ -83,6 +101,7 @@ const formSchema = z.object({
   
   // Consentimento - removido pois não é mais necessário
   consentToShareData: z.boolean().optional().default(true),
+  instructors: z.array(instructorSchema).default([]),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -92,11 +111,13 @@ interface ShareExperienceFormProps {
 }
 
 export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => {
+  const { user } = useAuth();
+  const userId = user?.id;
+  const { data: profile } = useUserProfile(userId);
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNewSchool, setIsNewSchool] = useState(false);
   const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
-  const [instructors, setInstructors] = useState<Instructor[]>([]);
 
   const { data: schools, isLoading: schoolsLoading } = useQuery({
     queryKey: ['schools-list'],
@@ -110,53 +131,85 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
     },
   });
 
-  const form = useForm<FormData>({
+  const form = useForm<
+    Omit<FormData, 'instructors'> & { instructors: Instructor[] }
+  >({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      studentName: '',
-      university: '',
-      course: '',
+      studentName: profile?.full_name || '',
+      university: profile?.institution || '',
+      course: profile?.occupation || '',
       studentEmail: '',
       studentLinkedin: '',
       studentInstagram: '',
       studentWhatsapp: '',
       additionalInfo: '',
       consentToShareData: false,
+      instructors: [],
     },
   });
 
+  // Preencher campos automaticamente quando perfil carregar
+  useEffect(() => {
+    if (user && profile) {
+      form.setValue('studentName', profile.full_name || '');
+      form.setValue('university', profile.institution || '');
+      form.setValue('course', profile.occupation || '');
+    }
+  }, [user, profile, form]);
+
+  function ensureInstructor(i: Partial<Instructor>): Instructor {
+    return {
+      name: i.name ?? '',
+      subjects: i.subjects ?? [],
+      customSubject: i.customSubject ?? '',
+      shifts: i.shifts ?? [],
+      periods: i.periods ?? [],
+      email: i.email ?? '',
+      linkedin: i.linkedin ?? '',
+      instagram: i.instagram ?? '',
+      whatsapp: i.whatsapp ?? '',
+      saved: i.saved ?? false,
+    };
+  }
+
+  // Adicionar instrutor
   const addInstructor = () => {
-    setInstructors([...instructors, {
-      name: '',
-      subjects: [],
-      customSubject: '',
-      email: '',
-      linkedin: '',
-      saved: false,
-    }]);
+    const current = form.getValues('instructors') || [];
+    const next: Instructor[] = [
+      ...current.map(ensureInstructor),
+      ensureInstructor({}),
+    ];
+    form.setValue('instructors', next);
   };
 
+  // Remover instrutor
   const removeInstructor = (index: number) => {
-    setInstructors(instructors.filter((_, i) => i !== index));
+    const current = form.getValues('instructors') || [];
+    form.setValue('instructors', current.filter((_, i) => i !== index));
   };
 
+  // Salvar instrutor
   const saveInstructor = (index: number) => {
-    const updatedInstructors = [...instructors];
-    updatedInstructors[index].saved = true;
-    setInstructors(updatedInstructors);
+    const current = form.getValues('instructors') || [];
+    if (!current[index]?.name || !current[index]?.subjects?.length || !current[index]?.shifts?.length || !current[index]?.periods?.length) return;
+    current[index].saved = true;
+    form.setValue('instructors', [...current]);
   };
 
+  // Validação no submit
   const onSubmit = async (data: FormData) => {
-    // Validar que pelo menos um instrutor foi adicionado
-    if (instructors.length === 0 || !instructors.some(i => i.name && i.subjects.length > 0)) {
+    const validInstructors = (data.instructors || []).filter(i => 
+      i.saved && i.name && i.subjects.length > 0 && i.shifts && i.shifts.length > 0 && i.periods && i.periods.length > 0
+    );
+    if (validInstructors.length === 0) {
       toast({
         title: 'Instrutor obrigatório',
-        description: 'Você deve adicionar pelo menos um professor instrutor.',
+        description: 'Você deve adicionar e salvar pelo menos um professor instrutor com turno e período preenchidos.',
         variant: 'destructive',
       });
       return;
     }
-
     setIsSubmitting(true);
     try {
       // Inserir ex-estagiário na tabela pending
@@ -172,6 +225,9 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           whatsapp: data.studentWhatsapp || null,
           contributor_name: data.studentName,
           consent_to_share_data: data.consentToShareData,
+          school_id: data.schoolId || null,
+          user_id: user?.id || null,
+          additional_info: data.additionalInfo || null,
         });
 
       if (studentError) throw studentError;
@@ -182,8 +238,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       });
 
       form.reset();
-      setInstructors([]);
-      onSuccess();
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
@@ -202,7 +256,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
         {/* Dados do Ex-Estagiário */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Seus Dados como Ex-Estagiário</h3>
-          
           <FormField
             control={form.control}
             name="studentName"
@@ -210,13 +263,12 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
               <FormItem>
                 <FormLabel>Nome *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Seu nome" {...field} />
+                  <Input placeholder="Seu nome" {...field} disabled={!!user} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -225,13 +277,12 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 <FormItem>
                   <FormLabel>Universidade *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: UFBA" {...field} />
+                    <Input placeholder="Ex: UFBA" {...field} disabled={!!user} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="course"
@@ -239,14 +290,15 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 <FormItem>
                   <FormLabel>Curso *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Pedagogia" {...field} />
+                    <Input placeholder="Ex: Pedagogia" {...field} disabled={!!user} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-
+          {/* Campos de contato */}
+          {user ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -261,7 +313,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="studentWhatsapp"
@@ -275,9 +326,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 </FormItem>
               )}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="studentLinkedin"
@@ -302,7 +350,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="studentInstagram"
@@ -329,12 +376,56 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
               )}
             />
           </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="studentLinkedin"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>LinkedIn (opcional)</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center">
+                        <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">linkedin.com/in/</span>
+                        <Input 
+                          placeholder="seu-perfil" 
+                          {...field}
+                          onChange={(e) => {
+                            let value = e.target.value;
+                            value = value.replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//i, '');
+                            field.onChange(value);
+                          }}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+          {/* Mensagem de aviso para dados protegidos */}
+          {user && (
+            (form.watch('studentEmail') || form.watch('studentWhatsapp') || form.watch('studentInstagram')) && (
+              <div className="space-y-4 bg-primary/5 p-4 rounded-lg border border-primary/20 mt-2">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-foreground">
+                      Dados de contato protegidos
+                    </p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Essas informações ficarão protegidas e só serão disponibilizados para outros usuários caso você permita quando receberem uma solicitação de contato.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )
+          )}
         </div>
-
         {/* Dados da Escola */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Escola do Estágio</h3>
-          
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -345,8 +436,9 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             />
             <Label htmlFor="newSchool">A escola não está no mapa</Label>
           </div>
-
+          {/* Seleção de escola existente */}
           {!isNewSchool ? (
+            <>
             <FormField
               control={form.control}
               name="schoolId"
@@ -375,90 +467,14 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 </FormItem>
               )}
             />
-          ) : (
-            <>
-              <FormField
-                control={form.control}
-                name="newSchoolName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome da Escola *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nome completo da escola" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="newSchoolAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Endereço Completo</FormLabel>
-                    <FormControl>
-                      <AddressAutocomplete
-                        value={field.value || ''}
-                        onChange={field.onChange}
-                        onCoordinatesChange={(lat, lon) => setCoordinates({ lat, lon })}
-                        onNeighborhoodChange={(neighborhood) => {
-                          form.setValue('newSchoolNeighborhood', neighborhood);
-                        }}
-                        placeholder="Rua, número, complemento"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="newSchoolNeighborhood"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bairro</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nome do bairro" {...field} disabled />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="newSchoolNature"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Natureza</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Pública">Pública</SelectItem>
-                          <SelectItem value="Particular">Particular</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Turnos e Períodos apenas para nova escola */}
-              <div className="space-y-4">
-                <h4 className="font-poppins font-semibold text-sm">Turnos Disponíveis</h4>
+              {/* Turno(s) e Período(s) para escola existente */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                 <FormField
                   control={form.control}
                   name="newSchoolShifts"
                   render={() => (
                     <FormItem>
+                      <FormLabel>Turno(s)</FormLabel>
                       <div className="grid grid-cols-2 gap-4">
                         {availableShifts.map((shift) => (
                           <FormField
@@ -488,16 +504,13 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                     </FormItem>
                   )}
                 />
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-poppins font-semibold text-sm">Períodos de Ensino</h4>
                 <FormField
                   control={form.control}
                   name="newSchoolPeriods"
                   render={() => (
                     <FormItem>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormLabel>Período(s)</FormLabel>
+                      <div className="grid grid-cols-1 gap-4">
                         {availablePeriods.map((period) => (
                           <FormField
                             key={period}
@@ -522,60 +535,93 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                             )}
                           />
                         ))}
-                        <FormField
-                          key="Outros"
-                          control={form.control}
-                          name="newSchoolPeriods"
-                          render={({ field }) => (
-                            <FormItem className="flex items-center space-x-2 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes('Outros')}
-                                  onCheckedChange={(checked) => {
-                                    return checked
-                                      ? field.onChange([...(field.value || []), 'Outros'])
-                                      : field.onChange(
-                                          field.value?.filter((value) => value !== 'Outros')
-                                        );
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">Outros</FormLabel>
-                            </FormItem>
-                          )}
-                        />
                       </div>
                     </FormItem>
                   )}
                 />
-                
-                {form.watch('newSchoolPeriods')?.includes('Outros') && (
-                  <FormField
-                    control={form.control}
-                    name="customPeriod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Especifique o período</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Digite o período" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              </div>
+            </>
+          ) : (
+            <>
+              <FormField
+                control={form.control}
+                name="newSchoolName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome da Escola *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome completo da escola" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
+              />
+              <FormField
+                control={form.control}
+                name="newSchoolAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Endereço Completo</FormLabel>
+                    <FormControl>
+                      <AddressAutocomplete
+                        value={field.value || ''}
+                        onChange={field.onChange}
+                        onCoordinatesChange={(lat, lon) => setCoordinates({ lat, lon })}
+                        onNeighborhoodChange={(neighborhood) => {
+                          form.setValue('newSchoolNeighborhood', neighborhood);
+                        }}
+                        placeholder="Rua, número, complemento"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="newSchoolNeighborhood"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Bairro</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nome do bairro" {...field} disabled />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="newSchoolNature"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Natureza</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Pública">Pública</SelectItem>
+                          <SelectItem value="Particular">Particular</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </>
           )}
         </div>
-
         {/* Instrutores */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores *</h3>
           <p className="text-xs sm:text-sm text-muted-foreground">
             Recomende um ou mais professores instrutores que você teve durante o estágio
           </p>
-          
           <button
             type="button"
             onClick={addInstructor}
@@ -583,11 +629,9 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           >
             + Adicionar Instrutor
           </button>
-
-          {instructors.length > 0 && (
+          {form.watch('instructors')?.length > 0 && (
             <InstructorFields
-              instructors={instructors}
-              onAdd={addInstructor}
+              instructors={form.watch('instructors')}
               onRemove={removeInstructor}
               onSave={saveInstructor}
               form={form}
@@ -595,22 +639,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             />
           )}
         </div>
-
-        {/* Aviso sobre dados pessoais */}
-        <div className="space-y-4 bg-primary/5 p-4 rounded-lg border border-primary/20">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">
-                Dados de contato protegidos
-              </p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Se você preencher algum dado pessoal (Email, WhatsApp, LinkedIn ou Instagram), será necessário fazer login. Essas informações ficarão protegidas e só serão visíveis para outros usuários caso você permita quando receberem uma solicitação de contato.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Informações Adicionais */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Informações Adicionais (Opcional)</h3>
@@ -632,7 +660,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             )}
           />
         </div>
-
         <button
           type="submit" 
           className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none" 

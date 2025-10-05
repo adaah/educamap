@@ -30,6 +30,7 @@ const AuthPage = () => {
   const [fullName, setFullName] = useState("");
   const [occupation, setOccupation] = useState("");
   const [institution, setInstitution] = useState("");
+  const [course, setCourse] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
@@ -93,6 +94,7 @@ const AuthPage = () => {
       full_name: fullName,
       occupation: occupation || null,
       institution: institution || null,
+      course: course || null,
     });
 
     if (error) {
@@ -135,7 +137,7 @@ const AuthPage = () => {
     setLoading(true);
 
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: `${window.location.origin}/auth`,
+      redirectTo: `${window.location.origin}/minha-conta?tab=redefinir-senha`,
     });
 
     if (error) {
@@ -321,6 +323,18 @@ const AuthPage = () => {
                           placeholder="Ex: UFBA, UNEB"
                           value={institution}
                           onChange={(e) => setInstitution(e.target.value)}
+                          className="h-11"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-course">Curso/Área</Label>
+                        <Input
+                          id="signup-course"
+                          type="text"
+                          placeholder="Ex: Pedagogia, Matemática, História"
+                          value={course}
+                          onChange={(e) => setCourse(e.target.value)}
                           className="h-11"
                         />
                       </div>

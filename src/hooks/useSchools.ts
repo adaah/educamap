@@ -137,6 +137,8 @@ export const useSchool = (id: string) => {
           id: i.id,
           name: i.name,
           subject: i.subject,
+          shifts: i.shifts || [],
+          periods: i.periods || [],
           email: i.email || undefined,
           linkedin: i.linkedin || undefined,
           whatsapp: i.whatsapp || undefined,

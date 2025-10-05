@@ -6,12 +6,19 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { UseFormReturn } from 'react-hook-form';
 import { useState } from 'react';
 
+const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
+const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
+
 export interface Instructor {
   name: string;
   subjects: string[];
   customSubject?: string;
+  shifts?: string[];
+  periods?: string[];
   email?: string;
   linkedin?: string;
+  instagram?: string;
+  whatsapp?: string;
   saved?: boolean;
 }
 
@@ -26,12 +33,11 @@ interface InstructorFieldsProps {
 
 export const InstructorFields = ({ 
   instructors, 
-  onAdd, 
   onRemove,
   onSave,
   form,
   availableSubjects 
-}: InstructorFieldsProps) => {
+}: Omit<InstructorFieldsProps, 'onAdd'>) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const handleSaveInstructor = (index: number) => {
@@ -50,17 +56,6 @@ export const InstructorFields = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-        <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores</h3>
-        <button
-          type="button"
-          onClick={onAdd}
-          className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all"
-        >
-          + Adicionar Instrutor
-        </button>
-      </div>
-
       {instructors.map((instructor, index) => {
         const isSaved = instructor.saved || editingIndex !== index;
         const isEditing = editingIndex === index || !instructor.saved;
@@ -177,6 +172,66 @@ export const InstructorFields = ({
                 )}
               />
             )}
+
+            <div>
+              <FormLabel className="mb-2 block">Turno(s) *</FormLabel>
+              <div className="grid grid-cols-2 gap-3">
+                {availableShifts.map((shift) => (
+                  <FormField
+                    key={shift}
+                    control={form.control}
+                    name={`instructors.${index}.shifts`}
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes(shift)}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...(field.value || []), shift])
+                                : field.onChange(
+                                    field.value?.filter((value: string) => value !== shift)
+                                  );
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal text-sm">{shift}</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <FormLabel className="mb-2 block">Período(s) *</FormLabel>
+              <div className="grid grid-cols-2 gap-3">
+                {availablePeriods.map((period) => (
+                  <FormField
+                    key={period}
+                    control={form.control}
+                    name={`instructors.${index}.periods`}
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes(period)}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...(field.value || []), period])
+                                : field.onChange(
+                                    field.value?.filter((value: string) => value !== period)
+                                  );
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal text-sm">{period}</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField

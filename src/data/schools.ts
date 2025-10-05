@@ -17,6 +17,8 @@ export interface School {
     id: string;
     name: string;
     subject: string;
+    shifts?: string[];
+    periods?: string[];
     email?: string;
     linkedin?: string;
     whatsapp?: string;

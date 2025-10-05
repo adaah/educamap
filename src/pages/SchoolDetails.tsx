@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ProtectedContactInfo } from '@/components/ProtectedContactInfo';
+import { ContactIcons } from '@/components/ContactIcons';
 import { 
   ArrowLeft, 
   MapPin, 
@@ -265,20 +266,38 @@ const SchoolDetails = () => {
                       <div className="p-3 bg-filter-bg rounded-lg">
                         <h4 className="font-poppins font-semibold text-xs sm:text-sm">{instructor.name}</h4>
                         <p className="text-muted-foreground font-montserrat text-xs sm:text-sm">{instructor.subject}</p>
+                        {(instructor.shifts && instructor.shifts.length > 0) && (
+                          <div className="mt-2">
+                            <p className="text-xs text-muted-foreground">
+                              <span className="font-medium">Turno(s):</span> {instructor.shifts.join(', ')}
+                            </p>
+                          </div>
+                        )}
+                        {(instructor.periods && instructor.periods.length > 0) && (
+                          <div className="mt-1">
+                            <p className="text-xs text-muted-foreground">
+                              <span className="font-medium">Período(s):</span> {instructor.periods.join(', ')}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                      <ProtectedContactInfo
-                        entityType="instructor"
-                        entityId={instructor.id}
-                        entityName={instructor.name}
-                        contactData={{
-                          email: instructor.email,
-                          whatsapp: instructor.whatsapp,
-                          linkedin: instructor.linkedin,
-                          instagram: instructor.instagram,
-                        }}
-                        contributorName={instructor.contributorName}
-                        ownerUserId={instructor.userId}
-                      />
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h5 className="font-medium text-sm text-muted-foreground">Contatos disponíveis:</h5>
+                        </div>
+                        <ContactIcons
+                          contactData={{
+                            email: instructor.email,
+                            whatsapp: instructor.whatsapp,
+                            linkedin: instructor.linkedin,
+                            instagram: instructor.instagram,
+                          }}
+                          entityType="instructor"
+                          entityId={instructor.id}
+                          entityName={instructor.name}
+                          ownerUserId={instructor.userId}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -327,19 +346,23 @@ const SchoolDetails = () => {
                           {student.university} - {student.course}
                         </p>
                       </div>
-                      <ProtectedContactInfo
-                        entityType="former_student"
-                        entityId={student.id}
-                        entityName={student.name}
-                        contactData={{
-                          email: student.email,
-                          whatsapp: student.whatsapp,
-                          linkedin: student.linkedin,
-                          instagram: student.instagram,
-                        }}
-                        contributorName={student.contributorName}
-                        ownerUserId={student.userId}
-                      />
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h5 className="font-medium text-sm text-muted-foreground">Contatos disponíveis:</h5>
+                        </div>
+                        <ContactIcons
+                          contactData={{
+                            email: student.email,
+                            whatsapp: student.whatsapp,
+                            linkedin: student.linkedin,
+                            instagram: student.instagram,
+                          }}
+                          entityType="former_student"
+                          entityId={student.id}
+                          entityName={student.name}
+                          ownerUserId={student.userId}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>

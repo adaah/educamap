@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { usePendingSubmissions } from "@/hooks/usePendingSubmissions";
 import { useSchools } from "@/hooks/useSchools";
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { LogOut, Check, X, Trash2, Eye } from "lucide-react";
+import { AdminNotifications } from "@/components/AdminNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -18,6 +20,9 @@ const AdminPanel = () => {
   const { user, isAdmin, loading, signOut } = useAdminAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  
+  // Ativar atualizações em tempo real
+  useRealtimeUpdates();
 
   const {
     pendingSchools,
@@ -106,6 +111,9 @@ const AdminPanel = () => {
             Sair
           </Button>
         </div>
+
+        {/* Notificações */}
+        <AdminNotifications />
 
         <Tabs defaultValue="pending" className="space-y-4">
           <TabsList>

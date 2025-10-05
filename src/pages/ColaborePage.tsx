@@ -15,6 +15,7 @@ import {
 import { ShareExperienceForm } from '@/components/forms/ShareExperienceForm';
 import { RegisterSchoolForm } from '@/components/forms/RegisterSchoolForm';
 import { InstitutionalDataForm } from '@/components/forms/InstitutionalDataForm';
+import { RegisterInstructorForm } from '@/components/forms/RegisterInstructorForm';
 
 const ColaborePage = () => {
   const [openDialog, setOpenDialog] = useState<string | null>(null);
@@ -40,6 +41,13 @@ const ColaborePage = () => {
       description: "Para gestores escolares ou secretarias que desejam fornecer informações oficiais de contato, turmas e oportunidades.",
       buttonText: "Atualizar Dados da Escola",
       form: InstitutionalDataForm,
+    },
+    {
+      id: 'register-instructor',
+      title: "Cadastrar-se como Professor Instrutor",
+      description: "Para professores que desejam se cadastrar como instrutores e disponibilizar seus dados de contato para estudantes.",
+      buttonText: "Cadastrar como Instrutor",
+      form: RegisterInstructorForm,
     }
   ];
 
@@ -72,7 +80,8 @@ const ColaborePage = () => {
               const icons = [
                 <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" /></svg>,
                 <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>,
-                <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
+                <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /></svg>
               ];
               
               return (
@@ -104,7 +113,7 @@ const ColaborePage = () => {
                               {option.buttonText}
                             </button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-subtle border-2 mx-2">
+                          <DialogContent className="bg-gradient-subtle border-2 mx-2">
                             <DialogHeader className="space-y-3 pb-4 sm:pb-6 border-b">
                               <div className="inline-flex p-2 sm:p-3 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl text-primary w-fit">
                                 {icons[index]}

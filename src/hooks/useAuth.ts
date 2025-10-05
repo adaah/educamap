@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
+import { useQuery } from '@tanstack/react-query';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -58,5 +59,29 @@ export const useAuth = () => {
     return { error };
   };
 
-  return { user, session, loading, signUp, signIn, signOut };
+  const updatePassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    return { error };
+  };
+
+  return { user, session, loading, signUp, signIn, signOut, updatePassword };
 };
+
+export function useUserProfile(userId?: string) {
+  return useQuery({
+    queryKey: ['user-profile', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (!userId) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name, institution, occupation')
+        .eq('user_id', userId)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+}

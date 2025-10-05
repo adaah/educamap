@@ -174,6 +174,44 @@ export const usePendingSubmissions = () => {
     mutationFn: async (pendingStudent: any) => {
       const { data: user } = await supabase.auth.getUser();
 
+      // Se há dados de escola na experiência, atualizar a escola
+      if (pendingStudent.school_id) {
+        // Buscar dados da escola atual
+        const { data: schoolData, error: schoolError } = await supabase
+          .from('schools')
+          .select('*')
+          .eq('id', pendingStudent.school_id)
+          .single();
+
+        if (!schoolError && schoolData) {
+          // Atualizar dados da escola com informações da experiência
+          const updateData: any = {};
+          
+          // Atualizar email se não existir ou se for diferente
+          if (pendingStudent.email && !schoolData.email) {
+            updateData.email = pendingStudent.email;
+          }
+          
+          // Atualizar telefone se não existir ou se for diferente
+          if (pendingStudent.whatsapp && !schoolData.phone) {
+            updateData.phone = pendingStudent.whatsapp;
+          }
+          
+          // Atualizar informações adicionais se não existirem
+          if (pendingStudent.additional_info && !schoolData.additional_info) {
+            updateData.additional_info = pendingStudent.additional_info;
+          }
+
+          // Aplicar atualizações se houver
+          if (Object.keys(updateData).length > 0) {
+            await supabase
+              .from('schools')
+              .update(updateData)
+              .eq('id', pendingStudent.school_id);
+          }
+        }
+      }
+
       await supabase.from("former_students").insert({
         name: pendingStudent.name,
         course: pendingStudent.course,
@@ -183,7 +221,8 @@ export const usePendingSubmissions = () => {
         linkedin: pendingStudent.linkedin,
         instagram: pendingStudent.instagram,
         contributor_name: pendingStudent.contributor_name,
-        school_id: null, // This would need to be linked if applicable
+        school_id: pendingStudent.school_id || null,
+        user_id: pendingStudent.user_id || null,
       });
 
       await supabase

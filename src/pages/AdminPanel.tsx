@@ -8,20 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Check, X, Trash2, Eye } from "lucide-react";
+import { LogOut, Check, X, Trash2 } from "lucide-react";
 import { AdminNotifications } from "@/components/AdminNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const AdminPanel = () => {
   const { user, isAdmin, loading, signOut } = useAdminAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  // Ativar atualizações em tempo real
   useRealtimeUpdates();
 
   const {
@@ -35,20 +32,6 @@ const AdminPanel = () => {
   } = usePendingSubmissions();
 
   const { data: schools = [] } = useSchools();
-
-  const { data: contactLogs = [] } = useQuery({
-    queryKey: ["contactLogs"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("contact_view_logs")
-        .select("*")
-        .order("viewed_at", { ascending: false })
-        .limit(100);
-
-      if (error) throw error;
-      return data;
-    },
-  });
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -112,7 +95,6 @@ const AdminPanel = () => {
           </Button>
         </div>
 
-        {/* Notificações */}
         <AdminNotifications />
 
         <Tabs defaultValue="pending" className="space-y-4">
@@ -124,12 +106,6 @@ const AdminPanel = () => {
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="existing">Dados Existentes</TabsTrigger>
-            <TabsTrigger value="logs">
-              Logs de Visualização
-              <Badge variant="secondary" className="ml-2">
-                {contactLogs.length}
-              </Badge>
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="pending" className="space-y-4">
@@ -149,21 +125,11 @@ const AdminPanel = () => {
                       <p className="text-sm">Contribuidor: {school.contributor_name}</p>
                     )}
                     <div className="flex gap-2 mt-4">
-                      <Button
-                        size="sm"
-                        onClick={() => approveSchool.mutate(school)}
-                        disabled={approveSchool.isPending}
-                      >
-                        <Check className="mr-2 h-4 w-4" />
-                        Aprovar
+                      <Button size="sm" onClick={() => approveSchool.mutate(school)} disabled={approveSchool.isPending}>
+                        <Check className="mr-2 h-4 w-4" />Aprovar
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => rejectSubmission.mutate({ table: "pending_schools", id: school.id })}
-                      >
-                        <X className="mr-2 h-4 w-4" />
-                        Rejeitar
+                      <Button size="sm" variant="destructive" onClick={() => rejectSubmission.mutate({ table: "pending_schools", id: school.id })}>
+                        <X className="mr-2 h-4 w-4" />Rejeitar
                       </Button>
                     </div>
                   </div>
@@ -184,25 +150,13 @@ const AdminPanel = () => {
                   <div key={instructor.id} className="border rounded-lg p-4 space-y-2">
                     <h3 className="font-semibold">{instructor.name}</h3>
                     <p className="text-sm">Disciplina: {instructor.subject}</p>
-                    {instructor.school_name && (
-                      <p className="text-sm">Escola: {instructor.school_name}</p>
-                    )}
+                    {instructor.school_name && <p className="text-sm">Escola: {instructor.school_name}</p>}
                     <div className="flex gap-2 mt-4">
-                      <Button
-                        size="sm"
-                        onClick={() => approveInstructor.mutate(instructor)}
-                        disabled={approveInstructor.isPending}
-                      >
-                        <Check className="mr-2 h-4 w-4" />
-                        Aprovar
+                      <Button size="sm" onClick={() => approveInstructor.mutate(instructor)} disabled={approveInstructor.isPending}>
+                        <Check className="mr-2 h-4 w-4" />Aprovar
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => rejectSubmission.mutate({ table: "pending_instructors", id: instructor.id })}
-                      >
-                        <X className="mr-2 h-4 w-4" />
-                        Rejeitar
+                      <Button size="sm" variant="destructive" onClick={() => rejectSubmission.mutate({ table: "pending_instructors", id: instructor.id })}>
+                        <X className="mr-2 h-4 w-4" />Rejeitar
                       </Button>
                     </div>
                   </div>
@@ -225,21 +179,11 @@ const AdminPanel = () => {
                     <p className="text-sm">Curso: {student.course}</p>
                     <p className="text-sm">Universidade: {student.university}</p>
                     <div className="flex gap-2 mt-4">
-                      <Button
-                        size="sm"
-                        onClick={() => approveStudent.mutate(student)}
-                        disabled={approveStudent.isPending}
-                      >
-                        <Check className="mr-2 h-4 w-4" />
-                        Aprovar
+                      <Button size="sm" onClick={() => approveStudent.mutate(student)} disabled={approveStudent.isPending}>
+                        <Check className="mr-2 h-4 w-4" />Aprovar
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => rejectSubmission.mutate({ table: "pending_former_students", id: student.id })}
-                      >
-                        <X className="mr-2 h-4 w-4" />
-                        Rejeitar
+                      <Button size="sm" variant="destructive" onClick={() => rejectSubmission.mutate({ table: "pending_former_students", id: student.id })}>
+                        <X className="mr-2 h-4 w-4" />Rejeitar
                       </Button>
                     </div>
                   </div>
@@ -280,59 +224,6 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="logs" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Histórico de Visualizações de Contatos</CardTitle>
-                <CardDescription>
-                  Registro de todos os usuários que visualizaram dados de contato
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {contactLogs.map((log) => (
-                    <div key={log.id} className="border rounded-lg p-4 space-y-2">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3 flex-1">
-                          <Eye className="h-5 w-5 text-muted-foreground mt-0.5" />
-                          <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-sm">
-                              {log.viewer_email}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              visualizou dados de contato de{" "}
-                              <span className="font-medium">{log.viewed_entity_name}</span>
-                              {" "}({log.viewed_entity_type === "former_student" ? "Ex-estagiário" : 
-                                 log.viewed_entity_type === "instructor" ? "Professor" : "Escola"})
-                            </p>
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {log.contact_fields_viewed.map((field: string) => (
-                                <Badge key={field} variant="outline" className="text-xs">
-                                  {field}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-xs text-muted-foreground whitespace-nowrap">
-                          {formatDistanceToNow(new Date(log.viewed_at), {
-                            addSuffix: true,
-                            locale: ptBR,
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  {contactLogs.length === 0 && (
-                    <p className="text-muted-foreground text-center py-8">
-                      Nenhuma visualização registrada ainda
-                    </p>
-                  )}
-                </div>
               </CardContent>
             </Card>
           </TabsContent>

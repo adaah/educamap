@@ -1,18 +1,14 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Map, List, LogOut, User } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Map, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, signOut } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 sm:h-16 items-center px-3 sm:px-4">
-        {/* Logo/Brand */}
         <Link 
           to="/" 
           className="flex items-center space-x-2 mr-2 sm:mr-0"
@@ -26,7 +22,6 @@ const Header = () => {
           </div>
         </Link>
 
-        {/* Navigation Menu - Hidden on mobile, shown on desktop */}
         <nav className="hidden md:flex items-center space-x-1 ml-auto sm:ml-8">
           <Button
             variant={location.pathname === '/' ? 'default' : 'ghost'}
@@ -61,37 +56,7 @@ const Header = () => {
           </Button>
         </nav>
 
-        {/* Auth Status & Beta Badge */}
         <div className="ml-auto md:ml-4 flex items-center gap-2">
-          {user ? (
-            <div className="hidden sm:flex items-center gap-2">
-              <Badge 
-                variant="outline" 
-                className="font-montserrat text-xs cursor-pointer hover:bg-accent transition-colors"
-                onClick={() => navigate('/minha-conta')}
-              >
-                <User className="w-3 h-3 mr-1" />
-                {user.email}
-              </Badge>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => signOut()}
-                className="h-8"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
-            </div>
-          ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="hidden sm:flex h-8 font-montserrat"
-            >
-              <Link to="/auth">Login</Link>
-            </Button>
-          )}
           <Badge variant="secondary" className="bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 font-poppins font-semibold">
             BETA
           </Badge>

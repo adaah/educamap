@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,7 +11,6 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AddressAutocomplete } from '@/components/AddressAutocomplete';
 import { InstructorFields } from '@/components/forms/InstructorFields';
-import { Info } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -29,22 +28,11 @@ import {
 } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, Plus } from 'lucide-react';
-import { useAuth, useUserProfile } from '@/hooks/useAuth';
 
 const availableSubjects = [
-  'Matemática',
-  'Português',
-  'Ciências',
-  'História',
-  'Geografia',
-  'Educação Física',
-  'Artes',
-  'Inglês',
-  'Filosofia',
-  'Sociologia',
-  'Química',
-  'Física',
-  'Biologia',
+  'Matemática', 'Português', 'Ciências', 'História', 'Geografia',
+  'Educação Física', 'Artes', 'Inglês', 'Filosofia', 'Sociologia',
+  'Química', 'Física', 'Biologia',
 ];
 
 const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
@@ -56,10 +44,6 @@ interface Instructor {
   customSubject?: string;
   shifts?: string[];
   periods?: string[];
-  email?: string;
-  linkedin?: string;
-  instagram?: string;
-  whatsapp?: string;
   saved?: boolean;
 }
 
@@ -69,24 +53,13 @@ const instructorSchema = z.object({
   customSubject: z.string(),
   shifts: z.array(z.string()).optional(),
   periods: z.array(z.string()).optional(),
-  email: z.string(),
-  linkedin: z.string(),
-  instagram: z.string(),
-  whatsapp: z.string(),
   saved: z.boolean(),
 });
 
 const formSchema = z.object({
-  // Dados do ex-estagiário
   studentName: z.string().trim().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100),
   university: z.string().trim().min(3, 'Universidade deve ter pelo menos 3 caracteres').max(100),
   course: z.string().trim().min(3, 'Curso deve ter pelo menos 3 caracteres').max(100),
-  studentEmail: z.string().trim().email('Email inválido').max(255).optional().or(z.literal('')),
-  studentLinkedin: z.string().trim().max(255).optional().or(z.literal('')),
-  studentInstagram: z.string().trim().max(100).optional().or(z.literal('')),
-  studentWhatsapp: z.string().trim().max(20).optional().or(z.literal('')),
-  
-  // Dados da escola
   schoolId: z.string().optional(),
   newSchoolName: z.string().trim().max(200).optional(),
   newSchoolAddress: z.string().trim().max(500).optional(),
@@ -95,12 +68,7 @@ const formSchema = z.object({
   newSchoolShifts: z.array(z.string()).optional(),
   newSchoolPeriods: z.array(z.string()).optional(),
   customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
-  
-  // Informações adicionais
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
-  
-  // Consentimento - removido pois não é mais necessário
-  consentToShareData: z.boolean().optional().default(true),
   instructors: z.array(instructorSchema).default([]),
 });
 
@@ -111,9 +79,6 @@ interface ShareExperienceFormProps {
 }
 
 export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => {
-  const { user } = useAuth();
-  const userId = user?.id;
-  const { data: profile } = useUserProfile(userId);
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isNewSchool, setIsNewSchool] = useState(false);
@@ -136,27 +101,13 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
   >({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      studentName: profile?.full_name || '',
-      university: profile?.institution || '',
-      course: profile?.occupation || '',
-      studentEmail: '',
-      studentLinkedin: '',
-      studentInstagram: '',
-      studentWhatsapp: '',
+      studentName: '',
+      university: '',
+      course: '',
       additionalInfo: '',
-      consentToShareData: false,
       instructors: [],
     },
   });
-
-  // Preencher campos automaticamente quando perfil carregar
-  useEffect(() => {
-    if (user && profile) {
-      form.setValue('studentName', profile.full_name || '');
-      form.setValue('university', profile.institution || '');
-      form.setValue('course', profile.occupation || '');
-    }
-  }, [user, profile, form]);
 
   function ensureInstructor(i: Partial<Instructor>): Instructor {
     return {
@@ -165,15 +116,10 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       customSubject: i.customSubject ?? '',
       shifts: i.shifts ?? [],
       periods: i.periods ?? [],
-      email: i.email ?? '',
-      linkedin: i.linkedin ?? '',
-      instagram: i.instagram ?? '',
-      whatsapp: i.whatsapp ?? '',
       saved: i.saved ?? false,
     };
   }
 
-  // Adicionar instrutor
   const addInstructor = () => {
     const current = form.getValues('instructors') || [];
     const next: Instructor[] = [
@@ -183,13 +129,11 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
     form.setValue('instructors', next);
   };
 
-  // Remover instrutor
   const removeInstructor = (index: number) => {
     const current = form.getValues('instructors') || [];
     form.setValue('instructors', current.filter((_, i) => i !== index));
   };
 
-  // Salvar instrutor
   const saveInstructor = (index: number) => {
     const current = form.getValues('instructors') || [];
     if (!current[index]?.name || !current[index]?.subjects?.length || !current[index]?.shifts?.length || !current[index]?.periods?.length) return;
@@ -197,7 +141,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
     form.setValue('instructors', [...current]);
   };
 
-  // Validação no submit
   const onSubmit = async (data: FormData) => {
     const validInstructors = (data.instructors || []).filter(i => 
       i.saved && i.name && i.subjects.length > 0 && i.shifts && i.shifts.length > 0 && i.periods && i.periods.length > 0
@@ -212,22 +155,13 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
     }
     setIsSubmitting(true);
     try {
-      // Inserir ex-estagiário na tabela pending
       const { error: studentError } = await supabase
         .from('pending_former_students')
         .insert({
           name: data.studentName,
           university: data.university,
           course: data.course,
-          email: data.studentEmail || null,
-          linkedin: data.studentLinkedin ? `https://linkedin.com/in/${data.studentLinkedin}` : null,
-          instagram: data.studentInstagram ? `https://www.instagram.com/${data.studentInstagram}` : null,
-          whatsapp: data.studentWhatsapp || null,
           contributor_name: data.studentName,
-          consent_to_share_data: data.consentToShareData,
-          school_id: data.schoolId || null,
-          user_id: user?.id || null,
-          additional_info: data.additionalInfo || null,
         });
 
       if (studentError) throw studentError;
@@ -253,7 +187,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Dados do Ex-Estagiário */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Seus Dados como Ex-Estagiário</h3>
           <FormField
@@ -263,7 +196,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
               <FormItem>
                 <FormLabel>Nome *</FormLabel>
                 <FormControl>
-                  <Input placeholder="Seu nome" {...field} disabled={!!user} />
+                  <Input placeholder="Seu nome" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -277,7 +210,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 <FormItem>
                   <FormLabel>Universidade *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: UFBA" {...field} disabled={!!user} />
+                    <Input placeholder="Ex: UFBA" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -290,139 +223,15 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 <FormItem>
                   <FormLabel>Curso *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Pedagogia" {...field} disabled={!!user} />
+                    <Input placeholder="Ex: Pedagogia" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          {/* Campos de contato */}
-          {user ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="studentEmail"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email (opcional)</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="seu@email.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="studentWhatsapp"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>WhatsApp (opcional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="(71) 99999-9999" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="studentLinkedin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>LinkedIn (opcional)</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center">
-                      <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">linkedin.com/in/</span>
-                      <Input 
-                        placeholder="seu-perfil" 
-                        {...field}
-                        onChange={(e) => {
-                          let value = e.target.value;
-                          value = value.replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//i, '');
-                          field.onChange(value);
-                        }}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="studentInstagram"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Instagram (opcional)</FormLabel>
-                  <FormControl>
-                    <div className="flex items-center">
-                      <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">instagram.com/</span>
-                      <Input 
-                        placeholder="usuario" 
-                        {...field}
-                        onChange={(e) => {
-                          let value = e.target.value;
-                          value = value.replace(/^@/, '');
-                          value = value.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '');
-                          field.onChange(value);
-                        }}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="studentLinkedin"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>LinkedIn (opcional)</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center">
-                        <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">linkedin.com/in/</span>
-                        <Input 
-                          placeholder="seu-perfil" 
-                          {...field}
-                          onChange={(e) => {
-                            let value = e.target.value;
-                            value = value.replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//i, '');
-                            field.onChange(value);
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          {/* Mensagem de aviso para dados protegidos */}
-          {user && (
-            (form.watch('studentEmail') || form.watch('studentWhatsapp') || form.watch('studentInstagram')) && (
-              <div className="space-y-4 bg-primary/5 p-4 rounded-lg border border-primary/20 mt-2">
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-foreground">
-                      Dados de contato protegidos
-                    </p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      Essas informações ficarão protegidas e só serão disponibilizados para outros usuários caso você permita quando receberem uma solicitação de contato.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )
-          )}
         </div>
+        
         {/* Dados da Escola */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Escola do Estágio</h3>
@@ -436,7 +245,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             />
             <Label htmlFor="newSchool">A escola não está no mapa</Label>
           </div>
-          {/* Seleção de escola existente */}
           {!isNewSchool ? (
             <>
             <FormField
@@ -467,7 +275,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 </FormItem>
               )}
             />
-              {/* Turno(s) e Período(s) para escola existente */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                 <FormField
                   control={form.control}
@@ -489,9 +296,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                                     onCheckedChange={(checked) => {
                                       return checked
                                         ? field.onChange([...(field.value || []), shift])
-                                        : field.onChange(
-                                            field.value?.filter((value) => value !== shift)
-                                          );
+                                        : field.onChange(field.value?.filter((value) => value !== shift));
                                     }}
                                   />
                                 </FormControl>
@@ -524,9 +329,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                                     onCheckedChange={(checked) => {
                                       return checked
                                         ? field.onChange([...(field.value || []), period])
-                                        : field.onChange(
-                                            field.value?.filter((value) => value !== period)
-                                          );
+                                        : field.onChange(field.value?.filter((value) => value !== period));
                                     }}
                                   />
                                 </FormControl>
@@ -616,6 +419,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             </>
           )}
         </div>
+        
         {/* Instrutores */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores *</h3>
@@ -639,6 +443,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             />
           )}
         </div>
+        
         {/* Informações Adicionais */}
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-lg">Informações Adicionais (Opcional)</h3>
@@ -678,4 +483,3 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
     </Form>
   );
 };
-

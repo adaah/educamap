@@ -9,8 +9,6 @@ import SchoolDetails from "./pages/SchoolDetails";
 import ColaborePage from "./pages/ColaborePage";
 import AdminLogin from "./pages/AdminLogin";
 import AdminPanel from "./pages/AdminPanel";
-import AuthPage from "./pages/AuthPage";
-import MyAccountPage from "./pages/MyAccountPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,8 +24,6 @@ const App = () => (
           <Route path="/lista" element={<ListPage />} />
           <Route path="/escola/:id" element={<SchoolDetails />} />
           <Route path="/colabore" element={<ColaborePage />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/minha-conta" element={<MyAccountPage />} />
           <Route path="/admin-acesso" element={<AdminLogin />} />
           <Route path="/painel-administrativo" element={<AdminPanel />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

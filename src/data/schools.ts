@@ -19,24 +19,14 @@ export interface School {
     subject: string;
     shifts?: string[];
     periods?: string[];
-    email?: string;
-    linkedin?: string;
-    whatsapp?: string;
-    instagram?: string;
     contributorName?: string;
-    userId?: string;
   }[];
   formerStudents: {
     id: string;
     name: string;
     university: string;
     course: string;
-    email?: string;
-    linkedin?: string;
-    instagram?: string;
-    whatsapp?: string;
     contributorName?: string;
-    userId?: string;
   }[];
 }
 

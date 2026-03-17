@@ -45,24 +45,14 @@ export const useSchools = () => {
               id: i.id,
               name: i.name,
               subject: i.subject,
-              email: i.email || undefined,
-              linkedin: i.linkedin || undefined,
-              whatsapp: i.whatsapp || undefined,
-              instagram: i.instagram || undefined,
               contributorName: i.contributor_name || undefined,
-              userId: i.user_id || undefined,
             })) || [],
             formerStudents: formerStudents.data?.map(f => ({
               id: f.id,
               name: f.name,
               university: f.university,
               course: f.course,
-              email: f.email || undefined,
-              linkedin: f.linkedin || undefined,
-              instagram: f.instagram || undefined,
-              whatsapp: f.whatsapp || undefined,
               contributorName: f.contributor_name || undefined,
-              userId: f.user_id || undefined,
             })) || [],
           };
         })
@@ -72,7 +62,6 @@ export const useSchools = () => {
     },
   });
 
-  // Real-time subscription for new schools
   useEffect(() => {
     const channel = supabase
       .channel('schools-changes')
@@ -84,7 +73,6 @@ export const useSchools = () => {
           table: 'schools'
         },
         () => {
-          // Refetch schools when any change happens
           queryClient.invalidateQueries({ queryKey: ['schools'] });
         }
       )
@@ -137,26 +125,14 @@ export const useSchool = (id: string) => {
           id: i.id,
           name: i.name,
           subject: i.subject,
-          shifts: i.shifts || [],
-          periods: i.periods || [],
-          email: i.email || undefined,
-          linkedin: i.linkedin || undefined,
-          whatsapp: i.whatsapp || undefined,
-          instagram: i.instagram || undefined,
           contributorName: i.contributor_name || undefined,
-          userId: i.user_id || undefined,
         })) || [],
         formerStudents: formerStudents.data?.map(f => ({
           id: f.id,
           name: f.name,
           university: f.university,
           course: f.course,
-          email: f.email || undefined,
-          linkedin: f.linkedin || undefined,
-          instagram: f.instagram || undefined,
-          whatsapp: f.whatsapp || undefined,
           contributorName: f.contributor_name || undefined,
-          userId: f.user_id || undefined,
         })) || [],
       } as School;
     },

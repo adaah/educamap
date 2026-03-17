@@ -15,16 +15,11 @@ export interface Instructor {
   customSubject?: string;
   shifts?: string[];
   periods?: string[];
-  email?: string;
-  linkedin?: string;
-  instagram?: string;
-  whatsapp?: string;
   saved?: boolean;
 }
 
 interface InstructorFieldsProps {
   instructors: Instructor[];
-  onAdd: () => void;
   onRemove: (index: number) => void;
   onSave?: (index: number) => void;
   form: UseFormReturn<any>;
@@ -37,13 +32,12 @@ export const InstructorFields = ({
   onSave,
   form,
   availableSubjects 
-}: Omit<InstructorFieldsProps, 'onAdd'>) => {
+}: InstructorFieldsProps) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const handleSaveInstructor = (index: number) => {
     const instructor = form.watch(`instructors.${index}`);
     
-    // Validar se tem nome e pelo menos uma disciplina
     if (!instructor?.name || !instructor?.subjects?.length) {
       return;
     }
@@ -57,7 +51,6 @@ export const InstructorFields = ({
   return (
     <div className="space-y-6">
       {instructors.map((instructor, index) => {
-        const isSaved = instructor.saved || editingIndex !== index;
         const isEditing = editingIndex === index || !instructor.saved;
         
         return (
@@ -232,51 +225,6 @@ export const InstructorFields = ({
                 ))}
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name={`instructors.${index}.email`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email (opcional)</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="email@exemplo.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`instructors.${index}.linkedin`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>LinkedIn (opcional)</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center">
-                        <span className="text-xs text-muted-foreground mr-1 whitespace-nowrap">linkedin.com/in/</span>
-                        <Input 
-                          placeholder="seu-perfil" 
-                          {...field}
-                          onChange={(e) => {
-                            let value = e.target.value;
-                            value = value.replace(/^(https?:\/\/)?(www\.)?linkedin\.com\/in\//i, '');
-                            field.onChange(value);
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <p className="text-xs text-muted-foreground mt-2">
-              Pelo menos um dos campos (Email ou LinkedIn) é recomendado para contato.
-            </p>
           </div>
         </div>
         );

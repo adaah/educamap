@@ -1,14 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSchool } from '@/hooks/useSchools';
-import { useTrackSchoolView } from '@/hooks/useTrackSchoolView';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ProtectedContactInfo } from '@/components/ProtectedContactInfo';
-import { ContactIcons } from '@/components/ContactIcons';
 import { 
   ArrowLeft, 
   MapPin, 
@@ -27,9 +24,6 @@ const SchoolDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: school, isLoading } = useSchool(id || '');
-  
-  // Track school view for logged in users
-  useTrackSchoolView(id);
 
   if (isLoading) {
     return (
@@ -70,7 +64,6 @@ const SchoolDetails = () => {
       <Header />
       
       <main className="flex-1 container py-4 sm:py-8 px-3 sm:px-6">
-        {/* Breadcrumb/Back Button */}
         <div className="mb-4 sm:mb-6">
           <Button 
             variant="ghost" 
@@ -86,7 +79,6 @@ const SchoolDetails = () => {
           </nav>
         </div>
 
-        {/* Header */}
         <div className="mb-6 sm:mb-8 px-1">
           <div className="flex flex-col gap-3 mb-3 sm:mb-4">
             <div className="flex items-start justify-between gap-3">
@@ -115,7 +107,6 @@ const SchoolDetails = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Contact Information */}
             <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
@@ -177,7 +168,6 @@ const SchoolDetails = () => {
               </CardContent>
             </Card>
 
-            {/* Additional Info - Moved here after Contact */}
             {school.additionalInfo && (
               <Card className="shadow-card bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-primary/20">
                 <CardHeader>
@@ -262,44 +252,14 @@ const SchoolDetails = () => {
               <CardContent>
                 <div className="space-y-3 sm:space-y-4">
                   {school.instructors.map((instructor, index) => (
-                    <div key={index} className="space-y-3">
-                      <div className="p-3 bg-filter-bg rounded-lg">
-                        <h4 className="font-poppins font-semibold text-xs sm:text-sm">{instructor.name}</h4>
-                        <p className="text-muted-foreground font-montserrat text-xs sm:text-sm">{instructor.subject}</p>
-                        {(instructor.shifts && instructor.shifts.length > 0) && (
-                          <div className="mt-2">
-                            <p className="text-xs text-muted-foreground">
-                              <span className="font-medium">Turno(s):</span> {instructor.shifts.join(', ')}
-                            </p>
-                          </div>
-                        )}
-                        {(instructor.periods && instructor.periods.length > 0) && (
-                          <div className="mt-1">
-                            <p className="text-xs text-muted-foreground">
-                              <span className="font-medium">Período(s):</span> {instructor.periods.join(', ')}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h5 className="font-medium text-sm text-muted-foreground">Contatos disponíveis:</h5>
-                        </div>
-                        <ContactIcons
-                          contactData={{
-                            email: instructor.email,
-                            whatsapp: instructor.whatsapp,
-                            linkedin: instructor.linkedin,
-                            instagram: instructor.instagram,
-                          }}
-                          entityType="instructor"
-                          entityId={instructor.id}
-                          entityName={instructor.name}
-                          ownerUserId={instructor.userId}
-                        />
-                      </div>
+                    <div key={index} className="p-3 bg-filter-bg rounded-lg">
+                      <h4 className="font-poppins font-semibold text-xs sm:text-sm">{instructor.name}</h4>
+                      <p className="text-muted-foreground font-montserrat text-xs sm:text-sm">{instructor.subject}</p>
                     </div>
                   ))}
+                  {school.instructors.length === 0 && (
+                    <p className="text-muted-foreground text-sm text-center py-4">Nenhum professor cadastrado</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -307,7 +267,6 @@ const SchoolDetails = () => {
 
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6">
-            {/* Quick Actions */}
             <Card className="shadow-card border-2 hover:border-primary/20 transition-all bg-gradient-to-br from-primary/5 to-secondary/5">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-lg">Ações Rápidas</CardTitle>
@@ -339,32 +298,16 @@ const SchoolDetails = () => {
               <CardContent>
                 <div className="space-y-3">
                   {school.formerStudents.map((student, index) => (
-                    <div key={index} className="space-y-3">
-                      <div className="p-3 bg-filter-bg rounded-lg">
-                        <h4 className="font-poppins font-semibold text-xs sm:text-sm">{student.name}</h4>
-                        <p className="text-muted-foreground font-montserrat text-xs">
-                          {student.university} - {student.course}
-                        </p>
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h5 className="font-medium text-sm text-muted-foreground">Contatos disponíveis:</h5>
-                        </div>
-                        <ContactIcons
-                          contactData={{
-                            email: student.email,
-                            whatsapp: student.whatsapp,
-                            linkedin: student.linkedin,
-                            instagram: student.instagram,
-                          }}
-                          entityType="former_student"
-                          entityId={student.id}
-                          entityName={student.name}
-                          ownerUserId={student.userId}
-                        />
-                      </div>
+                    <div key={index} className="p-3 bg-filter-bg rounded-lg">
+                      <h4 className="font-poppins font-semibold text-xs sm:text-sm">{student.name}</h4>
+                      <p className="text-muted-foreground font-montserrat text-xs">
+                        {student.university} - {student.course}
+                      </p>
                     </div>
                   ))}
+                  {school.formerStudents.length === 0 && (
+                    <p className="text-muted-foreground text-sm text-center py-4">Nenhum ex-aluno cadastrado</p>
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -185,8 +185,8 @@ const ListPage = () => {
                   />
                 ))
               ) : (
-                <div className="text-center py-16 bg-gradient-to-br from-background to-muted/30 rounded-xl border-2 border-dashed border-muted">
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-elegant">
+                <div className="text-center py-16 bg-muted/30 rounded-xl border-2 border-dashed border-muted">
+                  <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Search className="w-10 h-10 text-primary" />
                   </div>
                   <h3 className="font-poppins font-bold text-xl text-foreground mb-3">

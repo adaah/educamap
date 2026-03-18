@@ -83,7 +83,7 @@ const ListPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-primary/5 pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
       
       <main className="flex-1 container py-4 sm:py-8 px-3 sm:px-6 lg:px-8">

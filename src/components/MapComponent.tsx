@@ -101,8 +101,8 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
 
             // Cria o HTML do popup (igual à sua estrutura de Card, mas em string)
             const natureBadge = school.nature === 'Pública' 
-                ? '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: linear-gradient(to right, #fbbf24, #f59e0b); color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Pública</span>'
-                : '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: linear-gradient(to right, #f97316, #ea580c); color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Particular</span>';
+                ? '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: #fbbf24; color: black; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Pública</span>'
+                : '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: #f97316; color: black; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Particular</span>';
             
             const popupContent = `
                 <div class="p-3 font-montserrat" style="max-width: 280px;">

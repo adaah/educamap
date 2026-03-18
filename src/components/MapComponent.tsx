@@ -145,9 +145,12 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
             
             // 4. Conecta o Popup ao marcador
             marker.bindPopup(popupContent, {
-                // Opção para fechar o popup ao clicar em outro
                 autoClose: false,
-                closeOnClick: false 
+                closeOnClick: false,
+                autoPanPaddingTopLeft: L.point(20, 80),
+                autoPanPaddingBottomRight: L.point(20, 20),
+                maxWidth: 300,
+                minWidth: 250
             });
 
             // 5. Adiciona um Listener ao evento de 'click' do marcador

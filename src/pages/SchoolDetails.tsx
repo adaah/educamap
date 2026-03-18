@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSchool } from '@/hooks/useSchools';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+
 import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,7 +34,6 @@ const SchoolDetails = () => {
             <p className="font-montserrat text-muted-foreground">Carregando...</p>
           </div>
         </main>
-        <Footer />
         <BottomNav />
       </div>
     );
@@ -53,7 +52,6 @@ const SchoolDetails = () => {
             </Button>
           </div>
         </main>
-        <Footer />
         <BottomNav />
       </div>
     );
@@ -274,7 +272,7 @@ const SchoolDetails = () => {
               <CardContent className="space-y-3">
                 <button 
                   className="w-full px-6 py-3 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all flex items-center justify-center"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/', { state: { selectedSchool: school } })}
                 >
                   <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                   Ver no Mapa
@@ -342,7 +340,7 @@ const SchoolDetails = () => {
         </div>
       </main>
       
-      <Footer />
+      
       <BottomNav />
     </div>
   );

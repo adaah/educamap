@@ -319,7 +319,7 @@ const SchoolDetails = () => {
               </CardHeader>
               <CardContent>
                 <div 
-                  className="w-full h-40 sm:h-48 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                  className="w-full h-40 sm:h-48 bg-muted rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => {
                     const encodedAddress = encodeURIComponent(school.fullAddress);
                     window.open(`https://maps.google.com/?q=${encodedAddress}`, '_blank');

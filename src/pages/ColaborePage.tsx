@@ -109,7 +109,7 @@ const ColaborePage = () => {
                           onOpenChange={(open) => setOpenDialog(open ? option.id : null)}
                         >
                           <DialogTrigger asChild>
-                            <button className="mt-3 sm:mt-4 w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-sm sm:text-base rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
+                            <button className="mt-3 sm:mt-4 w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-secondary text-white font-poppins font-semibold text-sm sm:text-base rounded-lg hover:bg-secondary/90 transition-all">
                               {option.buttonText}
                             </button>
                           </DialogTrigger>

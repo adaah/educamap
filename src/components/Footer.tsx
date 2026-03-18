@@ -23,38 +23,12 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Useful Links */}
+          {/* Projeto */}
           <div>
-            <h3 className="font-poppins font-semibold text-base sm:text-lg mb-3 sm:mb-4">Links Úteis</h3>
-            <div className="space-y-3 text-xs sm:text-sm font-montserrat">
-              <a 
-                href="https://www.instagram.com/idealab.ic/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <span>Idealab.ic</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-              <a 
-                href="https://github.com/ic-ufba/edu-map" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <span>Código Fonte</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-              <a 
-                href="https://docs.google.com/forms/d/e/1FAIpQLSeJmzlN7bj6AOlwBqZbcQcw7NRcnsXs2Hay4q4rlzS-yOdijQ/viewform" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <span>Contato</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
+            <h3 className="font-poppins font-semibold text-base sm:text-lg mb-3 sm:mb-4">Projeto Independente</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground font-montserrat leading-relaxed">
+              Este é um projeto independente desenvolvido por estudantes na Universidade Federal da Bahia (UFBA), sem vínculo institucional oficial.
+            </p>
           </div>
         </div>
 

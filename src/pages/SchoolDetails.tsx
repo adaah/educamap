@@ -273,7 +273,7 @@ const SchoolDetails = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <button 
-                  className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center"
+                  className="w-full px-6 py-3 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all flex items-center justify-center"
                   onClick={() => navigate('/')}
                 >
                   <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />

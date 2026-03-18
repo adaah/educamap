@@ -244,21 +244,7 @@ const SchoolDetails = () => {
                     <div key={index} className="p-3 bg-filter-bg rounded-lg">
                       <h4 className="font-poppins font-semibold text-xs sm:text-sm">{instructor.name}</h4>
                       <p className="text-muted-foreground font-montserrat text-xs sm:text-sm">{instructor.subject || 'Sem informação'}</p>
-                      {!instructor.additionalInfo && (
-                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-muted-foreground italic">
-                          Sem informação
-                        </div>
-                      )}
-                      {instructor.additionalInfo && (
-                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line">
-                          {instructor.additionalInfo}
-                        </div>
-                      )}
-                      {instructor.additionalInfo && (
-                        <div className="mt-2 text-[11px] sm:text-xs text-muted-foreground italic">
-                          Enviado por: {instructor.contributorName || 'Contribuidor'}
-                        </div>
-                      )}
+                      
                       {(instructor.shifts?.length > 0 || instructor.periods?.length > 0) && (
                         <div className="mt-2 space-y-2">
                           {instructor.shifts?.length > 0 && (
@@ -279,6 +265,22 @@ const SchoolDetails = () => {
                               ))}
                             </div>
                           )}
+                        </div>
+                      )}
+                      
+                      {!instructor.additionalInfo && (
+                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-muted-foreground italic">
+                          Sem informação
+                        </div>
+                      )}
+                      {instructor.additionalInfo && (
+                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line">
+                          {instructor.additionalInfo}
+                        </div>
+                      )}
+                      {instructor.additionalInfo && (
+                        <div className="mt-2 text-[11px] sm:text-xs text-muted-foreground italic">
+                          Enviado por: {instructor.contributorName || 'Contribuidor'}
                         </div>
                       )}
                     </div>

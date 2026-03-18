@@ -77,6 +77,7 @@ const formSchema = z.object({
   newSchoolShifts: z.array(z.string()).optional(),
   newSchoolPeriods: z.array(z.string()).optional(),
   customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
+  studentExperience: z.string().trim().max(1000).optional().or(z.literal('')),
   instructors: z.array(instructorSchema).default([]),
 });
 
@@ -119,6 +120,9 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       newSchoolEmail: '',
       newSchoolPhone: '',
       newSchoolWebsite: '',
+      newSchoolPeriods: [],
+      customPeriod: '',
+      studentExperience: '',
       instructors: [],
     },
   });
@@ -221,7 +225,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             email: data.hasContactData ? (data.newSchoolEmail || null) : null,
             phone: data.hasContactData ? (data.newSchoolPhone || null) : null,
             website: data.hasContactData ? (data.newSchoolWebsite || null) : null,
-            additional_info: data.additionalInfo || null,
+            additional_info: data.studentExperience || null,
             contributor_name: data.studentName,
             periods: data.hasContactData ? (data.newSchoolPeriods || []) : [],
             shifts: data.hasContactData ? (data.newSchoolShifts || []) : [],
@@ -239,6 +243,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           university: data.university,
           course: data.course,
           contributor_name: data.studentName,
+          additional_info: data.studentExperience || null,
         });
 
       if (studentError) throw studentError;
@@ -263,7 +268,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             school_name: isNewSchool ? (data.newSchoolName || null) : null,
             shifts: instructor.shifts || [],
             periods: instructor.periods || [],
-            additional_info: data.additionalInfo || null,
+            additional_info: data.studentExperience || null,
           });
         if (instructorError) throw instructorError;
       }
@@ -735,6 +740,28 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
               availableSubjects={availableSubjects}
             />
           )}
+        </div>
+        
+        {/* Experiência do Estagiário */}
+        <div className="space-y-4">
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Sua Experiência como Estagiário (Opcional)</h3>
+          <FormField
+            control={form.control}
+            name="studentExperience"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Compartilhe sua experiência</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Como foi sua experiência de estágio? O que você aprendeu? Alguma dica para futuros estagiários?"
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
         <button
           type="submit" 

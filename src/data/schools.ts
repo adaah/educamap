@@ -20,6 +20,7 @@ export interface School {
     shifts?: string[];
     periods?: string[];
     contributorName?: string;
+    additionalInfo?: string;
   }[];
   formerStudents: {
     id: string;
@@ -27,6 +28,7 @@ export interface School {
     university: string;
     course: string;
     contributorName?: string;
+    additionalInfo?: string;
   }[];
 }
 

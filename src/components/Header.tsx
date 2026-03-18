@@ -17,7 +17,7 @@ const Header = () => {
             <Map className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-poppins font-bold text-sm sm:text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">EduMap Salvador</span>
+            <span className="font-poppins font-bold text-sm sm:text-xl text-secondary">EduMap Salvador</span>
             <span className="font-montserrat text-[10px] sm:text-xs text-muted-foreground">Estágio em instituições de ensino</span>
           </div>
         </Link>
@@ -57,7 +57,7 @@ const Header = () => {
         </nav>
 
         <div className="ml-auto md:ml-4 flex items-center gap-2">
-          <Badge variant="secondary" className="bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 font-poppins font-semibold">
+          <Badge variant="secondary" className="bg-secondary text-white border-0 font-poppins font-semibold">
             BETA
           </Badge>
         </div>

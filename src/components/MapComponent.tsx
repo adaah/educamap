@@ -101,8 +101,8 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
 
             // Cria o HTML do popup (igual à sua estrutura de Card, mas em string)
             const natureBadge = school.nature === 'Pública' 
-                ? '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: linear-gradient(to right, #fbbf24, #f59e0b); color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Pública</span>'
-                : '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: linear-gradient(to right, #f97316, #ea580c); color: white; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Particular</span>';
+                ? '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: #fbbf24; color: black; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Pública</span>'
+                : '<span style="display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; background: #f97316; color: black; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; margin-bottom: 0.5rem;">Particular</span>';
             
             const popupContent = `
                 <div class="p-3 font-montserrat" style="max-width: 280px;">
@@ -136,7 +136,7 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                         </div>
                     </div>
                     
-                    <button id="details-btn-${school.id}" style="width: 100%; padding: 0.625rem; border-radius: 0.5rem; font-family: Poppins, sans-serif; font-weight: 600; background: linear-gradient(to right, #f97316, #fbbf24); color: white; border: none; cursor: pointer; transition: all 0.3s; font-size: 0.875rem;">
+                    <button id="details-btn-${school.id}" style="width: 100%; padding: 0.625rem; border-radius: 0.5rem; font-family: Poppins, sans-serif; font-weight: 600; background: #f97316; color: white; border: none; cursor: pointer; transition: all 0.3s; font-size: 0.875rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 0.375rem; vertical-align: middle;"><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path><path d="M18 19H6c-1.1 0-2-.9-2 2V7c0-1.1.9-2 2-2h5"></path></svg>
                         Ver Detalhes
                     </button>

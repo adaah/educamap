@@ -40,8 +40,8 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
               variant={school.nature === 'Pública' ? 'default' : 'secondary'} 
               className={`flex-shrink-0 px-2.5 py-1 text-[10px] sm:text-xs font-semibold shadow-sm ${
                 school.nature === 'Pública' 
-                  ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white border-0' 
-                  : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0'
+                  ? 'bg-primary text-primary-foreground border-0' 
+                  : 'bg-secondary text-secondary-foreground border-0'
               }`}
             >
               <Building2 className="w-3 h-3 mr-1" />
@@ -82,7 +82,7 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button 
             onClick={handleViewDetails}
-            className="flex-1 px-6 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center"
+            className="flex-1 px-6 py-2.5 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all flex items-center justify-center"
           >
             <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             Ver Detalhes

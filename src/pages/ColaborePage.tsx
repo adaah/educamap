@@ -52,19 +52,19 @@ const ColaborePage = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-subtle pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
       
       <main className="flex-1 container py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           {/* Header Section */}
           <div className="text-center mb-8 sm:mb-12">
-            <div className="inline-block p-2 sm:p-3 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mb-3 sm:mb-4">
+            <div className="inline-block p-2 sm:p-3 bg-primary/20 rounded-full mb-3 sm:mb-4">
               <svg className="w-8 h-8 sm:w-12 sm:h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-2 sm:mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">
+            <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl mb-2 sm:mb-6 text-secondary px-4">
               Contribua com a Comunidade
             </h1>
             <p className="font-montserrat text-sm sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
@@ -90,7 +90,7 @@ const ColaborePage = () => {
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
                       {/* Icon */}
                       <div className="flex-shrink-0 self-start">
-                        <div className="p-3 sm:p-4 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl text-primary group-hover:scale-110 transition-transform duration-300">
+                        <div className="p-3 sm:p-4 bg-primary/10 rounded-2xl text-primary group-hover:scale-110 transition-transform duration-300">
                           {icons[index]}
                         </div>
                       </div>
@@ -109,16 +109,16 @@ const ColaborePage = () => {
                           onOpenChange={(open) => setOpenDialog(open ? option.id : null)}
                         >
                           <DialogTrigger asChild>
-                            <button className="mt-3 sm:mt-4 w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-sm sm:text-base rounded-lg hover:shadow-lg transition-all transform hover:scale-105">
+                            <button className="mt-3 sm:mt-4 w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-secondary text-white font-poppins font-semibold text-sm sm:text-base rounded-lg hover:bg-secondary/90 transition-all">
                               {option.buttonText}
                             </button>
                           </DialogTrigger>
-                          <DialogContent className="bg-gradient-subtle border-2 mx-2">
+                          <DialogContent className="bg-background border-2 mx-2">
                             <DialogHeader className="space-y-3 pb-4 sm:pb-6 border-b">
-                              <div className="inline-flex p-2 sm:p-3 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl text-primary w-fit">
+                              <div className="inline-flex p-2 sm:p-3 bg-primary/10 rounded-2xl text-primary w-fit">
                                 {icons[index]}
                               </div>
-                              <DialogTitle className="font-poppins text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                              <DialogTitle className="font-poppins text-xl sm:text-3xl font-bold text-secondary">
                                 {option.title}
                               </DialogTitle>
                               <DialogDescription className="font-montserrat text-sm sm:text-base text-muted-foreground">
@@ -140,7 +140,7 @@ const ColaborePage = () => {
 
           {/* Additional Info */}
           <div className="mt-12 sm:mt-16 space-y-6">
-            <Card className="p-6 sm:p-8 bg-gradient-to-br from-destructive/5 to-destructive/10 border-2 border-destructive/20">
+            <Card className="p-6 sm:p-8 bg-destructive/5 border-2 border-destructive/20">
               <div className="text-center">
                 <div className="inline-block p-3 bg-destructive/10 rounded-full mb-4">
                   <svg className="w-8 h-8 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +155,7 @@ const ColaborePage = () => {
                 </p>
                 <a 
                   href="mailto:idealab.ic.ufba@gmail.com?subject=Solicitação de Correção/Remoção - EduMap Salvador" 
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-destructive to-destructive/80 text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-destructive text-destructive-foreground font-poppins font-semibold rounded-lg hover:bg-destructive/90 transition-all"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -165,7 +165,7 @@ const ColaborePage = () => {
               </div>
             </Card>
 
-            <Card className="p-6 sm:p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/10">
+            <Card className="p-6 sm:p-8 bg-primary/5 border-2 border-primary/10">
               <div className="text-center">
                 <h3 className="font-poppins font-bold text-xl sm:text-2xl text-foreground mb-3">
                   Dúvidas ou Sugestões?

@@ -83,16 +83,16 @@ const ListPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background via-background to-primary/5 pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
       
       <main className="flex-1 container py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="mb-6 sm:mb-8 text-center">
-          <div className="inline-block p-2 sm:p-3 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mb-3 sm:mb-4">
+          <div className="inline-block p-2 sm:p-3 bg-primary/20 rounded-full mb-3 sm:mb-4">
             <GraduationCap className="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
           </div>
-          <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-2 sm:mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">
+          <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-2 sm:mb-6 text-secondary px-4">
             Encontre sua Escola de Estágio
           </h1>
           <p className="font-montserrat text-sm sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
@@ -185,8 +185,8 @@ const ListPage = () => {
                   />
                 ))
               ) : (
-                <div className="text-center py-16 bg-gradient-to-br from-background to-muted/30 rounded-xl border-2 border-dashed border-muted">
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-elegant">
+                <div className="text-center py-16 bg-muted/30 rounded-xl border-2 border-dashed border-muted">
+                  <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Search className="w-10 h-10 text-primary" />
                   </div>
                   <h3 className="font-poppins font-bold text-xl text-foreground mb-3">
@@ -197,7 +197,7 @@ const ListPage = () => {
                   </p>
                   <button
                     onClick={handleClearFilters}
-                    className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
+                    className="px-6 py-3 bg-secondary text-white font-poppins font-semibold rounded-lg hover:bg-secondary/90 transition-all"
                   >
                     Limpar todos os filtros
                   </button>

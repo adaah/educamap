@@ -90,8 +90,8 @@ const SchoolDetails = () => {
                 variant={school.nature === 'Pública' ? 'default' : 'secondary'} 
                 className={`flex-shrink-0 px-3 py-1.5 text-xs sm:text-sm font-semibold shadow-md ${
                   school.nature === 'Pública' 
-                    ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white border-0' 
-                    : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0'
+                    ? 'bg-primary text-primary-foreground border-0' 
+                    : 'bg-secondary text-secondary-foreground border-0'
                 }`}
               >
                 <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
@@ -112,7 +112,7 @@ const SchoolDetails = () => {
             <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                  <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
                     <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   Informações de Contato
@@ -169,10 +169,10 @@ const SchoolDetails = () => {
             </Card>
 
             {school.additionalInfo && (
-              <Card className="shadow-card bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-primary/20">
+              <Card className="shadow-card bg-primary/5 border-2 border-primary/20">
                 <CardHeader>
                   <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                    <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                    <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
                       <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     Informações Adicionais
@@ -194,7 +194,7 @@ const SchoolDetails = () => {
             <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                  <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
                     <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   Oportunidades de Estágio
@@ -243,7 +243,7 @@ const SchoolDetails = () => {
             <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                  <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
                     <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   Professores Instrutores
@@ -267,13 +267,13 @@ const SchoolDetails = () => {
 
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6">
-            <Card className="shadow-card border-2 hover:border-primary/20 transition-all bg-gradient-to-br from-primary/5 to-secondary/5">
+            <Card className="shadow-card border-2 hover:border-primary/20 transition-all bg-primary/5">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-lg">Ações Rápidas</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <button 
-                  className="w-full px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center"
+                  className="w-full px-6 py-3 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all flex items-center justify-center"
                   onClick={() => navigate('/')}
                 >
                   <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
@@ -289,7 +289,7 @@ const SchoolDetails = () => {
             <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-lg flex items-center">
-                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-secondary mr-2">
+                  <div className="p-2 bg-secondary/10 rounded-xl text-secondary mr-2">
                     <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   Ex-Alunos Estagiários
@@ -319,14 +319,14 @@ const SchoolDetails = () => {
               </CardHeader>
               <CardContent>
                 <div 
-                  className="w-full h-40 sm:h-48 bg-gradient-to-br from-blue-50 to-green-50 rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+                  className="w-full h-40 sm:h-48 bg-muted rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => {
                     const encodedAddress = encodeURIComponent(school.fullAddress);
                     window.open(`https://maps.google.com/?q=${encodedAddress}`, '_blank');
                   }}
                 >
                   <div className="absolute inset-0 opacity-20">
-                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-green-100"></div>
+                    <div className="w-full h-full bg-muted"></div>
                   </div>
                   <div className="relative text-center px-4">
                     <MapPin className="w-10 h-10 sm:w-12 sm:h-12 text-pin-primary mx-auto mb-2" fill="currentColor" />

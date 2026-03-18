@@ -54,7 +54,7 @@ export const InstructorFields = ({
         const isEditing = editingIndex === index || !instructor.saved;
         
         return (
-        <div key={index} className="p-4 border-2 border-primary/20 rounded-lg bg-gradient-to-br from-primary/5 to-secondary/5 relative">
+        <div key={index} className="p-4 border-2 border-primary/20 rounded-lg bg-primary/5 relative">
           {instructors.length > 1 && (
             <button
               type="button"

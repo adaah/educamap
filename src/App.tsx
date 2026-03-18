@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 import MapPage from "./pages/MapPage";
 import ListPage from "./pages/ListPage";
 import SchoolDetails from "./pages/SchoolDetails";
@@ -13,8 +14,10 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+const AppInner = () => {
+  useRealtimeUpdates({ showToasts: false });
+
+  return (
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -31,7 +34,15 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
-);
+  );
+};
+
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppInner />
+    </QueryClientProvider>
+  );
+};
 
 export default App;

@@ -3,8 +3,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-export const useRealtimeUpdates = () => {
+type RealtimeUpdatesOptions = {
+  showToasts?: boolean;
+};
+
+export const useRealtimeUpdates = (options: RealtimeUpdatesOptions = {}) => {
   const queryClient = useQueryClient();
+  const showToasts = options.showToasts ?? false;
 
   useEffect(() => {
     // Escutar mudanças nas tabelas principais
@@ -22,11 +27,61 @@ export const useRealtimeUpdates = () => {
           queryClient.invalidateQueries({ queryKey: ['schools'] });
           queryClient.invalidateQueries({ queryKey: ['school'] });
           
+          if (!showToasts) return;
+
           if (payload.eventType === 'INSERT') {
             toast.success('Nova escola adicionada ao mapa!');
           } else if (payload.eventType === 'UPDATE') {
             toast.success('Informações da escola atualizadas!');
           }
+        }
+      )
+      .subscribe();
+
+    const schoolPeriodsChannel = supabase
+      .channel('school-periods-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'school_periods'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['schools'] });
+          queryClient.invalidateQueries({ queryKey: ['school'] });
+        }
+      )
+      .subscribe();
+
+    const schoolSubjectsChannel = supabase
+      .channel('school-subjects-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'school_subjects'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['schools'] });
+          queryClient.invalidateQueries({ queryKey: ['school'] });
+        }
+      )
+      .subscribe();
+
+    const schoolShiftsChannel = supabase
+      .channel('school-shifts-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'school_shifts'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['schools'] });
+          queryClient.invalidateQueries({ queryKey: ['school'] });
         }
       )
       .subscribe();
@@ -45,6 +100,8 @@ export const useRealtimeUpdates = () => {
           queryClient.invalidateQueries({ queryKey: ['schools'] });
           queryClient.invalidateQueries({ queryKey: ['school'] });
           
+          if (!showToasts) return;
+
           if (payload.eventType === 'INSERT') {
             toast.success('Novo instrutor adicionado!');
           }
@@ -66,6 +123,8 @@ export const useRealtimeUpdates = () => {
           queryClient.invalidateQueries({ queryKey: ['schools'] });
           queryClient.invalidateQueries({ queryKey: ['school'] });
           
+          if (!showToasts) return;
+
           if (payload.eventType === 'INSERT') {
             toast.success('Nova experiência de estudante adicionada!');
           }
@@ -87,6 +146,8 @@ export const useRealtimeUpdates = () => {
           queryClient.invalidateQueries({ queryKey: ['contact-requests'] });
           queryClient.invalidateQueries({ queryKey: ['contact-request'] });
           
+          if (!showToasts) return;
+
           if (payload.eventType === 'INSERT') {
             toast.success('Nova solicitação de contato recebida!');
           } else if (payload.eventType === 'UPDATE') {
@@ -104,9 +165,12 @@ export const useRealtimeUpdates = () => {
     // Cleanup
     return () => {
       schoolChannel.unsubscribe();
+      schoolPeriodsChannel.unsubscribe();
+      schoolSubjectsChannel.unsubscribe();
+      schoolShiftsChannel.unsubscribe();
       instructorChannel.unsubscribe();
       studentChannel.unsubscribe();
       contactRequestChannel.unsubscribe();
     };
-  }, [queryClient]);
+  }, [queryClient, showToasts]);
 };

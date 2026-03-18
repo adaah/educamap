@@ -1,11 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { School } from '@/data/schools';
-import { useEffect } from 'react';
 
 export const useSchools = () => {
-  const queryClient = useQueryClient();
-  
   const query = useQuery({
     queryKey: ['schools'],
     queryFn: async () => {
@@ -61,27 +58,6 @@ export const useSchools = () => {
       return schools;
     },
   });
-
-  useEffect(() => {
-    const channel = supabase
-      .channel('schools-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'schools'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['schools'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
 
   return query;
 };

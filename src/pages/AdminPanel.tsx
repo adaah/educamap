@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { usePendingSubmissions } from "@/hooks/usePendingSubmissions";
 import { useSchools } from "@/hooks/useSchools";
-import { useRealtimeUpdates } from "@/hooks/useRealtimeUpdates";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,8 +18,6 @@ const AdminPanel = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
-  useRealtimeUpdates();
-
   const {
     pendingSchools,
     pendingInstructors,

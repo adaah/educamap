@@ -52,7 +52,6 @@ const SchoolDetails = () => {
             </Button>
           </div>
         </main>
-        <Footer />
         <BottomNav />
       </div>
     );

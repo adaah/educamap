@@ -34,7 +34,7 @@ const Footer = () => {
 
         <div className="border-t mt-6 sm:mt-8 pt-6 sm:pt-8 text-center">
           <p className="text-xs sm:text-sm text-muted-foreground font-montserrat">
-            © 2025 EduMap Salvador. Todos os direitos reservados.
+            © 2026 EduMap Salvador. Todos os direitos reservados.
           </p>
         </div>
       </div>

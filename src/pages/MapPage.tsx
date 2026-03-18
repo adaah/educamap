@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+
 import BottomNav from '@/components/BottomNav';
 import MapComponent from '@/components/MapComponent';
 import { type School } from '@/data/schools';

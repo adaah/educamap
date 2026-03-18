@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+
 import BottomNav from '@/components/BottomNav';
 import FilterPanel, { type FilterState } from '@/components/FilterPanel';
 import SchoolCard from '@/components/SchoolCard';

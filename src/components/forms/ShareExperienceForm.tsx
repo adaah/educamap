@@ -44,6 +44,7 @@ interface Instructor {
   customSubject?: string;
   shifts?: string[];
   periods?: string[];
+  additionalInfo?: string;
   saved?: boolean;
 }
 
@@ -53,6 +54,7 @@ const instructorSchema = z.object({
   customSubject: z.string(),
   shifts: z.array(z.string()).optional(),
   periods: z.array(z.string()).optional(),
+  additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
   saved: z.boolean(),
 });
 
@@ -75,7 +77,6 @@ const formSchema = z.object({
   newSchoolShifts: z.array(z.string()).optional(),
   newSchoolPeriods: z.array(z.string()).optional(),
   customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
-  additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
   instructors: z.array(instructorSchema).default([]),
 });
 
@@ -111,7 +112,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       studentName: '',
       university: '',
       course: '',
-      additionalInfo: '',
       hasContactData: false,
       schoolEmail: '',
       schoolPhone: '',
@@ -130,12 +130,17 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       customSubject: i.customSubject ?? '',
       shifts: i.shifts ?? [],
       periods: i.periods ?? [],
+      additionalInfo: i.additionalInfo ?? '',
       saved: i.saved ?? false,
     };
   }
 
   const addInstructor = () => {
     const current = form.getValues('instructors') || [];
+    // Limitar a 1 professor no formulário ShareExperienceForm
+    if (current.length >= 1) {
+      return;
+    }
     const next: Instructor[] = [
       ...current.map(ensureInstructor),
       ensureInstructor({}),
@@ -234,14 +239,20 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           university: data.university,
           course: data.course,
           contributor_name: data.studentName,
-          additional_info: data.additionalInfo || null,
         });
 
       if (studentError) throw studentError;
 
       // Registrar os instrutores recomendados como pendentes
       for (const instructor of validInstructors) {
-        const subject = instructor.subjects.join(', ');
+        // Tratar campo 'Outros' nas disciplinas
+        const finalSubjects = [...instructor.subjects];
+        if (instructor.subjects.includes('Outros') && instructor.customSubject) {
+          const index = finalSubjects.indexOf('Outros');
+          if (index > -1) finalSubjects[index] = instructor.customSubject;
+        }
+        
+        const subject = finalSubjects.join(', ');
         const { error: instructorError } = await supabase
           .from('pending_instructors')
           .insert({
@@ -705,15 +716,17 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
         <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores *</h3>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Recomende um ou mais professores instrutores que você teve durante o estágio
+            Recomende um professor instrutor que você teve durante o estágio
           </p>
-          <button
-            type="button"
-            onClick={addInstructor}
-            className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
-          >
-            + Adicionar Instrutor
-          </button>
+          {form.watch('instructors')?.length === 0 && (
+            <button
+              type="button"
+              onClick={addInstructor}
+              className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
+            >
+              + Adicionar Instrutor
+            </button>
+          )}
           {form.watch('instructors')?.length > 0 && (
             <InstructorFields
               instructors={form.watch('instructors')}
@@ -722,28 +735,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
               availableSubjects={availableSubjects}
             />
           )}
-        </div>
-        
-        {/* Informações Adicionais */}
-        <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-base sm:text-lg">Informações Adicionais (Opcional)</h3>
-          <FormField
-            control={form.control}
-            name="additionalInfo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Compartilhe sua experiência</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Como foi sua experiência de estágio nesta escola? Alguma dica para futuros estagiários?"
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
         <button
           type="submit" 

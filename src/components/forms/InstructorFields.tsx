@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { UseFormReturn } from 'react-hook-form';
@@ -13,6 +14,7 @@ export interface Instructor {
   customSubject?: string;
   shifts?: string[];
   periods?: string[];
+  additionalInfo?: string;
   saved?: boolean;
 }
 
@@ -194,6 +196,26 @@ export const InstructorFields = ({
                   />
                 ))}
               </div>
+            </div>
+
+            <div>
+              <FormLabel className="mb-2 block">Informações Adicionais (Opcional)</FormLabel>
+              <FormField
+                control={form.control}
+                name={`instructors.${index}.additionalInfo`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Comente sobre sua experiência com este instrutor..."
+                        className="min-h-[80px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
         </div>

@@ -127,7 +127,7 @@ const SchoolDetails = () => {
                 ) : (
                   <div className="flex items-center font-montserrat text-xs sm:text-sm text-muted-foreground">
                     <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-3 flex-shrink-0" />
-                    <span>Sem informações de email</span>
+                    <span>Sem informação</span>
                   </div>
                 )}
                 
@@ -141,7 +141,7 @@ const SchoolDetails = () => {
                 ) : (
                   <div className="flex items-center font-montserrat text-xs sm:text-sm text-muted-foreground">
                     <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-3 flex-shrink-0" />
-                    <span>Sem informações de telefone</span>
+                    <span>Sem informação</span>
                   </div>
                 )}
                 
@@ -160,34 +160,13 @@ const SchoolDetails = () => {
                 ) : (
                   <div className="flex items-center font-montserrat text-xs sm:text-sm text-muted-foreground">
                     <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-3 flex-shrink-0" />
-                    <span>Sem informações de website</span>
+                    <span>Sem informação</span>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            {school.additionalInfo && (
-              <Card className="shadow-card bg-primary/5 border-2 border-primary/20">
-                <CardHeader>
-                  <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                    <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
-                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
-                    Informações Adicionais
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="font-montserrat text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-line bg-white/50 p-3 sm:p-4 rounded-lg">
-                    {school.additionalInfo}
-                  </div>
-                  <div className="flex items-center text-xs sm:text-sm text-muted-foreground italic border-t pt-3">
-                    <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 flex-shrink-0" />
-                    <span className="break-words">Compartilhado por: {school.contributor_name || 'Contribuidor'}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
+            
             {/* Teaching Opportunities */}
             <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
@@ -201,24 +180,32 @@ const SchoolDetails = () => {
               <CardContent className="space-y-4">
                 <div>
                   <h3 className="font-poppins font-semibold text-xs sm:text-sm mb-2">Períodos de Ensino</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {school.periods.map((period) => (
-                      <Badge key={period} variant="outline" className="font-montserrat text-xs">
-                        {period}
-                      </Badge>
-                    ))}
-                  </div>
+                  {school.periods.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {school.periods.map((period) => (
+                        <Badge key={period} variant="outline" className="font-montserrat text-xs">
+                          {period}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground font-montserrat text-xs italic">Sem informação</p>
+                  )}
                 </div>
                 
                 <div>
                   <h3 className="font-poppins font-semibold text-xs sm:text-sm mb-2">Matérias/Disciplinas</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {school.subjects.map((subject) => (
-                      <Badge key={subject} variant="secondary" className="font-montserrat text-xs">
-                        {subject}
-                      </Badge>
-                    ))}
-                  </div>
+                  {school.subjects.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {school.subjects.map((subject) => (
+                        <Badge key={subject} variant="secondary" className="font-montserrat text-xs">
+                          {subject}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground font-montserrat text-xs italic">Sem informação</p>
+                  )}
                 </div>
                 
                 <div>
@@ -226,13 +213,17 @@ const SchoolDetails = () => {
                     <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                     Turnos Disponíveis
                   </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {school.shift.map((shift) => (
-                      <Badge key={shift} variant="outline" className="font-montserrat text-xs">
-                        {shift}
-                      </Badge>
-                    ))}
-                  </div>
+                  {school.shift.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {school.shift.map((shift) => (
+                        <Badge key={shift} variant="outline" className="font-montserrat text-xs">
+                          {shift}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground font-montserrat text-xs italic">Sem informação</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -252,7 +243,12 @@ const SchoolDetails = () => {
                   {school.instructors.map((instructor, index) => (
                     <div key={index} className="p-3 bg-filter-bg rounded-lg">
                       <h4 className="font-poppins font-semibold text-xs sm:text-sm">{instructor.name}</h4>
-                      <p className="text-muted-foreground font-montserrat text-xs sm:text-sm">{instructor.subject}</p>
+                      <p className="text-muted-foreground font-montserrat text-xs sm:text-sm">{instructor.subject || 'Sem informação'}</p>
+                      {!instructor.additionalInfo && (
+                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-muted-foreground italic">
+                          Sem informação
+                        </div>
+                      )}
                       {instructor.additionalInfo && (
                         <div className="mt-2 text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line">
                           {instructor.additionalInfo}
@@ -288,11 +284,33 @@ const SchoolDetails = () => {
                     </div>
                   ))}
                   {school.instructors.length === 0 && (
-                    <p className="text-muted-foreground text-sm text-center py-4">Nenhum professor cadastrado</p>
+                    <p className="text-muted-foreground text-sm text-center py-4">Sem informação</p>
                   )}
                 </div>
               </CardContent>
             </Card>
+
+            {school.additionalInfo && (
+              <Card className="shadow-card bg-primary/5 border-2 border-primary/20">
+                <CardHeader>
+                  <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
+                    <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
+                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                    Informações Adicionais
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="font-montserrat text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-line bg-white/50 p-3 sm:p-4 rounded-lg">
+                    {school.additionalInfo}
+                  </div>
+                  <div className="flex items-center text-xs sm:text-sm text-muted-foreground italic border-t pt-3">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 flex-shrink-0" />
+                    <span className="break-words">Compartilhado por: {school.contributor_name || 'Contribuidor'}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -303,7 +321,7 @@ const SchoolDetails = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <button 
-                  className="w-full px-6 py-3 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all flex items-center justify-center"
+                  className="w-full px-6 py-3 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all flex items-center justify-center border border-white/20 shadow-sm"
                   onClick={() => navigate('/', { state: { selectedSchool: school } })}
                 >
                   <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
@@ -322,7 +340,7 @@ const SchoolDetails = () => {
                   <div className="p-2 bg-secondary/10 rounded-xl text-secondary mr-2">
                     <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  Ex-Alunos Estagiários
+                  Alunos Estagiários
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -333,9 +351,13 @@ const SchoolDetails = () => {
                       <p className="text-muted-foreground font-montserrat text-xs">
                         {student.university} - {student.course}
                       </p>
-                      {student.additionalInfo && (
+                      {student.additionalInfo ? (
                         <div className="mt-2 text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line">
                           {student.additionalInfo}
+                        </div>
+                      ) : (
+                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-muted-foreground italic">
+                          Sem informação
                         </div>
                       )}
                       {student.additionalInfo && (
@@ -346,7 +368,7 @@ const SchoolDetails = () => {
                     </div>
                   ))}
                   {school.formerStudents.length === 0 && (
-                    <p className="text-muted-foreground text-sm text-center py-4">Nenhum ex-aluno cadastrado</p>
+                    <p className="text-muted-foreground text-sm text-center py-4">Sem informação</p>
                   )}
                 </div>
               </CardContent>

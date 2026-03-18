@@ -49,7 +49,7 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
         // Coordenadas de Salvador: [-12.9714, -38.5014]
         // Zoom padrão ligeiramente menor em mobile para mostrar mais área
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-        const initialZoom = isMobile ? 11 : 13;
+        const initialZoom = isMobile ? 12 : 13;
         map.current = L.map(mapContainer.current!).setView([-12.9714, -38.5014], initialZoom);
 
         // 2. Adiciona os Tiles (OpenStreetMap - 100% gratuito)
@@ -150,6 +150,7 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
             marker.bindPopup(popupContent, {
                 autoClose: false,
                 closeOnClick: false,
+                autoPan: true,
                 autoPanPaddingTopLeft: L.point(20, 80),
                 autoPanPaddingBottomRight: L.point(20, 20),
                 maxWidth: 300,
@@ -159,14 +160,13 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
             // 5. Adiciona um Listener ao evento de 'click' do marcador
             // Usamos o evento Leaflet, e não o elemento DOM (como no Mapbox)
             marker.on('click', () => {
-                 // Centraliza o mapa no marcador em qualquer clique
-                 if (map.current) {
-                    const latLngForCenter: [number, number] = [school.coordinates[1], school.coordinates[0]];
-                    map.current.setView(latLngForCenter, map.current.getZoom(), { animate: true });
-                 }
-
                  setSelectedPopup(school);
                  onSchoolSelect?.(school);
+                 
+                 // Abrir popup manualmente para garantir posicionamento correto
+                 setTimeout(() => {
+                    marker.openPopup();
+                 }, 0);
                  
                  // Adiciona listener ao botão APÓS o popup ser aberto (ou o DOM é criado)
                  // É uma forma menos "React" de fazer, mas funciona com popups do Leaflet

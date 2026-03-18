@@ -23,7 +23,7 @@ const ColaborePage = () => {
   const collaborationOptions = [
     {
       id: 'share-experience',
-      title: "Recomendar um Instrutor ou Compartilhar Experiência",
+      title: "Recomendar um Instrutor e/ou Compartilhar Experiência",
       description: "Para estudantes que concluíram estágio e querem listar seus professores instrutores ou dar feedback sobre a escola.",
       buttonText: "Compartilhar Minha Experiência",
       form: ShareExperienceForm,

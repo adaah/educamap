@@ -40,8 +40,8 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
               variant={school.nature === 'Pública' ? 'default' : 'secondary'} 
               className={`flex-shrink-0 px-2.5 py-1 text-[10px] sm:text-xs font-semibold shadow-sm ${
                 school.nature === 'Pública' 
-                  ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white border-0' 
-                  : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0'
+                  ? 'bg-primary text-primary-foreground border-0' 
+                  : 'bg-secondary text-secondary-foreground border-0'
               }`}
             >
               <Building2 className="w-3 h-3 mr-1" />

@@ -90,8 +90,8 @@ const SchoolDetails = () => {
                 variant={school.nature === 'Pública' ? 'default' : 'secondary'} 
                 className={`flex-shrink-0 px-3 py-1.5 text-xs sm:text-sm font-semibold shadow-md ${
                   school.nature === 'Pública' 
-                    ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white border-0' 
-                    : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-0'
+                    ? 'bg-primary text-primary-foreground border-0' 
+                    : 'bg-secondary text-secondary-foreground border-0'
                 }`}
               >
                 <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />

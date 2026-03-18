@@ -113,7 +113,7 @@ const ColaborePage = () => {
                               {option.buttonText}
                             </button>
                           </DialogTrigger>
-                          <DialogContent className="bg-gradient-subtle border-2 mx-2">
+                          <DialogContent className="bg-background border-2 mx-2">
                             <DialogHeader className="space-y-3 pb-4 sm:pb-6 border-b">
                               <div className="inline-flex p-2 sm:p-3 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl text-primary w-fit">
                                 {icons[index]}

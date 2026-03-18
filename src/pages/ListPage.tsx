@@ -89,7 +89,7 @@ const ListPage = () => {
       <main className="flex-1 container py-4 sm:py-8 px-3 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="mb-6 sm:mb-8 text-center">
-          <div className="inline-block p-2 sm:p-3 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full mb-3 sm:mb-4">
+          <div className="inline-block p-2 sm:p-3 bg-primary/20 rounded-full mb-3 sm:mb-4">
             <GraduationCap className="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
           </div>
           <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-2 sm:mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">

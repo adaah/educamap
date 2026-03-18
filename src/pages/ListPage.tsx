@@ -92,7 +92,7 @@ const ListPage = () => {
           <div className="inline-block p-2 sm:p-3 bg-primary/20 rounded-full mb-3 sm:mb-4">
             <GraduationCap className="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
           </div>
-          <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-2 sm:mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent px-4">
+          <h1 className="font-poppins font-bold text-2xl sm:text-4xl md:text-5xl text-foreground mb-2 sm:mb-6 text-secondary px-4">
             Encontre sua Escola de Estágio
           </h1>
           <p className="font-montserrat text-sm sm:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">

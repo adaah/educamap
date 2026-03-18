@@ -169,7 +169,7 @@ const SchoolDetails = () => {
             </Card>
 
             {school.additionalInfo && (
-              <Card className="shadow-card bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-primary/20">
+              <Card className="shadow-card bg-primary/5 border-2 border-primary/20">
                 <CardHeader>
                   <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
                     <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">

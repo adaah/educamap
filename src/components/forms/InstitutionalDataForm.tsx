@@ -388,7 +388,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
           <button
             type="button"
             onClick={() => setInstructors([...instructors, { name: '', subjects: [], customSubject: '', saved: false }])}
-            className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all"
+            className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
           >
             + Adicionar Instrutor
           </button>

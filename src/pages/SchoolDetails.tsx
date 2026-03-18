@@ -34,7 +34,6 @@ const SchoolDetails = () => {
             <p className="font-montserrat text-muted-foreground">Carregando...</p>
           </div>
         </main>
-        <Footer />
         <BottomNav />
       </div>
     );

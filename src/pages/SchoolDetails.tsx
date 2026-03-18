@@ -267,7 +267,7 @@ const SchoolDetails = () => {
 
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6">
-            <Card className="shadow-card border-2 hover:border-primary/20 transition-all bg-gradient-to-br from-primary/5 to-secondary/5">
+            <Card className="shadow-card border-2 hover:border-primary/20 transition-all bg-primary/5">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-lg">Ações Rápidas</CardTitle>
               </CardHeader>

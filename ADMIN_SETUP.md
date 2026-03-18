@@ -49,8 +49,8 @@ O painel admin permite:
 
 - **Aprovar ou Rejeitar Escolas**: Todas as escolas enviadas pelos formulários públicos ficam em status "pendente" até aprovação
 - **Aprovar ou Rejeitar Professores**: Professores instrutores enviados também precisam de aprovação
-- **Aprovar ou Rejeitar Ex-Estagiários**: Experiências compartilhadas por ex-estagiários precisam de moderação
-- **Deletar Dados Existentes**: Remover escolas, professores ou ex-estagiários já aprovados
+- **Aprovar ou Rejeitar Estagiários**: Experiências compartilhadas por estagiários precisam de moderação
+- **Deletar Dados Existentes**: Remover escolas, professores ou estagiários já aprovados
 
 ### Segurança
 

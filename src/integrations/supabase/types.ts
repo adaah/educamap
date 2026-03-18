@@ -103,6 +103,7 @@ export type Database = {
           contributor_name: string | null
           course: string
           created_at: string | null
+          additional_info: string | null
           email: string | null
           id: string
           instagram: string | null
@@ -117,6 +118,7 @@ export type Database = {
           contributor_name?: string | null
           course: string
           created_at?: string | null
+          additional_info?: string | null
           email?: string | null
           id?: string
           instagram?: string | null
@@ -131,6 +133,7 @@ export type Database = {
           contributor_name?: string | null
           course?: string
           created_at?: string | null
+          additional_info?: string | null
           email?: string | null
           id?: string
           instagram?: string | null
@@ -153,6 +156,7 @@ export type Database = {
       }
       instructors: {
         Row: {
+          additional_info: string | null
           contributor_name: string | null
           created_at: string | null
           email: string | null
@@ -166,6 +170,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          additional_info?: string | null
           contributor_name?: string | null
           created_at?: string | null
           email?: string | null
@@ -179,6 +184,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          additional_info?: string | null
           contributor_name?: string | null
           created_at?: string | null
           email?: string | null
@@ -206,6 +212,7 @@ export type Database = {
           consent_to_share_data: boolean | null
           contributor_name: string | null
           course: string
+          additional_info: string | null
           email: string | null
           id: string
           instagram: string | null
@@ -222,6 +229,7 @@ export type Database = {
           consent_to_share_data?: boolean | null
           contributor_name?: string | null
           course: string
+          additional_info?: string | null
           email?: string | null
           id?: string
           instagram?: string | null
@@ -238,6 +246,7 @@ export type Database = {
           consent_to_share_data?: boolean | null
           contributor_name?: string | null
           course?: string
+          additional_info?: string | null
           email?: string | null
           id?: string
           instagram?: string | null
@@ -254,6 +263,7 @@ export type Database = {
       }
       pending_instructors: {
         Row: {
+          additional_info: string | null
           consent_to_share_data: boolean | null
           contributor_name: string | null
           email: string | null
@@ -261,16 +271,19 @@ export type Database = {
           instagram: string | null
           linkedin: string | null
           name: string
+          periods: string[] | null
           reviewed_at: string | null
           reviewed_by: string | null
           school_id: string | null
           school_name: string | null
+          shifts: string[] | null
           status: string | null
           subject: string
           submitted_at: string | null
           whatsapp: string | null
         }
         Insert: {
+          additional_info?: string | null
           consent_to_share_data?: boolean | null
           contributor_name?: string | null
           email?: string | null
@@ -278,16 +291,19 @@ export type Database = {
           instagram?: string | null
           linkedin?: string | null
           name: string
+          periods?: string[] | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           school_id?: string | null
           school_name?: string | null
+          shifts?: string[] | null
           status?: string | null
           subject: string
           submitted_at?: string | null
           whatsapp?: string | null
         }
         Update: {
+          additional_info?: string | null
           consent_to_share_data?: boolean | null
           contributor_name?: string | null
           email?: string | null
@@ -295,16 +311,70 @@ export type Database = {
           instagram?: string | null
           linkedin?: string | null
           name?: string
+          periods?: string[] | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           school_id?: string | null
           school_name?: string | null
+          shifts?: string[] | null
           status?: string | null
           subject?: string
           submitted_at?: string | null
           whatsapp?: string | null
         }
         Relationships: []
+      }
+      instructor_periods: {
+        Row: {
+          id: string
+          instructor_id: string
+          period: string
+        }
+        Insert: {
+          id?: string
+          instructor_id: string
+          period: string
+        }
+        Update: {
+          id?: string
+          instructor_id?: string
+          period?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructor_periods_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      instructor_shifts: {
+        Row: {
+          id: string
+          instructor_id: string
+          shift: string
+        }
+        Insert: {
+          id?: string
+          instructor_id: string
+          shift: string
+        }
+        Update: {
+          id?: string
+          instructor_id?: string
+          shift?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructor_shifts_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pending_schools: {
         Row: {
@@ -377,6 +447,71 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      pending_school_updates: {
+        Row: {
+          additional_info: string | null
+          contributor_name: string | null
+          contributor_position: string | null
+          email: string | null
+          id: string
+          instructors: Json | null
+          phone: string | null
+          periods: string[] | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          school_id: string
+          shifts: string[] | null
+          status: string | null
+          subjects: string[] | null
+          submitted_at: string | null
+          website: string | null
+        }
+        Insert: {
+          additional_info?: string | null
+          contributor_name?: string | null
+          contributor_position?: string | null
+          email?: string | null
+          id?: string
+          instructors?: Json | null
+          phone?: string | null
+          periods?: string[] | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_id: string
+          shifts?: string[] | null
+          status?: string | null
+          subjects?: string[] | null
+          submitted_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          additional_info?: string | null
+          contributor_name?: string | null
+          contributor_position?: string | null
+          email?: string | null
+          id?: string
+          instructors?: Json | null
+          phone?: string | null
+          periods?: string[] | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          school_id?: string
+          shifts?: string[] | null
+          status?: string | null
+          subjects?: string[] | null
+          submitted_at?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_school_updates_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

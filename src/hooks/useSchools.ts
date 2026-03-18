@@ -23,6 +23,26 @@ export const useSchools = () => {
             supabase.from('former_students').select('*').eq('school_id', school.id),
           ]);
 
+          const instructorIds = instructors.data?.map((i) => i.id) || [];
+          const [instructorShifts, instructorPeriods] = await Promise.all([
+            instructorIds.length
+              ? supabase.from('instructor_shifts').select('instructor_id, shift').in('instructor_id', instructorIds)
+              : Promise.resolve({ data: [] as any[], error: null }),
+            instructorIds.length
+              ? supabase.from('instructor_periods').select('instructor_id, period').in('instructor_id', instructorIds)
+              : Promise.resolve({ data: [] as any[], error: null }),
+          ]);
+
+          const shiftsByInstructor = new Map<string, string[]>();
+          (instructorShifts.data || []).forEach((row: any) => {
+            shiftsByInstructor.set(row.instructor_id, [...(shiftsByInstructor.get(row.instructor_id) || []), row.shift]);
+          });
+
+          const periodsByInstructor = new Map<string, string[]>();
+          (instructorPeriods.data || []).forEach((row: any) => {
+            periodsByInstructor.set(row.instructor_id, [...(periodsByInstructor.get(row.instructor_id) || []), row.period]);
+          });
+
           return {
             id: school.id,
             name: school.name,
@@ -43,6 +63,9 @@ export const useSchools = () => {
               name: i.name,
               subject: i.subject,
               contributorName: i.contributor_name || undefined,
+              additionalInfo: i.additional_info || undefined,
+              shifts: shiftsByInstructor.get(i.id) || [],
+              periods: periodsByInstructor.get(i.id) || [],
             })) || [],
             formerStudents: formerStudents.data?.map(f => ({
               id: f.id,
@@ -50,6 +73,7 @@ export const useSchools = () => {
               university: f.university,
               course: f.course,
               contributorName: f.contributor_name || undefined,
+              additionalInfo: f.additional_info || undefined,
             })) || [],
           };
         })
@@ -82,6 +106,26 @@ export const useSchool = (id: string) => {
         supabase.from('former_students').select('*').eq('school_id', school.id),
       ]);
 
+      const instructorIds = instructors.data?.map((i) => i.id) || [];
+      const [instructorShifts, instructorPeriods] = await Promise.all([
+        instructorIds.length
+          ? supabase.from('instructor_shifts').select('instructor_id, shift').in('instructor_id', instructorIds)
+          : Promise.resolve({ data: [] as any[], error: null }),
+        instructorIds.length
+          ? supabase.from('instructor_periods').select('instructor_id, period').in('instructor_id', instructorIds)
+          : Promise.resolve({ data: [] as any[], error: null }),
+      ]);
+
+      const shiftsByInstructor = new Map<string, string[]>();
+      (instructorShifts.data || []).forEach((row: any) => {
+        shiftsByInstructor.set(row.instructor_id, [...(shiftsByInstructor.get(row.instructor_id) || []), row.shift]);
+      });
+
+      const periodsByInstructor = new Map<string, string[]>();
+      (instructorPeriods.data || []).forEach((row: any) => {
+        periodsByInstructor.set(row.instructor_id, [...(periodsByInstructor.get(row.instructor_id) || []), row.period]);
+      });
+
       return {
         id: school.id,
         name: school.name,
@@ -102,6 +146,9 @@ export const useSchool = (id: string) => {
           name: i.name,
           subject: i.subject,
           contributorName: i.contributor_name || undefined,
+          additionalInfo: i.additional_info || undefined,
+          shifts: shiftsByInstructor.get(i.id) || [],
+          periods: periodsByInstructor.get(i.id) || [],
         })) || [],
         formerStudents: formerStudents.data?.map(f => ({
           id: f.id,
@@ -109,6 +156,7 @@ export const useSchool = (id: string) => {
           university: f.university,
           course: f.course,
           contributorName: f.contributor_name || undefined,
+          additionalInfo: f.additional_info || undefined,
         })) || [],
       } as School;
     },

@@ -8,7 +8,7 @@ import { ptBR } from 'date-fns/locale';
 
 interface Notification {
   id: string;
-  type: 'school' | 'instructor' | 'student' | 'contact_request';
+  type: 'school' | 'school_update' | 'instructor' | 'student' | 'contact_request';
   title: string;
   description: string;
   status: 'pending' | 'approved' | 'denied';
@@ -24,8 +24,9 @@ export const AdminNotifications = () => {
     const fetchNotifications = async () => {
       try {
         // Buscar dados pendentes
-        const [schoolsResult, instructorsResult, studentsResult, requestsResult] = await Promise.all([
+        const [schoolsResult, schoolUpdatesResult, instructorsResult, studentsResult, requestsResult] = await Promise.all([
           supabase.from('pending_schools').select('*').eq('status', 'pending'),
+          supabase.from('pending_school_updates').select('*').eq('status', 'pending'),
           supabase.from('pending_instructors').select('*').eq('status', 'pending'),
           supabase.from('pending_former_students').select('*').eq('status', 'pending'),
           supabase.from('contact_requests').select('*').eq('status', 'pending')
@@ -43,6 +44,19 @@ export const AdminNotifications = () => {
             status: 'pending',
             createdAt: schoolsResult.data[0]?.submitted_at || new Date().toISOString(),
             count: schoolsResult.data.length
+          });
+        }
+
+        // Atualizações institucionais pendentes
+        if (schoolUpdatesResult.data && schoolUpdatesResult.data.length > 0) {
+          notifications.push({
+            id: 'school_updates',
+            type: 'school_update',
+            title: 'Atualizações Institucionais',
+            description: `${schoolUpdatesResult.data.length} atualização(ões) aguardando aprovação`,
+            status: 'pending',
+            createdAt: schoolUpdatesResult.data[0]?.submitted_at || new Date().toISOString(),
+            count: schoolUpdatesResult.data.length
           });
         }
 
@@ -104,6 +118,7 @@ export const AdminNotifications = () => {
   const getIcon = (type: string) => {
     switch (type) {
       case 'school': return <School className="h-4 w-4" />;
+      case 'school_update': return <School className="h-4 w-4" />;
       case 'instructor': return <Users className="h-4 w-4" />;
       case 'student': return <UserCheck className="h-4 w-4" />;
       case 'contact_request': return <Bell className="h-4 w-4" />;

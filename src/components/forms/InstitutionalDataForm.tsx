@@ -120,14 +120,10 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         });
 
       const allPeriods = data.periods || [];
-      if (data.customPeriod && data.periods?.includes('Outros')) {
-        allPeriods.push(data.customPeriod);
-      }
+      const normalizedPeriods = allPeriods.map((p) => (p === 'Outros' ? (data.customPeriod || p) : p));
 
       const allSubjects = data.subjects || [];
-      if (data.customSubject && data.subjects?.includes('Outros')) {
-        allSubjects.push(data.customSubject);
-      }
+      const normalizedSubjects = allSubjects.map((s) => (s === 'Outros' ? (data.customSubject || s) : s));
 
       if (isNewSchool && data.newSchoolName) {
         if (!coordinates) {
@@ -154,8 +150,8 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             website: data.website || null,
             additional_info: data.additionalInfo || null,
             contributor_name: `${data.contributorName} - ${data.contributorPosition}`,
-            periods: allPeriods,
-            subjects: allSubjects,
+            periods: normalizedPeriods,
+            subjects: normalizedSubjects,
             shifts: data.shifts || [],
             instructors: instructorsData,
           });
@@ -167,14 +163,23 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
           description: 'Dados enviados e aguardando aprovação. Obrigado pela contribuição!',
         });
       } else if (data.schoolId) {
-        for (const instructor of instructorsData) {
-          await supabase.from('pending_instructors').insert({
-            name: instructor.name,
-            subject: instructor.subjects.join(', '),
+        const { error: updateError } = await supabase
+          .from('pending_school_updates')
+          .insert({
             school_id: data.schoolId,
-            contributor_name: `${data.contributorName} - ${data.contributorPosition}`,
+            email: data.email || null,
+            phone: data.phone || null,
+            website: data.website || null,
+            additional_info: data.additionalInfo || null,
+            periods: normalizedPeriods,
+            subjects: normalizedSubjects,
+            shifts: data.shifts || [],
+            instructors: instructorsData,
+            contributor_name: data.contributorName,
+            contributor_position: data.contributorPosition,
           });
-        }
+
+        if (updateError) throw updateError;
 
         toast({
           title: 'Sucesso!',
@@ -208,7 +213,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Seus Dados</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Seus Dados</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField control={form.control} name="contributorName" render={({ field }) => (
               <FormItem><FormLabel>Nome *</FormLabel><FormControl><Input placeholder="Seu nome" {...field} /></FormControl><FormMessage /></FormItem>
@@ -220,7 +225,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Identificação da Escola</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Identificação da Escola</h3>
           <div className="flex items-center space-x-2">
             <input type="checkbox" id="newSchoolInst" checked={isNewSchool} onChange={(e) => setIsNewSchool(e.target.checked)} className="rounded" />
             <Label htmlFor="newSchoolInst">Cadastrar nova escola</Label>
@@ -282,7 +287,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Dados de Contato da Escola</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Dados de Contato da Escola</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField control={form.control} name="email" render={({ field }) => (
               <FormItem><FormLabel>Email Institucional</FormLabel><FormControl><Input type="email" placeholder="contato@escola.com" {...field} /></FormControl><FormMessage /></FormItem>
@@ -297,7 +302,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Turnos Disponíveis</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Turnos Disponíveis</h3>
           <FormField control={form.control} name="shifts" render={() => (
             <FormItem>
               <div className="grid grid-cols-2 gap-4">
@@ -317,7 +322,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Períodos Escolares</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Períodos Escolares</h3>
           <FormField control={form.control} name="periods" render={() => (
             <FormItem>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -350,7 +355,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Disciplinas/Áreas Disponíveis</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Disciplinas/Áreas Disponíveis</h3>
           <FormField control={form.control} name="subjects" render={() => (
             <FormItem>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -397,11 +402,6 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             <InstructorFields
               instructors={instructors}
               onRemove={(index) => setInstructors(instructors.filter((_, i) => i !== index))}
-              onSave={(index) => {
-                const updatedInstructors = [...instructors];
-                updatedInstructors[index].saved = true;
-                setInstructors(updatedInstructors);
-              }}
               form={form}
               availableSubjects={availableSubjects}
             />
@@ -409,7 +409,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Informações Adicionais</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Informações Adicionais</h3>
           <FormField control={form.control} name="additionalInfo" render={({ field }) => (
             <FormItem>
               <FormLabel>Informações sobre oportunidades de estágio</FormLabel>

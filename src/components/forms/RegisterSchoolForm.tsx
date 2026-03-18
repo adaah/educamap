@@ -31,6 +31,9 @@ const formSchema = z.object({
   fullAddress: z.string().trim().min(10, 'Endereço deve ter pelo menos 10 caracteres').max(500),
   neighborhood: z.string().trim().min(3, 'Bairro deve ter pelo menos 3 caracteres').max(100),
   nature: z.enum(['Pública', 'Particular'], { required_error: 'Selecione a natureza da escola' }),
+  email: z.string().trim().email('Email inválido').max(255).optional().or(z.literal('')),
+  phone: z.string().trim().max(20).optional().or(z.literal('')),
+  website: z.string().trim().max(255).optional().or(z.literal('')),
   shifts: z.array(z.string()).min(1, 'Selecione pelo menos um turno'),
   periods: z.array(z.string()).min(1, 'Selecione pelo menos um período'),
   customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
@@ -66,6 +69,9 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
       name: '',
       fullAddress: '',
       neighborhood: '',
+      email: '',
+      phone: '',
+      website: '',
       shifts: [],
       periods: [],
       customPeriod: '',
@@ -95,11 +101,9 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
           return { name: instructor.name, subjects: finalSubjects };
         });
 
-      const allPeriods = [...data.periods];
-      if (data.customPeriod && data.periods.includes('Outros')) allPeriods.push(data.customPeriod);
+      const allPeriods = data.periods.map((p) => (p === 'Outros' ? (data.customPeriod || p) : p));
 
-      const allSubjects = [...data.subjects];
-      if (data.customSubject && data.subjects.includes('Outros')) allSubjects.push(data.customSubject);
+      const allSubjects = data.subjects.map((s) => (s === 'Outros' ? (data.customSubject || s) : s));
 
       const { error: schoolError } = await supabase
         .from('pending_schools')
@@ -110,6 +114,9 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
           nature: data.nature,
           latitude: coordinates.lat,
           longitude: coordinates.lon,
+          email: data.email || null,
+          phone: data.phone || null,
+          website: data.website || null,
           additional_info: data.additionalInfo || null,
           periods: allPeriods,
           subjects: allSubjects,
@@ -135,7 +142,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Dados da Escola</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Dados da Escola</h3>
           <FormField control={form.control} name="name" render={({ field }) => (
             <FormItem><FormLabel>Nome da Escola *</FormLabel><FormControl><Input placeholder="Nome completo da escola" {...field} /></FormControl><FormMessage /></FormItem>
           )} />
@@ -164,10 +171,22 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
               <FormMessage />
             </FormItem>
           )} />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField control={form.control} name="email" render={({ field }) => (
+              <FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" placeholder="contato@escola.com" {...field} /></FormControl><FormMessage /></FormItem>
+            )} />
+            <FormField control={form.control} name="phone" render={({ field }) => (
+              <FormItem><FormLabel>Telefone</FormLabel><FormControl><Input placeholder="(71) 3333-3333" {...field} /></FormControl><FormMessage /></FormItem>
+            )} />
+            <FormField control={form.control} name="website" render={({ field }) => (
+              <FormItem className="md:col-span-2"><FormLabel>Website</FormLabel><FormControl><Input placeholder="https://www.escola.com.br" {...field} /></FormControl><FormMessage /></FormItem>
+            )} />
+          </div>
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Turnos Disponíveis *</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Turnos Disponíveis *</h3>
           <FormField control={form.control} name="shifts" render={() => (
             <FormItem>
               <div className="grid grid-cols-2 gap-4">
@@ -188,7 +207,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Períodos Escolares *</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Períodos Escolares *</h3>
           <FormField control={form.control} name="periods" render={() => (
             <FormItem>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -222,7 +241,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-lg">Disciplinas/Áreas *</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Disciplinas/Áreas *</h3>
           <FormField control={form.control} name="subjects" render={() => (
             <FormItem>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -270,11 +289,6 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
             <InstructorFields
               instructors={instructors}
               onRemove={(index) => setInstructors(instructors.filter((_, i) => i !== index))}
-              onSave={(index) => {
-                const updatedInstructors = [...instructors];
-                updatedInstructors[index].saved = true;
-                setInstructors(updatedInstructors);
-              }}
               form={form}
               availableSubjects={availableSubjects}
             />

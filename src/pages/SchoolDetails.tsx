@@ -253,6 +253,38 @@ const SchoolDetails = () => {
                     <div key={index} className="p-3 bg-filter-bg rounded-lg">
                       <h4 className="font-poppins font-semibold text-xs sm:text-sm">{instructor.name}</h4>
                       <p className="text-muted-foreground font-montserrat text-xs sm:text-sm">{instructor.subject}</p>
+                      {instructor.additionalInfo && (
+                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line">
+                          {instructor.additionalInfo}
+                        </div>
+                      )}
+                      {instructor.additionalInfo && (
+                        <div className="mt-2 text-[11px] sm:text-xs text-muted-foreground italic">
+                          Enviado por: {instructor.contributorName || 'Contribuidor'}
+                        </div>
+                      )}
+                      {(instructor.shifts?.length > 0 || instructor.periods?.length > 0) && (
+                        <div className="mt-2 space-y-2">
+                          {instructor.shifts?.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {instructor.shifts.map((shift) => (
+                                <Badge key={shift} variant="outline" className="font-montserrat text-xs">
+                                  {shift}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          {instructor.periods?.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {instructor.periods.map((period) => (
+                                <Badge key={period} variant="secondary" className="font-montserrat text-xs">
+                                  {period}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                   {school.instructors.length === 0 && (
@@ -301,6 +333,16 @@ const SchoolDetails = () => {
                       <p className="text-muted-foreground font-montserrat text-xs">
                         {student.university} - {student.course}
                       </p>
+                      {student.additionalInfo && (
+                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line">
+                          {student.additionalInfo}
+                        </div>
+                      )}
+                      {student.additionalInfo && (
+                        <div className="mt-2 text-[11px] sm:text-xs text-muted-foreground italic">
+                          Enviado por: {student.contributorName || 'Contribuidor'}
+                        </div>
+                      )}
                     </div>
                   ))}
                   {school.formerStudents.length === 0 && (

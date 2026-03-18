@@ -1,10 +1,8 @@
-import { X, Save } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { UseFormReturn } from 'react-hook-form';
-import { useState } from 'react';
 
 const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
 const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
@@ -21,7 +19,6 @@ export interface Instructor {
 interface InstructorFieldsProps {
   instructors: Instructor[];
   onRemove: (index: number) => void;
-  onSave?: (index: number) => void;
   form: UseFormReturn<any>;
   availableSubjects: string[];
 }
@@ -29,30 +26,12 @@ interface InstructorFieldsProps {
 export const InstructorFields = ({ 
   instructors, 
   onRemove,
-  onSave,
   form,
   availableSubjects 
 }: InstructorFieldsProps) => {
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-
-  const handleSaveInstructor = (index: number) => {
-    const instructor = form.watch(`instructors.${index}`);
-    
-    if (!instructor?.name || !instructor?.subjects?.length) {
-      return;
-    }
-    
-    setEditingIndex(null);
-    if (onSave) {
-      onSave(index);
-    }
-  };
-
   return (
     <div className="space-y-6">
       {instructors.map((instructor, index) => {
-        const isEditing = editingIndex === index || !instructor.saved;
-        
         return (
         <div key={index} className="p-4 border-2 border-primary/20 rounded-lg bg-primary/5 relative">
           {instructors.length > 1 && (
@@ -69,17 +48,6 @@ export const InstructorFields = ({
             <h4 className="font-poppins font-semibold text-base">
               Instrutor {index + 1}
             </h4>
-            {isEditing && (
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => handleSaveInstructor(index)}
-                className="gap-2"
-              >
-                <Save className="w-4 h-4" />
-                Salvar
-              </Button>
-            )}
           </div>
 
           <div className="space-y-4">
@@ -142,7 +110,9 @@ export const InstructorFields = ({
                           }}
                         />
                       </FormControl>
-                      <FormLabel className="font-normal text-sm">Outros</FormLabel>
+                      <FormLabel className="font-normal text-sm">
+                        {form.watch(`instructors.${index}.customSubject`) || 'Outros'}
+                      </FormLabel>
                     </FormItem>
                   )}
                 />

@@ -20,9 +20,11 @@ const AdminPanel = () => {
   
   const {
     pendingSchools,
+    pendingSchoolUpdates,
     pendingInstructors,
     pendingStudents,
     approveSchool,
+    approveSchoolUpdate,
     approveInstructor,
     approveStudent,
     rejectSubmission,
@@ -139,6 +141,46 @@ const AdminPanel = () => {
 
             <Card>
               <CardHeader>
+                <CardTitle>Atualizações Institucionais ({pendingSchoolUpdates.length})</CardTitle>
+                <CardDescription>Revisar atualizações enviadas para escolas existentes</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {pendingSchoolUpdates.map((update) => (
+                  <div key={update.id} className="border rounded-lg p-4 space-y-2">
+                    <p className="text-sm text-muted-foreground">Escola ID: {update.school_id}</p>
+                    {update.contributor_name && (
+                      <p className="text-sm">Contribuidor: {update.contributor_name}{update.contributor_position ? ` - ${update.contributor_position}` : ""}</p>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                      {update.email && <p>Email: {update.email}</p>}
+                      {update.phone && <p>Telefone: {update.phone}</p>}
+                      {update.website && <p>Website: {update.website}</p>}
+                    </div>
+                    {update.additional_info && (
+                      <p className="text-sm">Info adicional: {update.additional_info}</p>
+                    )}
+                    <div className="flex gap-2 mt-4">
+                      <Button size="sm" onClick={() => approveSchoolUpdate.mutate(update)} disabled={approveSchoolUpdate.isPending}>
+                        <Check className="mr-2 h-4 w-4" />Aprovar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => rejectSubmission.mutate({ table: "pending_school_updates", id: update.id })}
+                      >
+                        <X className="mr-2 h-4 w-4" />Rejeitar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                {pendingSchoolUpdates.length === 0 && (
+                  <p className="text-muted-foreground text-center py-8">Nenhuma atualização pendente</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
                 <CardTitle>Professores Pendentes ({pendingInstructors.length})</CardTitle>
                 <CardDescription>Revisar e aprovar novos professores</CardDescription>
               </CardHeader>
@@ -166,8 +208,8 @@ const AdminPanel = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Ex-Estagiários Pendentes ({pendingStudents.length})</CardTitle>
-                <CardDescription>Revisar e aprovar ex-estagiários</CardDescription>
+                <CardTitle>Estagiários Pendentes ({pendingStudents.length})</CardTitle>
+                <CardDescription>Revisar e aprovar estagiários</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {pendingStudents.map((student) => (
@@ -186,7 +228,7 @@ const AdminPanel = () => {
                   </div>
                 ))}
                 {pendingStudents.length === 0 && (
-                  <p className="text-muted-foreground text-center py-8">Nenhum ex-estagiário pendente</p>
+                  <p className="text-muted-foreground text-center py-8">Nenhum estagiário pendente</p>
                 )}
               </CardContent>
             </Card>

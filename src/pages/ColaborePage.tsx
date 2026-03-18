@@ -115,10 +115,10 @@ const ColaborePage = () => {
                           </DialogTrigger>
                           <DialogContent className="bg-background border-2 mx-2">
                             <DialogHeader className="space-y-3 pb-4 sm:pb-6 border-b">
-                              <div className="inline-flex p-2 sm:p-3 bg-primary/10 rounded-2xl text-primary w-fit">
-                                {icons[index]}
-                              </div>
-                              <DialogTitle className="font-poppins text-xl sm:text-3xl font-bold text-secondary">
+                              <DialogTitle className="font-poppins text-xl sm:text-3xl font-bold text-secondary flex flex-col items-center text-center gap-2 sm:flex-row sm:items-center sm:text-left">
+                                <span className="inline-flex p-2 sm:p-2.5 bg-primary/10 rounded-xl text-primary">
+                                  {icons[index]}
+                                </span>
                                 {option.title}
                               </DialogTitle>
                               <DialogDescription className="font-montserrat text-sm sm:text-base text-muted-foreground">

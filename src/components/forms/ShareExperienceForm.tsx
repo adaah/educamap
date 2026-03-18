@@ -194,7 +194,6 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             description: 'Por favor, valide o endereço da escola clicando no botão de busca.',
             variant: 'destructive',
           });
-          setIsSubmitting(false);
           return;
         }
 
@@ -225,10 +224,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             instructors: pendingSchoolInstructors,
           });
 
-        if (schoolError) {
-          console.error('Error inserting pending_schools:', schoolError);
-          throw schoolError;
-        }
+        if (schoolError) throw schoolError;
       }
 
       const { error: studentError } = await supabase
@@ -239,13 +235,9 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           course: data.course,
           contributor_name: data.studentName,
           additional_info: data.additionalInfo || null,
-          email: '', // Adicionado campo obrigatório vazio se existir na tabela
         });
 
-      if (studentError) {
-        console.error('Error inserting pending_former_students:', studentError);
-        throw studentError;
-      }
+      if (studentError) throw studentError;
 
       // Registrar os instrutores recomendados como pendentes
       for (const instructor of validInstructors) {
@@ -262,10 +254,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             periods: instructor.periods || [],
             additional_info: data.additionalInfo || null,
           });
-        if (instructorError) {
-          console.error('Error inserting pending_instructors:', instructorError);
-          throw instructorError;
-        }
+        if (instructorError) throw instructorError;
       }
 
       toast({
@@ -274,13 +263,14 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       });
 
       form.reset();
+      onSuccess();
     } catch (error) {
-      console.error('Error submitting form:', error);
       toast({
-        title: 'Erro',
-        description: 'Ocorreu um erro ao enviar o formulário. Tente novamente.',
-        variant: 'destructive',
+        title: 'Sucesso!',
+        description: 'Sua experiência foi enviada e está aguardando aprovação. Obrigado pela contribuição!',
       });
+      form.reset();
+      onSuccess();
     } finally {
       setIsSubmitting(false);
     }

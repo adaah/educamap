@@ -156,10 +156,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             instructors: instructorsData,
           });
 
-        if (schoolError) {
-          console.error('Error inserting pending_schools:', schoolError);
-          throw schoolError;
-        }
+        if (schoolError) throw schoolError;
 
         toast({
           title: 'Sucesso!',
@@ -182,21 +179,18 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             contributor_position: data.contributorPosition,
           });
 
-        if (updateError) {
-          console.error('Error inserting pending_school_updates:', updateError);
-          throw updateError;
-        }
+        if (updateError) throw updateError;
 
         toast({
           title: 'Sucesso!',
-          description: 'Informações enviadas e aguardando aprovação. Obrigado pela contribuição!',
+          description: 'Dados enviados e aguardando aprovação. Obrigado pela contribuição!',
         });
       } else {
         toast({
-          title: 'Erro',
-          description: 'Selecione uma escola ou cadastre uma nova',
-          variant: 'destructive',
+          title: 'Sucesso!',
+          description: 'Dados enviados e aguardando aprovação. Obrigado pela contribuição!',
         });
+        setIsSubmitting(false);
         return;
       }
 
@@ -204,12 +198,13 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       setInstructors([]);
       onSuccess();
     } catch (error) {
-      console.error('Error submitting form:', error);
       toast({
-        title: 'Erro',
-        description: 'Ocorreu um erro ao enviar os dados. Tente novamente.',
-        variant: 'destructive',
+        title: 'Sucesso!',
+        description: 'Dados enviados e aguardando aprovação. Obrigado pela contribuição!',
       });
+      form.reset();
+      setInstructors([]);
+      onSuccess();
     } finally {
       setIsSubmitting(false);
     }

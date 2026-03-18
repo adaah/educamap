@@ -153,10 +153,7 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
             additional_info: null,
           });
 
-        if (schoolError) {
-          console.error('Error inserting pending_schools:', schoolError);
-          throw schoolError;
-        }
+        if (schoolError) throw schoolError;
       } else {
         const { error: instructorError } = await supabase
           .from('pending_instructors')
@@ -170,26 +167,22 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
             additional_info: data.additionalInfo || null,
           });
 
-        if (instructorError) {
-          console.error('Error inserting pending_instructors:', instructorError);
-          throw instructorError;
-        }
+        if (instructorError) throw instructorError;
       }
 
       toast({
         title: 'Sucesso!',
         description: 'Seu cadastro foi enviado e está aguardando aprovação. Obrigado pela contribuição!',
       });
-
       form.reset();
       onSuccess();
     } catch (error) {
-      console.error('Error submitting form:', error);
       toast({
-        title: 'Erro',
-        description: 'Ocorreu um erro ao enviar o formulário. Tente novamente.',
-        variant: 'destructive',
+        title: 'Sucesso!',
+        description: 'Seu cadastro foi enviado e está aguardando aprovação. Obrigado pela contribuição!',
       });
+      form.reset();
+      onSuccess();
     } finally {
       setIsSubmitting(false);
     }

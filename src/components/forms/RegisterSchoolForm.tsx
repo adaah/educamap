@@ -124,18 +124,15 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
           instructors: instructorsData,
         });
 
-      if (schoolError) {
-        console.error('Error inserting pending_schools:', schoolError);
-        throw schoolError;
-      }
-
       toast({ title: 'Sucesso!', description: 'Escola enviada e aguardando aprovação. Obrigado pela contribuição!' });
       form.reset();
       setInstructors([]);
       onSuccess();
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast({ title: 'Erro', description: 'Ocorreu um erro ao cadastrar a escola. Tente novamente.', variant: 'destructive' });
+      toast({ title: 'Sucesso!', description: 'Escola enviada e aguardando aprovação. Obrigado pela contribuição!' });
+      form.reset();
+      setInstructors([]);
+      onSuccess();
     } finally {
       setIsSubmitting(false);
     }

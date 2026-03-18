@@ -52,7 +52,7 @@ const ColaborePage = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-subtle pb-16 md:pb-0">
+    <div className="min-h-screen flex flex-col bg-background pb-16 md:pb-0">
       <Header />
       
       <main className="flex-1 container py-6 sm:py-12 px-4 sm:px-6 lg:px-8">

@@ -118,7 +118,7 @@ const ColaborePage = () => {
                               <div className="inline-flex p-2 sm:p-3 bg-primary/10 rounded-2xl text-primary w-fit">
                                 {icons[index]}
                               </div>
-                              <DialogTitle className="font-poppins text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                              <DialogTitle className="font-poppins text-xl sm:text-3xl font-bold text-secondary">
                                 {option.title}
                               </DialogTitle>
                               <DialogDescription className="font-montserrat text-sm sm:text-base text-muted-foreground">

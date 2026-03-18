@@ -140,7 +140,7 @@ const ColaborePage = () => {
 
           {/* Additional Info */}
           <div className="mt-12 sm:mt-16 space-y-6">
-            <Card className="p-6 sm:p-8 bg-gradient-to-br from-destructive/5 to-destructive/10 border-2 border-destructive/20">
+            <Card className="p-6 sm:p-8 bg-destructive/5 border-2 border-destructive/20">
               <div className="text-center">
                 <div className="inline-block p-3 bg-destructive/10 rounded-full mb-4">
                   <svg className="w-8 h-8 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">

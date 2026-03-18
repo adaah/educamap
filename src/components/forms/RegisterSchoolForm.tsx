@@ -124,7 +124,10 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
           instructors: instructorsData,
         });
 
-      if (schoolError) throw schoolError;
+      if (schoolError) {
+        console.error('Error inserting pending_schools:', schoolError);
+        throw schoolError;
+      }
 
       toast({ title: 'Sucesso!', description: 'Escola enviada e aguardando aprovação. Obrigado pela contribuição!' });
       form.reset();

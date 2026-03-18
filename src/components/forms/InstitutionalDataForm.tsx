@@ -156,7 +156,10 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             instructors: instructorsData,
           });
 
-        if (schoolError) throw schoolError;
+        if (schoolError) {
+          console.error('Error inserting pending_schools:', schoolError);
+          throw schoolError;
+        }
 
         toast({
           title: 'Sucesso!',
@@ -179,7 +182,10 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             contributor_position: data.contributorPosition,
           });
 
-        if (updateError) throw updateError;
+        if (updateError) {
+          console.error('Error inserting pending_school_updates:', updateError);
+          throw updateError;
+        }
 
         toast({
           title: 'Sucesso!',

@@ -153,7 +153,10 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
             additional_info: null,
           });
 
-        if (schoolError) throw schoolError;
+        if (schoolError) {
+          console.error('Error inserting pending_schools:', schoolError);
+          throw schoolError;
+        }
       } else {
         const { error: instructorError } = await supabase
           .from('pending_instructors')
@@ -167,7 +170,10 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
             additional_info: data.additionalInfo || null,
           });
 
-        if (instructorError) throw instructorError;
+        if (instructorError) {
+          console.error('Error inserting pending_instructors:', instructorError);
+          throw instructorError;
+        }
       }
 
       toast({

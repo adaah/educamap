@@ -194,6 +194,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             description: 'Por favor, valide o endereço da escola clicando no botão de busca.',
             variant: 'destructive',
           });
+          setIsSubmitting(false);
           return;
         }
 
@@ -220,10 +221,14 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             contributor_name: data.studentName,
             periods: data.hasContactData ? (data.newSchoolPeriods || []) : [],
             shifts: data.hasContactData ? (data.newSchoolShifts || []) : [],
+            subjects: [], // Adicionado para evitar erro de campo faltante se houver
             instructors: pendingSchoolInstructors,
           });
 
-        if (schoolError) throw schoolError;
+        if (schoolError) {
+          console.error('Error inserting pending_schools:', schoolError);
+          throw schoolError;
+        }
       }
 
       const { error: studentError } = await supabase
@@ -234,9 +239,13 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           course: data.course,
           contributor_name: data.studentName,
           additional_info: data.additionalInfo || null,
+          email: '', // Adicionado campo obrigatório vazio se existir na tabela
         });
 
-      if (studentError) throw studentError;
+      if (studentError) {
+        console.error('Error inserting pending_former_students:', studentError);
+        throw studentError;
+      }
 
       // Registrar os instrutores recomendados como pendentes
       for (const instructor of validInstructors) {
@@ -251,8 +260,12 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             school_name: isNewSchool ? (data.newSchoolName || null) : null,
             shifts: instructor.shifts || [],
             periods: instructor.periods || [],
+            additional_info: data.additionalInfo || null,
           });
-        if (instructorError) throw instructorError;
+        if (instructorError) {
+          console.error('Error inserting pending_instructors:', instructorError);
+          throw instructorError;
+        }
       }
 
       toast({

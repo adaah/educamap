@@ -90,7 +90,7 @@ const ColaborePage = () => {
                     <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-6">
                       {/* Icon */}
                       <div className="flex-shrink-0 self-start">
-                        <div className="p-3 sm:p-4 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl text-primary group-hover:scale-110 transition-transform duration-300">
+                        <div className="p-3 sm:p-4 bg-primary/10 rounded-2xl text-primary group-hover:scale-110 transition-transform duration-300">
                           {icons[index]}
                         </div>
                       </div>

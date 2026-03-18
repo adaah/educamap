@@ -43,7 +43,7 @@ const MapPage = () => {
         </div>
       </main>
       
-      <Footer />
+      
       <BottomNav />
     </div>
   );

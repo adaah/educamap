@@ -208,7 +208,7 @@ const ListPage = () => {
         </div>
       </main>
       
-      <Footer />
+      
       <BottomNav />
     </div>
   );

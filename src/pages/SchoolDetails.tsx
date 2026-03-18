@@ -340,7 +340,7 @@ const SchoolDetails = () => {
         </div>
       </main>
       
-      <Footer />
+      
       <BottomNav />
     </div>
   );

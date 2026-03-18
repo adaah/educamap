@@ -326,7 +326,7 @@ const SchoolDetails = () => {
                   }}
                 >
                   <div className="absolute inset-0 opacity-20">
-                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-green-100"></div>
+                    <div className="w-full h-full bg-muted"></div>
                   </div>
                   <div className="relative text-center px-4">
                     <MapPin className="w-10 h-10 sm:w-12 sm:h-12 text-pin-primary mx-auto mb-2" fill="currentColor" />

@@ -136,7 +136,7 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
                         </div>
                     </div>
                     
-                    <button id="details-btn-${school.id}" style="width: 100%; padding: 0.625rem; border-radius: 0.5rem; font-family: Poppins, sans-serif; font-weight: 600; background: linear-gradient(to right, #f97316, #fbbf24); color: white; border: none; cursor: pointer; transition: all 0.3s; font-size: 0.875rem;">
+                    <button id="details-btn-${school.id}" style="width: 100%; padding: 0.625rem; border-radius: 0.5rem; font-family: Poppins, sans-serif; font-weight: 600; background: #f97316; color: white; border: none; cursor: pointer; transition: all 0.3s; font-size: 0.875rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 0.375rem; vertical-align: middle;"><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path><path d="M18 19H6c-1.1 0-2-.9-2 2V7c0-1.1.9-2 2-2h5"></path></svg>
                         Ver Detalhes
                     </button>

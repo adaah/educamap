@@ -27,7 +27,7 @@ const BottomNav = () => {
             >
               <div className={`p-2 rounded-lg mb-1 transition-all ${
                 isActive 
-                  ? 'bg-gradient-to-br from-primary/20 to-secondary/20 scale-110' 
+                  ? 'bg-primary/20 scale-110' 
                   : 'hover:bg-accent'
               }`}>
                 <Icon className="w-5 h-5" />

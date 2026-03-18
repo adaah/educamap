@@ -82,7 +82,7 @@ const SchoolCard = ({ school, onViewOnMap }: SchoolCardProps) => {
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <button 
             onClick={handleViewDetails}
-            className="flex-1 px-6 py-2.5 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg transition-all transform hover:scale-105 flex items-center justify-center"
+            className="flex-1 px-6 py-2.5 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all flex items-center justify-center"
           >
             <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             Ver Detalhes

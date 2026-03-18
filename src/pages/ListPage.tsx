@@ -197,7 +197,7 @@ const ListPage = () => {
                   </p>
                   <button
                     onClick={handleClearFilters}
-                    className="px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-poppins font-semibold rounded-lg hover:shadow-lg transition-all transform hover:scale-105"
+                    className="px-6 py-3 bg-secondary text-white font-poppins font-semibold rounded-lg hover:bg-secondary/90 transition-all"
                   >
                     Limpar todos os filtros
                   </button>

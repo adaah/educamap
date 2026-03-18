@@ -58,7 +58,7 @@ All colors MUST be HSL for consistency and theme support
 
     /* Gradients - Removed for solid colors */
     --gradient-primary: hsl(36 100% 50%);  /* Solid new orange */
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --gradient-subtle: hsl(0 0% 99%);
 
     /* Shadows */
     --shadow-card: 0 4px 6px -1px hsl(0 0% 0% / 0.1);

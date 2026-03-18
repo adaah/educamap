@@ -165,7 +165,7 @@ const ColaborePage = () => {
               </div>
             </Card>
 
-            <Card className="p-6 sm:p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/10">
+            <Card className="p-6 sm:p-8 bg-primary/5 border-2 border-primary/10">
               <div className="text-center">
                 <h3 className="font-poppins font-bold text-xl sm:text-2xl text-foreground mb-3">
                   Dúvidas ou Sugestões?

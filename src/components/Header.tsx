@@ -57,7 +57,7 @@ const Header = () => {
         </nav>
 
         <div className="ml-auto md:ml-4 flex items-center gap-2">
-          <Badge variant="secondary" className="bg-gradient-to-r from-amber-400 to-orange-500 text-white border-0 font-poppins font-semibold">
+          <Badge variant="secondary" className="bg-secondary text-white border-0 font-poppins font-semibold">
             BETA
           </Badge>
         </div>

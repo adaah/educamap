@@ -243,7 +243,7 @@ const SchoolDetails = () => {
             <Card className="shadow-card border-2 hover:border-primary/20 transition-all">
               <CardHeader>
                 <CardTitle className="font-poppins font-bold text-base sm:text-xl flex items-center">
-                  <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl text-primary mr-2">
+                  <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
                     <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   Professores Instrutores

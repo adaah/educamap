@@ -15,7 +15,7 @@ export const useSchools = () => {
 
       const schools: School[] = await Promise.all(
         schoolsData.map(async (school) => {
-          const [periods, subjects, shifts, instructors, formerStudents] = await Promise.all([
+          const [periods, subjects, shifts, instructorsData, formerStudentsData] = await Promise.all([
             supabase.from('school_periods').select('period').eq('school_id', school.id),
             supabase.from('school_subjects').select('subject').eq('school_id', school.id),
             supabase.from('school_shifts').select('shift').eq('school_id', school.id),
@@ -23,7 +23,7 @@ export const useSchools = () => {
             supabase.from('former_students').select('*').eq('school_id', school.id),
           ]);
 
-          const instructorIds = instructors.data?.map((i) => i.id) || [];
+          const instructorIds = instructorsData.data?.map((i) => i.id) || [];
           const [instructorShifts, instructorPeriods] = await Promise.all([
             instructorIds.length
               ? supabase.from('instructor_shifts').select('instructor_id, shift').in('instructor_id', instructorIds)
@@ -55,25 +55,26 @@ export const useSchools = () => {
             nature: school.nature as 'Pública' | 'Particular',
             additionalInfo: school.additional_info || undefined,
             contributor_name: school.contributor_name || undefined,
+            contributorName: school.contributor_name || undefined,
             periods: periods.data?.map(p => p.period) || [],
             subjects: subjects.data?.map(s => s.subject) || [],
             shift: shifts.data?.map(s => s.shift) || [],
-            instructors: instructors.data?.map(i => ({
+            instructors: instructorsData.data?.map(i => ({
               id: i.id,
               name: i.name,
               subject: i.subject,
-              contributorName: i.contributor_name || undefined,
               additionalInfo: i.additional_info || undefined,
-              shifts: shiftsByInstructor.get(i.id) || [],
-              periods: periodsByInstructor.get(i.id) || [],
+              contributorName: i.contributor_name || undefined,
+              shifts: (i as any).shifts || shiftsByInstructor.get(i.id) || [],
+              periods: (i as any).periods || periodsByInstructor.get(i.id) || [],
             })) || [],
-            formerStudents: formerStudents.data?.map(f => ({
+            formerStudents: formerStudentsData.data?.map(f => ({
               id: f.id,
               name: f.name,
               university: f.university,
               course: f.course,
-              contributorName: f.contributor_name || undefined,
               additionalInfo: f.additional_info || undefined,
+              contributorName: f.contributor_name || undefined,
             })) || [],
           };
         })
@@ -98,7 +99,7 @@ export const useSchool = (id: string) => {
 
       if (schoolError) throw schoolError;
 
-      const [periods, subjects, shifts, instructors, formerStudents] = await Promise.all([
+      const [periods, subjects, shifts, instructorsData, formerStudentsData] = await Promise.all([
         supabase.from('school_periods').select('period').eq('school_id', school.id),
         supabase.from('school_subjects').select('subject').eq('school_id', school.id),
         supabase.from('school_shifts').select('shift').eq('school_id', school.id),
@@ -106,7 +107,7 @@ export const useSchool = (id: string) => {
         supabase.from('former_students').select('*').eq('school_id', school.id),
       ]);
 
-      const instructorIds = instructors.data?.map((i) => i.id) || [];
+      const instructorIds = instructorsData.data?.map((i) => i.id) || [];
       const [instructorShifts, instructorPeriods] = await Promise.all([
         instructorIds.length
           ? supabase.from('instructor_shifts').select('instructor_id, shift').in('instructor_id', instructorIds)
@@ -137,26 +138,27 @@ export const useSchool = (id: string) => {
         website: school.website || undefined,
         nature: school.nature as 'Pública' | 'Particular',
         additionalInfo: school.additional_info || undefined,
+        contributorName: school.contributor_name || undefined,
         contributor_name: school.contributor_name || undefined,
         periods: periods.data?.map(p => p.period) || [],
         subjects: subjects.data?.map(s => s.subject) || [],
         shift: shifts.data?.map(s => s.shift) || [],
-        instructors: instructors.data?.map(i => ({
+        instructors: instructorsData.data?.map(i => ({
           id: i.id,
           name: i.name,
           subject: i.subject,
-          contributorName: i.contributor_name || undefined,
           additionalInfo: i.additional_info || undefined,
-          shifts: shiftsByInstructor.get(i.id) || [],
-          periods: periodsByInstructor.get(i.id) || [],
+          contributorName: i.contributor_name || undefined,
+          shifts: (i as any).shifts || shiftsByInstructor.get(i.id) || [],
+          periods: (i as any).periods || periodsByInstructor.get(i.id) || [],
         })) || [],
-        formerStudents: formerStudents.data?.map(f => ({
+        formerStudents: formerStudentsData.data?.map(f => ({
           id: f.id,
           name: f.name,
           university: f.university,
           course: f.course,
-          contributorName: f.contributor_name || undefined,
           additionalInfo: f.additional_info || undefined,
+          contributorName: f.contributor_name || undefined,
         })) || [],
       } as School;
     },

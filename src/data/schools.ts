@@ -9,6 +9,7 @@ export interface School {
   website?: string;
   nature: 'Pública' | 'Particular';
   additionalInfo?: string;
+  contributorName?: string;
   contributor_name?: string;
   periods: string[];
   subjects: string[];

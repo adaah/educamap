@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus, X } from 'lucide-react';
 
 const formSchema = z.object({
   contributorName: z.string().trim().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100),
@@ -43,9 +43,9 @@ const formSchema = z.object({
   website: z.string().trim().max(255).optional().or(z.literal('')),
   shifts: z.array(z.string()).optional(),
   periods: z.array(z.string()).optional(),
-  customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
+  customPeriods: z.array(z.string()).optional().or(z.literal('')),
   subjects: z.array(z.string()).optional(),
-  customSubject: z.string().trim().max(100).optional().or(z.literal('')),
+  customSubjects: z.array(z.string()).optional().or(z.literal('')),
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
 });
 
@@ -56,7 +56,7 @@ interface InstitutionalDataFormProps {
 }
 
 const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
-const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
+const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA', 'Técnico', 'Integrado Médio-Técnico', 'Outros'];
 const availableSubjects = [
   'Matemática', 'Português', 'Ciências', 'História', 'Geografia',
   'Educação Física', 'Artes', 'Inglês', 'Filosofia', 'Sociologia',
@@ -92,9 +92,9 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       website: '',
       shifts: [],
       periods: [],
-      customPeriod: '',
+      customPeriods: [],
       subjects: [],
-      customSubject: '',
+      customSubjects: [],
       additionalInfo: '',
     },
   });
@@ -105,25 +105,19 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       const instructorsData = instructors
         .filter(i => i.name && i.subjects.length > 0)
         .map(instructor => {
-          const finalSubjects = [...instructor.subjects];
-          const showCustom = instructor.subjects.includes('Outros');
-          if (showCustom && instructor.customSubject) {
-            const index = finalSubjects.indexOf('Outros');
-            if (index > -1) {
-              finalSubjects[index] = instructor.customSubject;
-            }
-          }
+          // Combinar disciplinas padrão com personalizadas
+          const finalSubjects = [...instructor.subjects, ...(instructor.customSubjects || [])];
           return {
             name: instructor.name,
             subjects: finalSubjects,
           };
         });
 
-      const allPeriods = data.periods || [];
-      const normalizedPeriods = allPeriods.map((p) => (p === 'Outros' ? (data.customPeriod || p) : p));
+      // Combinar períodos padrão com personalizadas
+      const allPeriods = [...(data.periods || []), ...(data.customPeriods || [])];
 
-      const allSubjects = data.subjects || [];
-      const normalizedSubjects = allSubjects.map((s) => (s === 'Outros' ? (data.customSubject || s) : s));
+      // Combinar disciplinas padrão com personalizadas
+      const allSubjects = [...(data.subjects || []), ...(data.customSubjects || [])];
 
       if (isNewSchool && data.newSchoolName) {
         if (!coordinates) {
@@ -150,8 +144,8 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             website: data.website || null,
             additional_info: data.additionalInfo || null,
             contributor_name: `${data.contributorName} - ${data.contributorPosition}`,
-            periods: normalizedPeriods,
-            subjects: normalizedSubjects,
+            periods: allPeriods,
+            subjects: allSubjects,
             shifts: data.shifts || [],
             instructors: instructorsData,
           });
@@ -171,8 +165,8 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             phone: data.phone || null,
             website: data.website || null,
             additional_info: data.additionalInfo || null,
-            periods: normalizedPeriods,
-            subjects: normalizedSubjects,
+            periods: allPeriods,
+            subjects: allSubjects,
             shifts: data.shifts || [],
             instructors: instructorsData,
             contributor_name: data.contributorName,
@@ -337,21 +331,60 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
                     </FormItem>
                   )} />
                 ))}
-                <FormField key="Outros" control={form.control} name="periods" render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value?.includes('Outros')} onCheckedChange={(checked) => checked ? field.onChange([...(field.value || []), 'Outros']) : field.onChange(field.value?.filter((value) => value !== 'Outros'))} />
-                    </FormControl>
-                    <FormLabel className="font-normal">Outros</FormLabel>
-                  </FormItem>
-                )} />
               </div>
             </FormItem>
           )} />
           {form.watch('periods')?.includes('Outros') && (
-            <FormField control={form.control} name="customPeriod" render={({ field }) => (
-              <FormItem><FormLabel>Especifique o período</FormLabel><FormControl><Input placeholder="Digite o período" {...field} /></FormControl><FormMessage /></FormItem>
-            )} />
+            <div className="space-y-2">
+              <FormLabel className="text-sm font-medium">Períodos Personalizados</FormLabel>
+              <FormField control={form.control} name="customPeriods" render={({ field }) => (
+                <FormItem>
+                  <div className="space-y-2">
+                    {(field.value || []).map((customPeriod, index) => (
+                      <div key={index} className="flex gap-2">
+                        <FormControl>
+                          <Input
+                            value={customPeriod}
+                            onChange={(e) => {
+                              const newPeriods = [...(field.value || [])];
+                              newPeriods[index] = e.target.value;
+                              field.onChange(newPeriods);
+                            }}
+                            placeholder="Digite um período personalizado"
+                          />
+                        </FormControl>
+                        {(field.value || []).length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newPeriods = (field.value || []).filter((_, i) => i !== index);
+                              field.onChange(newPeriods);
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newPeriods = [...(field.value || []), ''];
+                        field.onChange(newPeriods);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Adicionar Período
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
           )}
         </div>
 
@@ -382,9 +415,56 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
             </FormItem>
           )} />
           {form.watch('subjects')?.includes('Outros') && (
-            <FormField control={form.control} name="customSubject" render={({ field }) => (
-              <FormItem><FormLabel>Especifique a disciplina/área</FormLabel><FormControl><Input placeholder="Digite a disciplina ou área" {...field} /></FormControl><FormMessage /></FormItem>
-            )} />
+            <div className="space-y-2">
+              <FormLabel className="text-sm font-medium">Disciplinas Personalizadas</FormLabel>
+              <FormField control={form.control} name="customSubjects" render={({ field }) => (
+                <FormItem>
+                  <div className="space-y-2">
+                    {(field.value || []).map((customSubject, index) => (
+                      <div key={index} className="flex gap-2">
+                        <FormControl>
+                          <Input
+                            value={customSubject}
+                            onChange={(e) => {
+                              const newSubjects = [...(field.value || [])];
+                              newSubjects[index] = e.target.value;
+                              field.onChange(newSubjects);
+                            }}
+                            placeholder="Digite uma disciplina ou área"
+                          />
+                        </FormControl>
+                        {(field.value || []).length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newSubjects = (field.value || []).filter((_, i) => i !== index);
+                              field.onChange(newSubjects);
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newSubjects = [...(field.value || []), ''];
+                        field.onChange(newSubjects);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Adicionar Disciplina
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
           )}
         </div>
 
@@ -393,7 +473,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
           <p className="text-xs sm:text-sm text-muted-foreground">Liste professores que podem ser contatos para estágio</p>
           <button
             type="button"
-            onClick={() => setInstructors([...instructors, { name: '', subjects: [], customSubject: '', saved: false }])}
+            onClick={() => setInstructors([...instructors, { name: '', subjects: [], customSubjects: [], saved: false }])}
             className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
           >
             + Adicionar Instrutor

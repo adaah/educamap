@@ -78,7 +78,9 @@ export const usePendingSubmissions = () => {
           email: pendingSchool.email,
           phone: pendingSchool.phone,
           website: pendingSchool.website,
-          additional_info: pendingSchool.additional_info,
+          additional_info: pendingSchool.additional_info ? 
+            `📝 ${pendingSchool.contributor_name || 'Anônimo'}:\n${pendingSchool.additional_info}` : 
+            null,
           contributor_name: pendingSchool.contributor_name,
         })
         .select()
@@ -120,13 +122,15 @@ export const usePendingSubmissions = () => {
           pendingSchool.instructors.map((instructor: any) => ({
             school_id: school.id,
             name: instructor.name,
-            subject: instructor.subject,
+            subject: Array.isArray(instructor.subjects) ? (instructor.subjects.includes('Outros') && instructor.customSubject ? [...instructor.subjects.filter((s: string) => s !== 'Outros'), instructor.customSubject].join(', ') : instructor.subjects.join(', ')) : instructor.subject,
             email: instructor.email,
             linkedin: instructor.linkedin,
             whatsapp: instructor.whatsapp,
             instagram: instructor.instagram,
             contributor_name: pendingSchool.contributor_name,
             additional_info: instructor.additional_info,
+            shifts: instructor.shifts,
+            periods: instructor.periods,
           }))
         ).select("id");
 
@@ -184,7 +188,24 @@ export const usePendingSubmissions = () => {
       if (pendingUpdate.email !== null && pendingUpdate.email !== undefined) updateData.email = pendingUpdate.email;
       if (pendingUpdate.phone !== null && pendingUpdate.phone !== undefined) updateData.phone = pendingUpdate.phone;
       if (pendingUpdate.website !== null && pendingUpdate.website !== undefined) updateData.website = pendingUpdate.website;
-      if (pendingUpdate.additional_info !== null && pendingUpdate.additional_info !== undefined) updateData.additional_info = pendingUpdate.additional_info;
+      
+      // Acumular informações adicionais em vez de sobrescrever
+      if (pendingUpdate.additional_info !== null && pendingUpdate.additional_info !== undefined) {
+        // Buscar informações atuais da escola
+        const { data: currentSchool } = await supabase
+          .from('schools')
+          .select('additional_info')
+          .eq('id', pendingUpdate.school_id)
+          .single();
+        
+        const existingInfo = currentSchool?.additional_info || '';
+        const contributorName = pendingUpdate.contributor_name || 'Anônimo';
+        const newEntry = existingInfo ? 
+          `\n\n---\n📝 ${contributorName}:\n${pendingUpdate.additional_info}` :
+          `📝 ${contributorName}:\n${pendingUpdate.additional_info}`;
+        
+        updateData.additional_info = existingInfo + newEntry;
+      }
 
       if (Object.keys(updateData).length > 0) {
         const { error: updateError } = await supabase
@@ -233,12 +254,15 @@ export const usePendingSubmissions = () => {
           pendingUpdate.instructors.map((instructor: any) => ({
             school_id: pendingUpdate.school_id,
             name: instructor.name,
-            subject: Array.isArray(instructor.subjects) ? instructor.subjects.join(", ") : instructor.subject,
+            subject: Array.isArray(instructor.subjects) ? (instructor.subjects.includes('Outros') && instructor.customSubject ? [...instructor.subjects.filter((s: string) => s !== 'Outros'), instructor.customSubject].join(', ') : instructor.subjects.join(', ')) : instructor.subject,
             email: instructor.email,
             linkedin: instructor.linkedin,
             whatsapp: instructor.whatsapp,
             instagram: instructor.instagram,
             contributor_name: pendingUpdate.contributor_name ? `${pendingUpdate.contributor_name} - ${pendingUpdate.contributor_position || ""}`.trim() : null,
+            additional_info: instructor.additional_info,
+            shifts: instructor.shifts,
+            periods: instructor.periods,
           }))
         );
         if (insError) throw insError;
@@ -278,6 +302,8 @@ export const usePendingSubmissions = () => {
         contributor_name: pendingInstructor.contributor_name,
         additional_info: pendingInstructor.additional_info,
         school_id: pendingInstructor.school_id,
+        shifts: pendingInstructor.shifts,
+        periods: pendingInstructor.periods,
       }).select("id").single();
 
       if (insertError) throw insertError;
@@ -341,9 +367,13 @@ export const usePendingSubmissions = () => {
             updateData.phone = pendingStudent.whatsapp;
           }
           
-          // Atualizar informações adicionais se não existirem
-          if (pendingStudent.additional_info && !schoolData.additional_info) {
-            updateData.additional_info = pendingStudent.additional_info;
+          // Acumular informações adicionais em vez de sobrescrever
+          if (pendingStudent.additional_info) {
+            const existingInfo = schoolData.additional_info || '';
+            const contributorName = pendingStudent.contributor_name || 'Anônimo';
+            const newEntry = `\n\n---\n📝 ${contributorName}:\n${pendingStudent.additional_info}`;
+            
+            updateData.additional_info = existingInfo + newEntry;
           }
 
           // Aplicar atualizações se houver

@@ -18,7 +18,7 @@ const Header = () => {
           </div>
           <div className="flex flex-col">
             <span className="font-poppins font-bold text-sm sm:text-xl text-secondary">EduMap Salvador</span>
-            <span className="font-montserrat text-[10px] sm:text-xs text-muted-foreground">Estágio em instituições de ensino</span>
+            <span className="font-montserrat text-[10px] sm:text-xs text-muted-foreground">Estágio em Instituições de Ensino</span>
           </div>
         </Link>
 

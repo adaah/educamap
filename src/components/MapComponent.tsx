@@ -46,16 +46,16 @@ const MapComponent = ({ selectedSchool, onSchoolSelect }: MapComponentProps) => 
         }
 
         // 1. Inicializa o mapa no elemento 'div' com o id="mapa"
-        // Coordenadas de Salvador: [-12.9714, -38.5014]
+        // Coordenadas atualizadas: [-12.950191, -38.470462]
         // Zoom padrão ligeiramente menor em mobile para mostrar mais área
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-        const initialZoom = isMobile ? 12 : 13;
-        map.current = L.map(mapContainer.current!).setView([-12.9714, -38.5014], initialZoom);
+        const initialZoom = isMobile ? 11.5 : 13;
+        map.current = L.map(mapContainer.current!).setView([-12.950191, -38.470462], initialZoom);
 
         // 2. Adiciona os Tiles (OpenStreetMap - 100% gratuito)
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
+            attribution: ' OpenStreetMap contributors'
         }).addTo(map.current!);
 
         // 3. Criar ícones customizados para as escolas

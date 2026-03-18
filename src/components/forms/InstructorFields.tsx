@@ -1,21 +1,24 @@
-import { X } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
 import { UseFormReturn } from 'react-hook-form';
 
 const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
-const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
+const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA', 'Técnico', 'Integrado Médio-Técnico', 'Outros'];
 
 export interface Instructor {
   name: string;
   subjects: string[];
-  customSubject?: string;
+  customSubjects?: string[];
+  customPeriods?: string[];
   shifts?: string[];
   periods?: string[];
   additionalInfo?: string;
   saved?: boolean;
+  isNew?: boolean; // Indica se é um novo instrutor não listado
 }
 
 interface InstructorFieldsProps {
@@ -48,7 +51,7 @@ export const InstructorFields = ({
 
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-poppins font-semibold text-base">
-              Instrutor {index + 1}
+              {instructor.name || 'Instrutor'}
             </h4>
           </div>
 
@@ -60,7 +63,11 @@ export const InstructorFields = ({
                 <FormItem>
                   <FormLabel>Nome do Instrutor *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nome completo" {...field} />
+                    <Input 
+                      placeholder="Nome completo" 
+                      {...field} 
+                      disabled={!instructor.isNew} // Desabilitar se for instrutor existente
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,7 +120,7 @@ export const InstructorFields = ({
                         />
                       </FormControl>
                       <FormLabel className="font-normal text-sm">
-                        {form.watch(`instructors.${index}.customSubject`) || 'Outros'}
+                        Outros
                       </FormLabel>
                     </FormItem>
                   )}
@@ -123,19 +130,61 @@ export const InstructorFields = ({
             </div>
 
             {form.watch(`instructors.${index}.subjects`)?.includes('Outros') && (
-              <FormField
-                control={form.control}
-                name={`instructors.${index}.customSubject`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Especifique a disciplina</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Digite a disciplina" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-2">
+                <FormLabel className="text-sm font-medium">Disciplinas Personalizadas</FormLabel>
+                <FormField
+                  control={form.control}
+                  name={`instructors.${index}.customSubjects`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="space-y-2">
+                        {(field.value || []).map((customSubject, customIndex) => (
+                          <div key={customIndex} className="flex gap-2">
+                            <FormControl>
+                              <Input
+                                value={customSubject || ''}
+                                onChange={(e) => {
+                                  const currentValue = field.value || [];
+                                  const newSubjects = [...currentValue];
+                                  newSubjects[customIndex] = e.target.value;
+                                  field.onChange(newSubjects);
+                                }}
+                                placeholder="Digite uma disciplina"
+                              />
+                            </FormControl>
+                            {(field.value || []).length > 1 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newSubjects = (field.value || []).filter((_, i) => i !== customIndex);
+                                  field.onChange(newSubjects);
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newSubjects = [...(field.value || []), ''];
+                            field.onChange(newSubjects);
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Adicionar Disciplina
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             )}
 
             <div>
@@ -197,6 +246,64 @@ export const InstructorFields = ({
                 ))}
               </div>
             </div>
+
+            {form.watch(`instructors.${index}.periods`)?.includes('Outros') && (
+              <div className="space-y-2">
+                <FormLabel className="text-sm font-medium">Períodos Personalizados</FormLabel>
+                <FormField
+                  control={form.control}
+                  name={`instructors.${index}.customPeriods`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="space-y-2">
+                        {(field.value || []).map((customPeriod, customIndex) => (
+                          <div key={customIndex} className="flex gap-2">
+                            <FormControl>
+                              <Input
+                                value={customPeriod || ''}
+                                onChange={(e) => {
+                                  const currentValue = field.value || [];
+                                  const newPeriods = [...currentValue];
+                                  newPeriods[customIndex] = e.target.value;
+                                  field.onChange(newPeriods);
+                                }}
+                                placeholder="Digite um período personalizado"
+                              />
+                            </FormControl>
+                            {(field.value || []).length > 1 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newPeriods = (field.value || []).filter((_, i) => i !== customIndex);
+                                  field.onChange(newPeriods);
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newPeriods = [...(field.value || []), ''];
+                            field.onChange(newPeriods);
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Adicionar Período
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
 
             <div>
               <FormLabel className="mb-2 block">Informações Adicionais (Opcional)</FormLabel>

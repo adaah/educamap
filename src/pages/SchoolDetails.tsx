@@ -268,19 +268,23 @@ const SchoolDetails = () => {
                         </div>
                       )}
                       
-                      {!instructor.additionalInfo && (
+                      {instructor.additionalInfo ? (
+                        <div className="mt-3 space-y-2">
+                          <div className="text-xs font-poppins font-semibold text-primary flex items-center">
+                            <MessageCircle className="w-3 h-3 mr-1" />
+                            Relato do Estagiário:
+                          </div>
+                          <div className="text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line bg-white/50 p-2 rounded border border-primary/10">
+                            {instructor.additionalInfo}
+                          </div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground italic flex items-center">
+                            <Users className="w-3 h-3 mr-1" />
+                            Enviado por: {instructor.contributorName || 'Contribuidor'}
+                          </div>
+                        </div>
+                      ) : (
                         <div className="mt-2 text-xs sm:text-sm font-montserrat text-muted-foreground italic">
                           Sem informação
-                        </div>
-                      )}
-                      {instructor.additionalInfo && (
-                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line">
-                          {instructor.additionalInfo}
-                        </div>
-                      )}
-                      {instructor.additionalInfo && (
-                        <div className="mt-2 text-[11px] sm:text-xs text-muted-foreground italic">
-                          Enviado por: {instructor.contributorName || 'Contribuidor'}
                         </div>
                       )}
                     </div>
@@ -299,16 +303,20 @@ const SchoolDetails = () => {
                     <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
                       <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
-                    Informações Adicionais
+                    Relatos e Experiências
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="font-montserrat text-xs sm:text-sm text-foreground leading-relaxed whitespace-pre-line bg-white/50 p-3 sm:p-4 rounded-lg">
-                    {school.additionalInfo}
+                    {school.additionalInfo.split('\n\n---\n').map((entry, index) => (
+                      <div key={index} className={index > 0 ? 'mt-4 pt-4 border-t border-primary/20' : ''}>
+                        {entry}
+                      </div>
+                    ))}
                   </div>
                   <div className="flex items-center text-xs sm:text-sm text-muted-foreground italic border-t pt-3">
                     <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 flex-shrink-0" />
-                    <span className="break-words">Compartilhado por: {school.contributor_name || 'Contribuidor'}</span>
+                      <span className="break-words">Contribuições da comunidade EduMap</span>
                   </div>
                 </CardContent>
               </Card>
@@ -342,7 +350,7 @@ const SchoolDetails = () => {
                   <div className="p-2 bg-secondary/10 rounded-xl text-secondary mr-2">
                     <UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  Alunos Estagiários
+                  Alunos Estagiários/Ex-estagiários
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -363,7 +371,8 @@ const SchoolDetails = () => {
                         </div>
                       )}
                       {student.additionalInfo && (
-                        <div className="mt-2 text-[11px] sm:text-xs text-muted-foreground italic">
+                        <div className="mt-2 text-[11px] sm:text-xs text-muted-foreground italic flex items-center">
+                          <Users className="w-3 h-3 mr-1" />
                           Enviado por: {student.contributorName || 'Contribuidor'}
                         </div>
                       )}

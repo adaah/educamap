@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, X } from 'lucide-react';
 
 const availableSubjects = [
   'Matemática', 'Português', 'Ciências', 'História', 'Geografia',
@@ -36,22 +36,25 @@ const availableSubjects = [
 ];
 
 const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
-const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
+const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA', 'Técnico', 'Integrado Médio-Técnico', 'Outros'];
 
 interface Instructor {
   name: string;
   subjects: string[];
-  customSubject?: string;
+  customSubjects?: string[];
+  customPeriods?: string[];
   shifts?: string[];
   periods?: string[];
   additionalInfo?: string;
   saved?: boolean;
+  isNew?: boolean; // Indica se é um novo instrutor não listado
 }
 
 const instructorSchema = z.object({
   name: z.string(),
   subjects: z.array(z.string()),
-  customSubject: z.string(),
+  customSubjects: z.array(z.string()),
+  customPeriods: z.array(z.string()),
   shifts: z.array(z.string()).optional(),
   periods: z.array(z.string()).optional(),
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
@@ -76,8 +79,10 @@ const formSchema = z.object({
   newSchoolWebsite: z.string().trim().max(255).optional().or(z.literal('')),
   newSchoolShifts: z.array(z.string()).optional(),
   newSchoolPeriods: z.array(z.string()).optional(),
-  customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
+  newSchoolCustomPeriods: z.array(z.string()).optional().or(z.literal('')),
+  customPeriods: z.array(z.string()).optional().or(z.literal('')),
   studentExperience: z.string().trim().max(1000).optional().or(z.literal('')),
+  instructorSelection: z.string().optional(), // Campo para seleção de instrutor existente
   instructors: z.array(instructorSchema).default([]),
 });
 
@@ -121,21 +126,56 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       newSchoolPhone: '',
       newSchoolWebsite: '',
       newSchoolPeriods: [],
-      customPeriod: '',
+      newSchoolCustomPeriods: [],
+      customPeriods: [],
       studentExperience: '',
+      instructorSelection: '',
       instructors: [],
     },
   });
+
+  // Query para buscar instrutores de uma escola específica
+  const { data: schoolInstructors, isLoading: instructorsLoading } = useQuery({
+    queryKey: ['school-instructors', form.watch('schoolId')],
+    queryFn: async () => {
+      const schoolId = form.watch('schoolId');
+      if (!schoolId) return [];
+      
+      const { data, error } = await supabase
+        .from('instructors')
+        .select('id, name, subject')
+        .eq('school_id', schoolId)
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!form.watch('schoolId'),
+  });
+
+  // Limpar instrutores quando a escola for alterada (apenas se não houver instrutores selecionados)
+  useEffect(() => {
+    const schoolId = form.watch('schoolId');
+    const newSchoolName = form.watch('newSchoolName');
+    const currentInstructors = form.watch('instructors');
+    
+    // Se mudar a escola e não houver instrutores selecionados, limpar o campo de seleção
+    if ((schoolId || newSchoolName) && currentInstructors.length === 0) {
+      form.setValue('instructorSelection', '');
+    }
+  }, [form.watch('schoolId'), form.watch('newSchoolName'), form]);
 
   function ensureInstructor(i: Partial<Instructor>): Instructor {
     return {
       name: i.name ?? '',
       subjects: i.subjects ?? [],
-      customSubject: i.customSubject ?? '',
+      customSubjects: i.customSubjects ?? [],
+      customPeriods: i.customPeriods ?? [],
       shifts: i.shifts ?? [],
       periods: i.periods ?? [],
       additionalInfo: i.additionalInfo ?? '',
       saved: i.saved ?? false,
+      isNew: i.isNew ?? true,
     };
   }
 
@@ -147,7 +187,30 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
     }
     const next: Instructor[] = [
       ...current.map(ensureInstructor),
-      ensureInstructor({}),
+      ensureInstructor({ 
+        isNew: true,
+        customPeriods: [],  // Garantir inicialização como array vazio
+        customSubjects: []  // Garantir inicialização como array vazio
+      }), // Novo instrutor não listado
+    ];
+    form.setValue('instructors', next);
+  };
+
+  const selectExistingInstructor = (instructor: any) => {
+    const current = form.getValues('instructors') || [];
+    // Limitar a 1 professor no formulário ShareExperienceForm
+    if (current.length >= 1) {
+      return;
+    }
+    const next: Instructor[] = [
+      ...current.map(ensureInstructor),
+      ensureInstructor({ 
+        name: instructor.name,
+        subjects: [instructor.subject],
+        isNew: false, // Instrutor existente
+        customPeriods: [],  // Garantir inicialização como array vazio
+        customSubjects: []  // Garantir inicialização como array vazio
+      }),
     ];
     form.setValue('instructors', next);
   };
@@ -187,7 +250,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             phone: data.schoolPhone || null,
             website: data.schoolWebsite || null,
             shifts: data.newSchoolShifts || [],
-            periods: data.newSchoolPeriods || [],
+            periods: [...(data.newSchoolPeriods || []), ...(data.customPeriods || [])],
             contributor_name: data.studentName,
             contributor_position: 'Estagiário',
           });
@@ -227,7 +290,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             website: data.hasContactData ? (data.newSchoolWebsite || null) : null,
             additional_info: data.studentExperience || null,
             contributor_name: data.studentName,
-            periods: data.hasContactData ? (data.newSchoolPeriods || []) : [],
+            periods: data.hasContactData ? [...(data.newSchoolPeriods || []), ...(data.newSchoolCustomPeriods || [])] : [],
             shifts: data.hasContactData ? (data.newSchoolShifts || []) : [],
             subjects: [], // Adicionado para evitar erro de campo faltante se houver
             instructors: pendingSchoolInstructors,
@@ -244,20 +307,21 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           course: data.course,
           contributor_name: data.studentName,
           additional_info: data.studentExperience || null,
+          school_id: !isNewSchool ? (data.schoolId || null) : null,
+          school_name: isNewSchool ? (data.newSchoolName || null) : null,
         });
 
       if (studentError) throw studentError;
 
       // Registrar os instrutores recomendados como pendentes
       for (const instructor of validInstructors) {
-        // Tratar campo 'Outros' nas disciplinas
-        const finalSubjects = [...instructor.subjects];
-        if (instructor.subjects.includes('Outros') && instructor.customSubject) {
-          const index = finalSubjects.indexOf('Outros');
-          if (index > -1) finalSubjects[index] = instructor.customSubject;
-        }
-        
+        // Combinar disciplinas padrão com personalizadas
+        const finalSubjects = [...instructor.subjects, ...(instructor.customSubjects || [])];
         const subject = finalSubjects.join(', ');
+        
+        // Combinar períodos padrão com personalizadas
+        const finalPeriods = [...(instructor.periods || []), ...(instructor.customPeriods || [])];
+        
         const { error: instructorError } = await supabase
           .from('pending_instructors')
           .insert({
@@ -267,8 +331,8 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
             contributor_name: data.studentName,
             school_name: isNewSchool ? (data.newSchoolName || null) : null,
             shifts: instructor.shifts || [],
-            periods: instructor.periods || [],
-            additional_info: data.studentExperience || null,
+            periods: finalPeriods,
+            additional_info: instructor.additionalInfo || data.studentExperience || null,
           });
         if (instructorError) throw instructorError;
       }
@@ -717,34 +781,140 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
           )}
         </div>
         
-        {/* Instrutores */}
-        <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores *</h3>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Recomende um professor instrutor que você teve durante o estágio
-          </p>
-          {form.watch('instructors')?.length === 0 && (
-            <button
-              type="button"
-              onClick={addInstructor}
-              className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
-            >
-              + Adicionar Instrutor
-            </button>
-          )}
-          {form.watch('instructors')?.length > 0 && (
-            <InstructorFields
-              instructors={form.watch('instructors')}
-              onRemove={removeInstructor}
-              form={form}
-              availableSubjects={availableSubjects}
+        {/* Períodos Personalizados - só aparece se "Outros" for selecionado na nova escola */}
+        {form.watch('newSchoolPeriods')?.includes('Outros') && (
+          <div className="space-y-2 mt-3">
+            <FormLabel className="text-sm font-medium">Períodos Personalizados</FormLabel>
+            <FormField
+              control={form.control}
+              name="newSchoolCustomPeriods"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="space-y-2">
+                    {(field.value || []).map((customPeriod, index) => (
+                      <div key={index} className="flex gap-2">
+                        <FormControl>
+                          <Input
+                            value={customPeriod}
+                            onChange={(e) => {
+                              const newPeriods = [...(field.value || [])];
+                              newPeriods[index] = e.target.value;
+                              field.onChange(newPeriods);
+                            }}
+                            placeholder="Digite um período personalizado"
+                          />
+                        </FormControl>
+                        {(field.value || []).length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newPeriods = (field.value || []).filter((_, i) => i !== index);
+                              field.onChange(newPeriods);
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newPeriods = [...(field.value || []), ''];
+                        field.onChange(newPeriods);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Adicionar Período
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          )}
-        </div>
+          </div>
+        )}
+        
+        {/* Instrutores */}
+        {(form.watch('schoolId') || form.watch('newSchoolName')) && (
+          <div className="space-y-4">
+            <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores *</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Recomende um professor instrutor que você teve durante o estágio
+            </p>
+            
+            {!isNewSchool && form.watch('schoolId') && (
+              <div className="space-y-3">
+                <FormField
+                  control={form.control}
+                  name="instructorSelection"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Verifique se o instrutor já está cadastrado na escola</FormLabel>
+                      <Select onValueChange={(value) => {
+                        // Limpar instrutores existentes antes de fazer nova seleção
+                        form.setValue('instructors', []);
+                        
+                        if (value === 'new') {
+                          addInstructor();
+                        } else {
+                          const instructor = schoolInstructors?.find(i => i.id === value);
+                          if (instructor) {
+                            selectExistingInstructor(instructor);
+                          }
+                        }
+                        // Atualizar o valor do campo de seleção
+                        field.onChange(value);
+                      }} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um instrutor..." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {schoolInstructors?.map((instructor) => (
+                            <SelectItem key={instructor.id} value={instructor.id}>
+                              {instructor.name} - {instructor.subject}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="new">Instrutor não listado</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+            
+            {/* Botão '+ Adicionar Instrutor' apenas para novas escolas */}
+            {isNewSchool && form.watch('instructors')?.length === 0 && (
+              <button
+                type="button"
+                onClick={addInstructor}
+                className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
+              >
+                + Adicionar Instrutor
+              </button>
+            )}
+            {form.watch('instructors')?.length > 0 && (
+              <InstructorFields
+                instructors={form.watch('instructors')}
+                onRemove={removeInstructor}
+                form={form}
+                availableSubjects={availableSubjects}
+              />
+            )}
+          </div>
+        )}
         
         {/* Experiência do Estagiário */}
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-base sm:text-lg">Sua Experiência como Estagiário (Opcional)</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Sua Experiência na Instituição (Opcional)</h3>
           <FormField
             control={form.control}
             name="studentExperience"

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Plus, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 const availableSubjects = [
@@ -34,7 +34,7 @@ const availableSubjects = [
 ];
 
 const availableShifts = ['Manhã', 'Tarde', 'Noite', 'Integral'];
-const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA'];
+const availablePeriods = ['Educação Infantil', 'Fundamental I', 'Fundamental II', 'Ensino Médio', 'EJA', 'Técnico', 'Integrado Médio-Técnico', 'Outros'];
 
 const formSchema = z.object({
   name: z.string().trim().min(3, 'Nome deve ter pelo menos 3 caracteres').max(100),
@@ -50,11 +50,12 @@ const formSchema = z.object({
   newSchoolWebsite: z.string().trim().max(255).optional().or(z.literal('')),
   schoolShifts: z.array(z.string()).optional(),
   schoolPeriods: z.array(z.string()).optional(),
+  instructorSelection: z.string().optional(), // Campo para seleção de instrutor existente
   subjects: z.array(z.string()).min(1, 'Selecione pelo menos uma disciplina'),
-  customSubject: z.string().trim().max(100).optional().or(z.literal('')),
+  customSubjects: z.array(z.string()).optional().or(z.literal('')),
   shifts: z.array(z.string()).min(1, 'Selecione pelo menos um turno'),
   periods: z.array(z.string()).min(1, 'Selecione pelo menos um período'),
-  customPeriod: z.string().trim().max(100).optional().or(z.literal('')),
+  customPeriods: z.array(z.string()).optional().or(z.literal('')),
   additionalInfo: z.string().trim().max(1000).optional().or(z.literal('')),
 });
 
@@ -92,29 +93,58 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
       newSchoolWebsite: '',
       schoolShifts: [],
       schoolPeriods: [],
+      instructorSelection: '',
       subjects: [],
-      customSubject: '',
+      customSubjects: [],
       shifts: [],
       periods: [],
-      customPeriod: '',
+      customPeriods: [],
       additionalInfo: '',
     },
   });
 
+  // Query para buscar instrutores de uma escola específica
+  const { data: schoolInstructors, isLoading: instructorsLoading } = useQuery({
+    queryKey: ['school-instructors', form.watch('schoolId')],
+    queryFn: async () => {
+      const schoolId = form.watch('schoolId');
+      if (!schoolId) return [];
+      
+      const { data, error } = await supabase
+        .from('instructors')
+        .select('id, name, subject')
+        .eq('school_id', schoolId)
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!form.watch('schoolId'),
+  });
+
+  // Limpar seleção quando a escola for alterada
+  useEffect(() => {
+    const schoolId = form.watch('schoolId');
+    const newSchoolName = form.watch('newSchoolName');
+    
+    // Se mudar a escola, limpar os campos
+    if (schoolId || newSchoolName) {
+      form.setValue('instructorSelection', '');
+      form.setValue('name', '');
+    }
+  }, [form.watch('schoolId'), form.watch('newSchoolName'), form]);
+
+  const selectExistingInstructor = (instructor: any) => {
+    form.setValue('name', instructor.name);
+    form.setValue('subjects', [instructor.subject]);
+  };
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      const allSubjects = [...data.subjects];
-      if (data.customSubject && data.subjects.includes('Outros')) {
-        const idx = allSubjects.indexOf('Outros');
-        if (idx > -1) allSubjects[idx] = data.customSubject;
-      }
+      const allSubjects = [...data.subjects, ...data.customSubjects];
 
-      const allPeriods = [...data.periods];
-      if (data.customPeriod && data.periods.includes('Outros')) {
-        const idx = allPeriods.indexOf('Outros');
-        if (idx > -1) allPeriods[idx] = data.customPeriod;
-      }
+      const allPeriods = [...data.periods, ...data.customPeriods];
 
       // Se a escola não estiver no mapa, criar submissão como "nova escola" com este instrutor incluso
       if (data.isNewSchool) {
@@ -192,24 +222,6 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-base sm:text-lg">Seus Dados</h3>
-          
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nome Completo *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Seu nome completo" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="space-y-4">
           <h3 className="font-poppins font-semibold text-base sm:text-lg">Escola</h3>
           <FormField
             control={form.control}
@@ -255,22 +267,238 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
                 )}
               />
 
-              {/* Checkbox de dados/contato só aparece se uma escola estiver selecionada */}
+              {/* Dropdown para seleção de instrutores existentes */}
               {form.watch('schoolId') && (
+                <div className="space-y-3">
+                  <FormField
+                    control={form.control}
+                    name="instructorSelection"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Verifique se você já está cadastrado nesta escola</FormLabel>
+                        <Select onValueChange={(value) => {
+                          if (value === 'new') {
+                            // Limpar nome para permitir novo cadastro
+                            form.setValue('name', '');
+                          } else {
+                            const instructor = schoolInstructors?.find(i => i.id === value);
+                            if (instructor) {
+                              selectExistingInstructor(instructor);
+                            }
+                          }
+                          field.onChange(value);
+                        }} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione seu nome..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {schoolInstructors?.map((instructor) => (
+                              <SelectItem key={instructor.id} value={instructor.id}>
+                                {instructor.name} - {instructor.subject}
+                              </SelectItem>
+                            ))}
+                            <SelectItem value="new">Não estou listado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Checkbox de dados/contato - aparece para qualquer escola (nova ou existente) */}
+          {(form.watch('schoolId') || form.watch('isNewSchool')) && (
+            <FormField
+              control={form.control}
+              name="hasContactData"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox checked={!!field.value} onCheckedChange={(checked) => field.onChange(!!checked)} />
+                  </FormControl>
+                  <FormLabel className="font-normal">Tenho dados e/ou contato dessa escola</FormLabel>
+                </FormItem>
+              )}
+            />
+          )}
+
+          {/* Seção de dados da escola - aparece quando tem dados de contato */}
+          {form.watch('hasContactData') && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="hasContactData"
+                  name="newSchoolEmail"
                   render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Checkbox checked={!!field.value} onCheckedChange={(checked) => field.onChange(!!checked)} />
+                        <Input type="email" placeholder="contato@escola.com" {...field} />
                       </FormControl>
-                      <FormLabel className="font-normal">Tenho dados e/ou contato dessa escola</FormLabel>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
-            </>
+                <FormField
+                  control={form.control}
+                  name="newSchoolPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefone</FormLabel>
+                      <FormControl>
+                        <Input placeholder="(71) 3333-3333" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="newSchoolWebsite"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Website</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://www.escola.com.br" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="schoolShifts"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Turnos</FormLabel>
+                      <div className="grid grid-cols-2 gap-4">
+                        {availableShifts.map((shift) => (
+                          <FormField
+                            key={shift}
+                            control={form.control}
+                            name="schoolShifts"
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(shift)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...(field.value || []), shift])
+                                        : field.onChange(field.value?.filter((value) => value !== shift));
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">{shift}</FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="schoolPeriods"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Períodos</FormLabel>
+                      <div className="grid grid-cols-1 gap-4">
+                        {availablePeriods.map((period) => (
+                          <FormField
+                            key={period}
+                            control={form.control}
+                            name="schoolPeriods"
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(period)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...(field.value || []), period])
+                                        : field.onChange(field.value?.filter((value) => value !== period));
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">{period}</FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Períodos Personalizados - só aparece se "Outros" for selecionado */}
+                      {form.watch('schoolPeriods')?.includes('Outros') && (
+                        <div className="space-y-2 mt-3">
+                          <FormLabel className="text-sm font-medium">Períodos Personalizados</FormLabel>
+                          <FormField
+                            control={form.control}
+                            name="customPeriods"
+                            render={({ field }) => (
+                              <FormItem>
+                                <div className="space-y-2">
+                                  {(field.value || []).map((customPeriod, index) => (
+                                    <div key={index} className="flex gap-2">
+                                      <FormControl>
+                                        <Input
+                                          value={customPeriod}
+                                          onChange={(e) => {
+                                            const newPeriods = [...(field.value || [])];
+                                            newPeriods[index] = e.target.value;
+                                            field.onChange(newPeriods);
+                                          }}
+                                          placeholder="Digite um período personalizado"
+                                        />
+                                      </FormControl>
+                                      {(field.value || []).length > 1 && (
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => {
+                                            const newPeriods = (field.value || []).filter((_, i) => i !== index);
+                                            field.onChange(newPeriods);
+                                          }}
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  ))}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const newPeriods = [...(field.value || []), ''];
+                                      field.onChange(newPeriods);
+                                    }}
+                                  >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Adicionar Período
+                                  </Button>
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      )}
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
           )}
 
           {form.watch('isNewSchool') && (
@@ -346,301 +574,255 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="hasContactData"
-                render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={!!field.value} onCheckedChange={(checked) => field.onChange(!!checked)} />
-                    </FormControl>
-                    <FormLabel className="font-normal">Tenho dados e/ou contato dessa escola</FormLabel>
-                  </FormItem>
-                )}
-              />
-
-              {form.watch('hasContactData') && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="newSchoolEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="contato@escola.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="newSchoolPhone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Telefone</FormLabel>
-                        <FormControl>
-                          <Input placeholder="(71) 3333-3333" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="newSchoolWebsite"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>Website</FormLabel>
-                        <FormControl>
-                          <Input placeholder="https://www.escola.com.br" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="schoolShifts"
-                      render={() => (
-                        <FormItem>
-                          <FormLabel>Turnos da escola (opcional)</FormLabel>
-                          <div className="grid grid-cols-2 gap-3">
-                            {availableShifts.map((shift) => (
-                              <FormField
-                                key={shift}
-                                control={form.control}
-                                name="schoolShifts"
-                                render={({ field }) => (
-                                  <FormItem className="flex items-center space-x-2 space-y-0">
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(shift)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...(field.value || []), shift])
-                                            : field.onChange(field.value?.filter((value) => value !== shift));
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="font-normal text-sm">{shift}</FormLabel>
-                                  </FormItem>
-                                )}
-                              />
-                            ))}
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="schoolPeriods"
-                      render={() => (
-                        <FormItem>
-                          <FormLabel>Períodos da escola (opcional)</FormLabel>
-                          <div className="grid grid-cols-2 gap-3">
-                            {availablePeriods.map((period) => (
-                              <FormField
-                                key={period}
-                                control={form.control}
-                                name="schoolPeriods"
-                                render={({ field }) => (
-                                  <FormItem className="flex items-center space-x-2 space-y-0">
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value?.includes(period)}
-                                        onCheckedChange={(checked) => {
-                                          return checked
-                                            ? field.onChange([...(field.value || []), period])
-                                            : field.onChange(field.value?.filter((value) => value !== period));
-                                        }}
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="font-normal text-sm">{period}</FormLabel>
-                                  </FormItem>
-                                )}
-                              />
-                            ))}
-                          </div>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
-            </>
+              </>
           )}
         </div>
 
-        <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-base sm:text-lg">Dados Profissionais</h3>
-          
-          <FormField
-            control={form.control}
-            name="subjects"
-            render={() => (
-              <FormItem>
-                <FormLabel>Disciplinas que você leciona *</FormLabel>
-                <div className="grid grid-cols-2 gap-3">
-                  {availableSubjects.map((subject) => (
-                    <FormField
-                      key={subject}
-                      control={form.control}
-                      name="subjects"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(subject)}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, subject])
-                                  : field.onChange(field.value?.filter((value) => value !== subject));
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal text-sm">{subject}</FormLabel>
-                        </FormItem>
-                      )}
+        {/* Seção de dados do instrutor - aparece apenas após selecionar opção no dropdown */}
+        {(form.watch('instructorSelection') || form.watch('newSchoolName')) && (
+          <div className="space-y-4">
+            <h3 className="font-poppins font-semibold text-base sm:text-lg">Seus Dados</h3>
+            
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome Completo *</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Seu nome completo" 
+                      {...field}
+                      disabled={!!form.watch('instructorSelection') && form.watch('instructorSelection') !== 'new'}
                     />
-                  ))}
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
+        {/* Dados Profissionais - aparece apenas após selecionar opção no dropdown ou nova escola */}
+        {(form.watch('instructorSelection') || form.watch('newSchoolName')) && (
+          <div className="space-y-4">
+            <h3 className="font-poppins font-semibold text-base sm:text-lg">Dados Profissionais</h3>
+            
+            <div>
+              <FormLabel className="mb-2 block">Disciplinas que você leciona *</FormLabel>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {availableSubjects.map((subject) => (
                   <FormField
-                    key="Outros"
+                    key={subject}
                     control={form.control}
                     name="subjects"
                     render={({ field }) => (
                       <FormItem className="flex items-center space-x-2 space-y-0">
                         <FormControl>
                           <Checkbox
-                            checked={field.value?.includes('Outros')}
+                            checked={field.value?.includes(subject)}
                             onCheckedChange={(checked) => {
                               return checked
-                                ? field.onChange([...field.value, 'Outros'])
-                                : field.onChange(field.value?.filter((value) => value !== 'Outros'));
+                                ? field.onChange([...(field.value || []), subject])
+                                : field.onChange(
+                                    field.value?.filter((value: string) => value !== subject)
+                                  );
                             }}
                           />
                         </FormControl>
-                        <FormLabel className="font-normal text-sm">Outros</FormLabel>
+                        <FormLabel className="font-normal text-sm">{subject}</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+              {form.watch('subjects')?.includes('Outros') && (
+                <div className="space-y-2 mt-3">
+                  <FormLabel className="text-sm font-medium">Disciplinas Personalizadas</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="customSubjects"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="space-y-2">
+                          {(field.value || []).map((customSubject, index) => (
+                            <div key={index} className="flex gap-2">
+                              <FormControl>
+                                <Input
+                                  value={customSubject}
+                                  onChange={(e) => {
+                                    const newSubjects = [...(field.value || [])];
+                                    newSubjects[index] = e.target.value;
+                                    field.onChange(newSubjects);
+                                  }}
+                                  placeholder="Digite uma disciplina"
+                                />
+                              </FormControl>
+                              {(field.value || []).length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newSubjects = (field.value || []).filter((_, i) => i !== index);
+                                    field.onChange(newSubjects);
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newSubjects = [...(field.value || []), ''];
+                              field.onChange(newSubjects);
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Adicionar Disciplina
+                          </Button>
+                        </div>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              )}
+            </div>
 
-          {form.watch('subjects')?.includes('Outros') && (
+            <div>
+              <FormLabel className="mb-2 block">Turnos que você trabalha *</FormLabel>
+              <div className="grid grid-cols-2 gap-4">
+                {availableShifts.map((shift) => (
+                  <FormField
+                    key={shift}
+                    control={form.control}
+                    name="shifts"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes(shift)}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...(field.value || []), shift])
+                                : field.onChange(field.value?.filter((value) => value !== shift));
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">{shift}</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <FormLabel className="mb-2 block">Períodos que você trabalha *</FormLabel>
+              <div className="grid grid-cols-1 gap-4">
+                {availablePeriods.map((period) => (
+                  <FormField
+                    key={period}
+                    control={form.control}
+                    name="periods"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes(period)}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...(field.value || []), period])
+                                : field.onChange(field.value?.filter((value) => value !== period));
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">{period}</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+              {form.watch('periods')?.includes('Outros') && (
+                <FormField
+                  control={form.control}
+                  name="customPeriods"
+                  render={({ field }) => (
+                    <FormItem className="mt-3">
+                      <FormLabel>Períodos Personalizados</FormLabel>
+                      <div className="space-y-2">
+                        {(field.value || []).map((customPeriod, index) => (
+                          <div key={index} className="flex gap-2">
+                            <FormControl>
+                              <Input
+                                value={customPeriod}
+                                onChange={(e) => {
+                                  const newPeriods = [...(field.value || [])];
+                                  newPeriods[index] = e.target.value;
+                                  field.onChange(newPeriods);
+                                }}
+                                placeholder="Digite um período personalizado"
+                              />
+                            </FormControl>
+                            {(field.value || []).length > 1 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newPeriods = (field.value || []).filter((_, i) => i !== index);
+                                  field.onChange(newPeriods);
+                                }}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newPeriods = [...(field.value || []), ''];
+                            field.onChange(newPeriods);
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Adicionar Período
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
+
             <FormField
               control={form.control}
-              name="customSubject"
+              name="additionalInfo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Especifique a disciplina</FormLabel>
+                  <FormLabel>Informações Adicionais (Opcional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Libras, Educação Especial" {...field} />
+                    <Textarea 
+                      placeholder="Conte um pouco sobre sua experiência como professor..." 
+                      className="min-h-[100px]"
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          )}
-
-          <FormField
-            control={form.control}
-            name="shifts"
-            render={() => (
-              <FormItem>
-                <FormLabel>Turnos que você trabalha *</FormLabel>
-                <div className="grid grid-cols-2 gap-3">
-                  {availableShifts.map((shift) => (
-                    <FormField
-                      key={shift}
-                      control={form.control}
-                      name="shifts"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(shift)}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, shift])
-                                  : field.onChange(field.value?.filter((value) => value !== shift));
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal text-sm">{shift}</FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="periods"
-            render={() => (
-              <FormItem>
-                <FormLabel>Períodos que você trabalha *</FormLabel>
-                <div className="grid grid-cols-2 gap-3">
-                  {availablePeriods.map((period) => (
-                    <FormField
-                      key={period}
-                      control={form.control}
-                      name="periods"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center space-x-2 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(period)}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, period])
-                                  : field.onChange(field.value?.filter((value) => value !== period));
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal text-sm">{period}</FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="additionalInfo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Informações Adicionais (Opcional)</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Conte um pouco sobre sua experiência como professor..."
-                    rows={4}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          </div>
+        )}
 
         <button
           type="submit" 

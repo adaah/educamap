@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { usePendingSubmissions } from "@/hooks/usePendingSubmissions";
@@ -7,16 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Check, X, Trash2 } from "lucide-react";
+import { LogOut, Check, X, Trash2, Edit2 } from "lucide-react";
 import { AdminNotifications } from "@/components/AdminNotifications";
+import { AdminSchoolEditor } from "@/components/AdminSchoolEditor";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { School } from "@/data/schools";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const AdminPanel = () => {
   const { user, isAdmin, loading, signOut } = useAdminAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [editingSchool, setEditingSchool] = useState<School | null>(null);
   
   const {
     pendingSchools,
@@ -95,6 +99,20 @@ const AdminPanel = () => {
         </div>
 
         <AdminNotifications />
+
+        {editingSchool && (
+          <Dialog open={!!editingSchool} onOpenChange={(open) => !open && setEditingSchool(null)}>
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Editar Dados da Escola</DialogTitle>
+              </DialogHeader>
+              <AdminSchoolEditor 
+                school={editingSchool} 
+                onClose={() => setEditingSchool(null)} 
+              />
+            </DialogContent>
+          </Dialog>
+        )}
 
         <Tabs defaultValue="pending" className="space-y-4">
           <TabsList>
@@ -190,6 +208,12 @@ const AdminPanel = () => {
                     <h3 className="font-semibold">{instructor.name}</h3>
                     <p className="text-sm">Disciplina: {instructor.subject}</p>
                     {instructor.school_name && <p className="text-sm">Escola: {instructor.school_name}</p>}
+                    {instructor.additional_info && (
+                      <p className="text-sm bg-muted p-2 rounded italic">Relato: {instructor.additional_info}</p>
+                    )}
+                    {instructor.contributor_name && (
+                      <p className="text-xs text-muted-foreground">Enviado por: {instructor.contributor_name}</p>
+                    )}
                     <div className="flex gap-2 mt-4">
                       <Button size="sm" onClick={() => approveInstructor.mutate(instructor)} disabled={approveInstructor.isPending}>
                         <Check className="mr-2 h-4 w-4" />Aprovar
@@ -217,6 +241,12 @@ const AdminPanel = () => {
                     <h3 className="font-semibold">{student.name}</h3>
                     <p className="text-sm">Curso: {student.course}</p>
                     <p className="text-sm">Universidade: {student.university}</p>
+                    {student.additional_info && (
+                      <p className="text-sm bg-muted p-2 rounded italic">Experiência: {student.additional_info}</p>
+                    )}
+                    {student.contributor_name && (
+                      <p className="text-xs text-muted-foreground">Enviado por: {student.contributor_name}</p>
+                    )}
                     <div className="flex gap-2 mt-4">
                       <Button size="sm" onClick={() => approveStudent.mutate(student)} disabled={approveStudent.isPending}>
                         <Check className="mr-2 h-4 w-4" />Aprovar
@@ -249,17 +279,27 @@ const AdminPanel = () => {
                         <p className="text-sm text-muted-foreground">{school.fullAddress}</p>
                         <p className="text-sm">Professores: {school.instructors?.length || 0}</p>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => {
-                          if (confirm(`Tem certeza que deseja excluir ${school.name}?`)) {
-                            deleteSchool.mutate(school.id);
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingSchool(school)}
+                        >
+                          <Edit2 className="h-4 w-4 mr-2" />
+                          Editar
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            if (confirm(`Tem certeza que deseja excluir ${school.name}?`)) {
+                              deleteSchool.mutate(school.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}

@@ -109,7 +109,7 @@ export type Database = {
           instagram: string | null
           linkedin: string | null
           name: string
-          school_id: string
+          school_id: string | null
           university: string
           user_id: string | null
           whatsapp: string | null
@@ -124,7 +124,7 @@ export type Database = {
           instagram?: string | null
           linkedin?: string | null
           name: string
-          school_id: string
+          school_id?: string | null
           university: string
           user_id?: string | null
           whatsapp?: string | null
@@ -139,7 +139,7 @@ export type Database = {
           instagram?: string | null
           linkedin?: string | null
           name?: string
-          school_id?: string
+          school_id?: string | null
           university?: string
           user_id?: string | null
           whatsapp?: string | null

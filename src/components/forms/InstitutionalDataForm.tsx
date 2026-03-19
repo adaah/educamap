@@ -191,14 +191,13 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
       form.reset();
       setInstructors([]);
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro ao enviar formulário:', error);
       toast({
-        title: 'Sucesso!',
-        description: 'Dados enviados e aguardando aprovação. Obrigado pela contribuição!',
+        title: 'Erro ao enviar',
+        description: error?.message || 'Ocorreu um erro ao enviar os dados. Tente novamente.',
+        variant: 'destructive',
       });
-      form.reset();
-      setInstructors([]);
-      onSuccess();
     } finally {
       setIsSubmitting(false);
     }

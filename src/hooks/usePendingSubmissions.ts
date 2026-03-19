@@ -292,33 +292,74 @@ export const usePendingSubmissions = () => {
     mutationFn: async (pendingInstructor: any) => {
       const { data: user } = await supabase.auth.getUser();
 
-      const { data: inserted, error: insertError } = await supabase.from("instructors").insert({
-        name: pendingInstructor.name,
-        subject: pendingInstructor.subject,
-        email: pendingInstructor.email,
-        linkedin: pendingInstructor.linkedin,
-        whatsapp: pendingInstructor.whatsapp,
-        instagram: pendingInstructor.instagram,
-        contributor_name: pendingInstructor.contributor_name,
-        additional_info: pendingInstructor.additional_info,
-        school_id: pendingInstructor.school_id,
-        shifts: pendingInstructor.shifts,
-        periods: pendingInstructor.periods,
-      }).select("id").single();
-
-      if (insertError) throw insertError;
-
-      if (inserted?.id && Array.isArray(pendingInstructor.shifts) && pendingInstructor.shifts.length > 0) {
-        const { error } = await supabase.from("instructor_shifts" as any).insert(
-          pendingInstructor.shifts.map((shift: string) => ({ instructor_id: inserted.id, shift })) as any
-        );
-        if (error) throw error;
+      // Verificar se já existe um instrutor com mesmo nome na mesma escola
+      let existingInstructor = null;
+      if (pendingInstructor.school_id) {
+        const { data } = await supabase
+          .from("instructors")
+          .select("id, additional_info")
+          .eq("school_id", pendingInstructor.school_id)
+          .ilike("name", pendingInstructor.name)
+          .maybeSingle();
+        existingInstructor = data;
       }
-      if (inserted?.id && Array.isArray(pendingInstructor.periods) && pendingInstructor.periods.length > 0) {
-        const { error } = await supabase.from("instructor_periods" as any).insert(
-          pendingInstructor.periods.map((period: string) => ({ instructor_id: inserted.id, period })) as any
-        );
-        if (error) throw error;
+
+      if (existingInstructor) {
+        // Acumular additional_info em vez de criar duplicata
+        const updateData: Record<string, any> = {};
+        if (pendingInstructor.additional_info) {
+          const existing = existingInstructor.additional_info || '';
+          const contributorName = pendingInstructor.contributor_name || 'Anônimo';
+          const newEntry = existing
+            ? `\n\n---\n📝 ${contributorName}:\n${pendingInstructor.additional_info}`
+            : `📝 ${contributorName}:\n${pendingInstructor.additional_info}`;
+          updateData.additional_info = existing + newEntry;
+        }
+        if (pendingInstructor.email) updateData.email = pendingInstructor.email;
+        if (pendingInstructor.linkedin) updateData.linkedin = pendingInstructor.linkedin;
+        if (pendingInstructor.whatsapp) updateData.whatsapp = pendingInstructor.whatsapp;
+        if (pendingInstructor.instagram) updateData.instagram = pendingInstructor.instagram;
+
+        if (Object.keys(updateData).length > 0) {
+          const { error } = await supabase
+            .from("instructors")
+            .update(updateData)
+            .eq("id", existingInstructor.id);
+          if (error) throw error;
+        }
+      } else {
+        // Formatar additional_info com nome do contribuidor
+        let formattedInfo = pendingInstructor.additional_info;
+        if (formattedInfo && pendingInstructor.contributor_name) {
+          formattedInfo = `📝 ${pendingInstructor.contributor_name}:\n${formattedInfo}`;
+        }
+
+        const { data: inserted, error: insertError } = await supabase.from("instructors").insert({
+          name: pendingInstructor.name,
+          subject: pendingInstructor.subject,
+          email: pendingInstructor.email,
+          linkedin: pendingInstructor.linkedin,
+          whatsapp: pendingInstructor.whatsapp,
+          instagram: pendingInstructor.instagram,
+          contributor_name: pendingInstructor.contributor_name,
+          additional_info: formattedInfo,
+          school_id: pendingInstructor.school_id || null,
+        }).select("id").single();
+
+        if (insertError) throw insertError;
+
+        if (inserted?.id && Array.isArray(pendingInstructor.shifts) && pendingInstructor.shifts.length > 0) {
+          const { error } = await supabase.from("instructor_shifts" as any).insert(
+            pendingInstructor.shifts.map((shift: string) => ({ instructor_id: inserted.id, shift })) as any
+          );
+          if (error) throw error;
+        }
+        if (inserted?.id && Array.isArray(pendingInstructor.periods) && pendingInstructor.periods.length > 0) {
+          const { error } = await supabase.from("instructor_periods" as any).insert(
+            pendingInstructor.periods.map((period: string) => ({ instructor_id: inserted.id, period })) as any
+          );
+          if (error) throw error;
+        }
       }
 
       await supabase

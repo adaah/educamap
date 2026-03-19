@@ -427,7 +427,13 @@ export const usePendingSubmissions = () => {
         }
       }
 
-      await supabase.from("former_students").insert({
+      // Formatar additional_info com nome do contribuidor
+      let formattedInfo = pendingStudent.additional_info;
+      if (formattedInfo && pendingStudent.contributor_name) {
+        formattedInfo = `📝 ${pendingStudent.contributor_name}:\n${formattedInfo}`;
+      }
+
+      const { error: insertError } = await supabase.from("former_students").insert({
         name: pendingStudent.name,
         course: pendingStudent.course,
         university: pendingStudent.university,
@@ -436,10 +442,12 @@ export const usePendingSubmissions = () => {
         linkedin: pendingStudent.linkedin,
         instagram: pendingStudent.instagram,
         contributor_name: pendingStudent.contributor_name,
-        additional_info: pendingStudent.additional_info,
+        additional_info: formattedInfo,
         school_id: pendingStudent.school_id || null,
         user_id: pendingStudent.user_id || null,
       });
+
+      if (insertError) throw insertError;
 
       await supabase
         .from("pending_former_students")

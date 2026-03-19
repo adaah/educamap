@@ -344,13 +344,13 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
 
       form.reset();
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erro ao enviar formulário:', error);
       toast({
-        title: 'Sucesso!',
-        description: 'Sua experiência foi enviada e está aguardando aprovação. Obrigado pela contribuição!',
+        title: 'Erro ao enviar',
+        description: error?.message || 'Ocorreu um erro ao enviar sua experiência. Tente novamente.',
+        variant: 'destructive',
       });
-      form.reset();
-      onSuccess();
     } finally {
       setIsSubmitting(false);
     }

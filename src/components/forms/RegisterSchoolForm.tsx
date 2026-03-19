@@ -124,11 +124,9 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
       form.reset();
       setInstructors([]);
       onSuccess();
-    } catch (error) {
-      toast({ title: 'Sucesso!', description: 'Escola enviada e aguardando aprovação. Obrigado pela contribuição!' });
-      form.reset();
-      setInstructors([]);
-      onSuccess();
+    } catch (error: any) {
+      console.error('Erro ao enviar formulário:', error);
+      toast({ title: 'Erro ao enviar', description: error?.message || 'Ocorreu um erro ao cadastrar a escola. Tente novamente.', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }

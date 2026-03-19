@@ -272,15 +272,13 @@ const SchoolDetails = () => {
                         <div className="mt-3 space-y-2">
                           <div className="text-xs font-poppins font-semibold text-primary flex items-center">
                             <MessageCircle className="w-3 h-3 mr-1" />
-                            Relato do Estagiário:
+                            Relatos de Estagiários:
                           </div>
-                          <div className="text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line bg-white/50 p-2 rounded border border-primary/10">
-                            {instructor.additionalInfo}
-                          </div>
-                          <div className="text-[10px] sm:text-xs text-muted-foreground italic flex items-center">
-                            <Users className="w-3 h-3 mr-1" />
-                            Enviado por: {instructor.contributorName || 'Contribuidor'}
-                          </div>
+                          {instructor.additionalInfo.split('\n\n---\n').map((entry, entryIndex) => (
+                            <div key={entryIndex} className={`text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line bg-white/50 p-2 rounded border border-primary/10 ${entryIndex > 0 ? 'mt-2' : ''}`}>
+                              {entry}
+                            </div>
+                          ))}
                         </div>
                       ) : (
                         <div className="mt-2 text-xs sm:text-sm font-montserrat text-muted-foreground italic">

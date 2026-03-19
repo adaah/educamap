@@ -272,6 +272,8 @@ export type Database = {
           name: string
           reviewed_at: string | null
           reviewed_by: string | null
+          school_id: string | null
+          school_name: string | null
           status: string | null
           submitted_at: string | null
           university: string
@@ -289,6 +291,8 @@ export type Database = {
           name: string
           reviewed_at?: string | null
           reviewed_by?: string | null
+          school_id?: string | null
+          school_name?: string | null
           status?: string | null
           submitted_at?: string | null
           university: string
@@ -306,12 +310,22 @@ export type Database = {
           name?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
+          school_id?: string | null
+          school_name?: string | null
           status?: string | null
           submitted_at?: string | null
           university?: string
           whatsapp?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pending_former_students_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pending_instructors: {
         Row: {

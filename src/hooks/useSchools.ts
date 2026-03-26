@@ -56,9 +56,9 @@ export const useSchools = () => {
             additionalInfo: school.additional_info || undefined,
             contributor_name: school.contributor_name || undefined,
             contributorName: school.contributor_name || undefined,
-            periods: periods.data?.map(p => p.period) || [],
-            subjects: subjects.data?.map(s => s.subject) || [],
-            shift: shifts.data?.map(s => s.shift) || [],
+            periods: periods.data?.map(p => p.period).filter(p => p !== 'Outros') || [],
+            subjects: subjects.data?.map(s => s.subject).filter(s => s !== 'Outros') || [],
+            shift: shifts.data?.map(s => s.shift).filter(s => s !== 'Outros') || [],
             instructors: instructorsData.data?.map(i => ({
               id: i.id,
               name: i.name,

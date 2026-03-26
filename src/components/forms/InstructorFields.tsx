@@ -51,7 +51,7 @@ export const InstructorFields = ({
 
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-poppins font-semibold text-base">
-              {instructor.name || 'Instrutor'}
+              {instructor.name || 'Supervisor'}
             </h4>
           </div>
 
@@ -61,7 +61,7 @@ export const InstructorFields = ({
               name={`instructors.${index}.name`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome do Instrutor *</FormLabel>
+                  <FormLabel>Nome do Supervisor *</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="Nome completo" 
@@ -314,7 +314,7 @@ export const InstructorFields = ({
                   <FormItem>
                     <FormControl>
                       <Textarea
-                        placeholder="Comente sobre sua experiência com este instrutor..."
+                        placeholder="Comente sobre sua experiência com este supervisor..."
                         className="min-h-[80px]"
                         {...field}
                       />

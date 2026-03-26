@@ -835,7 +835,7 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
               Enviando...
             </>
           ) : (
-            'Cadastrar como Instrutor'
+            'Cadastrar como Supervisor'
           )}
         </button>
       </form>

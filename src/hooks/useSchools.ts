@@ -62,11 +62,11 @@ export const useSchools = () => {
             instructors: instructorsData.data?.map(i => ({
               id: i.id,
               name: i.name,
-              subject: i.subject,
+              subject: i.subject ? i.subject.split(', ').filter(s => s !== 'Outros').join(', ') || null : i.subject,
               additionalInfo: i.additional_info || undefined,
               contributorName: i.contributor_name || undefined,
-              shifts: (i as any).shifts || shiftsByInstructor.get(i.id) || [],
-              periods: (i as any).periods || periodsByInstructor.get(i.id) || [],
+              shifts: ((i as any).shifts || shiftsByInstructor.get(i.id) || []).filter((s: string) => s !== 'Outros'),
+              periods: ((i as any).periods || periodsByInstructor.get(i.id) || []).filter((p: string) => p !== 'Outros'),
             })) || [],
             formerStudents: formerStudentsData.data?.map(f => ({
               id: f.id,

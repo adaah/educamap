@@ -362,7 +362,7 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
             onClick={() => setInstructors([...instructors, { name: '', subjects: [], customSubjects: [], saved: false }])}
             className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
           >
-            + Adicionar Instrutor
+            + Adicionar Supervisor
           </button>
 
           {instructors.length > 0 && (

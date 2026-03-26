@@ -355,14 +355,14 @@ export const RegisterSchoolForm = ({ onSuccess }: RegisterSchoolFormProps) => {
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores (Opcional)</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Supervisores (Opcional)</h3>
           <p className="text-xs sm:text-sm text-muted-foreground">Liste professores que podem ser contatos para estágio</p>
           <button
             type="button"
             onClick={() => setInstructors([...instructors, { name: '', subjects: [], customSubjects: [], saved: false }])}
             className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
           >
-            + Adicionar Instrutor
+            + Adicionar Supervisor
           </button>
 
           {instructors.length > 0 && (

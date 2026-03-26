@@ -232,8 +232,8 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
     );
     if (validInstructors.length === 0) {
       toast({
-        title: 'Instrutor obrigatório',
-        description: 'Você deve adicionar pelo menos um professor instrutor com turno e período preenchidos.',
+        title: 'Supervisor obrigatório',
+        description: 'Você deve adicionar pelo menos um professor supervisor com turno e período preenchidos.',
         variant: 'destructive',
       });
       return;
@@ -842,9 +842,9 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
         {/* Instrutores */}
         {(form.watch('schoolId') || form.watch('newSchoolName')) && (
           <div className="space-y-4">
-            <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores *</h3>
+            <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Supervisores *</h3>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              Recomende um professor instrutor que você teve durante o estágio
+              Recomende um professor supervisor que você teve durante o estágio
             </p>
             
             {!isNewSchool && form.watch('schoolId') && (
@@ -854,7 +854,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                   name="instructorSelection"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Verifique se o instrutor já está cadastrado na escola</FormLabel>
+                      <FormLabel>Verifique se o supervisor já está cadastrado na escola</FormLabel>
                       <Select onValueChange={(value) => {
                         // Limpar instrutores existentes antes de fazer nova seleção
                         form.setValue('instructors', []);
@@ -872,7 +872,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                       }} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Selecione um instrutor..." />
+                            <SelectValue placeholder="Selecione um supervisor..." />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -881,7 +881,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                               {instructor.name} - {instructor.subject}
                             </SelectItem>
                           ))}
-                          <SelectItem value="new">Instrutor não listado</SelectItem>
+                          <SelectItem value="new">Supervisor não listado</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -898,7 +898,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
                 onClick={addInstructor}
                 className="w-full sm:w-auto px-4 py-2 bg-secondary text-white font-poppins font-semibold text-xs sm:text-sm rounded-lg hover:bg-secondary/90 transition-all"
               >
-                + Adicionar Instrutor
+                + Adicionar Supervisor
               </button>
             )}
             {form.watch('instructors')?.length > 0 && (

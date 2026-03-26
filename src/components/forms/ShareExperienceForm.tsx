@@ -233,7 +233,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
     if (validInstructors.length === 0) {
       toast({
         title: 'Instrutor obrigatório',
-        description: 'Você deve adicionar pelo menos um professor instrutor com turno e período preenchidos.',
+        description: 'Você deve adicionar pelo menos um professor supervisor com turno e período preenchidos.',
         variant: 'destructive',
       });
       return;
@@ -842,9 +842,9 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
         {/* Instrutores */}
         {(form.watch('schoolId') || form.watch('newSchoolName')) && (
           <div className="space-y-4">
-            <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores *</h3>
+            <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Supervisores *</h3>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              Recomende um professor instrutor que você teve durante o estágio
+              Recomende um professor supervisor que você teve durante o estágio
             </p>
             
             {!isNewSchool && form.watch('schoolId') && (

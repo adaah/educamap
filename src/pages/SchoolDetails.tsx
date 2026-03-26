@@ -235,7 +235,7 @@ const SchoolDetails = () => {
                   <div className="p-2 bg-primary/10 rounded-xl text-primary mr-2">
                     <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  Professores Instrutores
+                  Professores Supervisores
                 </CardTitle>
               </CardHeader>
               <CardContent>

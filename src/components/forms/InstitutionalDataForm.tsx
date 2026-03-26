@@ -468,7 +468,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         </div>
 
         <div className="space-y-4">
-          <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Instrutores (Opcional)</h3>
+          <h3 className="font-poppins font-semibold text-base sm:text-lg">Professores Supervisores (Opcional)</h3>
           <p className="text-xs sm:text-sm text-muted-foreground">Liste professores que podem ser contatos para estágio</p>
           <button
             type="button"

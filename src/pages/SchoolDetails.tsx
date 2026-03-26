@@ -359,21 +359,6 @@ const SchoolDetails = () => {
                       <p className="text-muted-foreground font-montserrat text-xs">
                         {student.university} - {student.course}
                       </p>
-                      {student.additionalInfo ? (
-                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line">
-                          {student.additionalInfo}
-                        </div>
-                      ) : (
-                        <div className="mt-2 text-xs sm:text-sm font-montserrat text-muted-foreground italic">
-                          Sem informação
-                        </div>
-                      )}
-                      {student.additionalInfo && (
-                        <div className="mt-2 text-[11px] sm:text-xs text-muted-foreground italic flex items-center">
-                          <Users className="w-3 h-3 mr-1" />
-                          Enviado por: {student.contributorName || 'Contribuidor'}
-                        </div>
-                      )}
                     </div>
                   ))}
                   {school.formerStudents.length === 0 && (

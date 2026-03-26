@@ -23,7 +23,7 @@ const ColaborePage = () => {
   const collaborationOptions = [
     {
       id: 'share-experience',
-      title: "Recomendar um Instrutor e/ou Compartilhar Experiência",
+      title: "Recomendar um Supervisor e/ou Compartilhar Experiência",
       description: "Para estudantes que concluíram estágio e querem listar seus professores supervisores ou dar feedback sobre a escola.",
       buttonText: "Compartilhar Minha Experiência",
       form: ShareExperienceForm,
@@ -46,7 +46,7 @@ const ColaborePage = () => {
       id: 'register-instructor',
       title: "Cadastrar-se como Professor Supervisor",
       description: "Para professores que desejam se cadastrar como supervisores e disponibilizar seus dados de contato para estudantes.",
-      buttonText: "Cadastrar como Instrutor",
+      buttonText: "Cadastrar como Supervisor",
       form: RegisterInstructorForm,
     }
   ];

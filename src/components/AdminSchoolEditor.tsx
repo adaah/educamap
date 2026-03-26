@@ -55,7 +55,7 @@ export const AdminSchoolEditor = ({ school, onClose }: AdminSchoolEditorProps) =
   };
 
   const handleDeleteInstructor = async (instructorId: string) => {
-    if (!confirm('Tem certeza que deseja excluir este instrutor? Esta ação não pode ser desfeita.')) {
+    if (!confirm('Tem certeza que deseja excluir este supervisor? Esta ação não pode ser desfeita.')) {
       return;
     }
     try {
@@ -65,11 +65,11 @@ export const AdminSchoolEditor = ({ school, onClose }: AdminSchoolEditorProps) =
         .eq('id', instructorId);
 
       if (error) throw error;
-      toast.success('Instrutor excluído!');
+      toast.success('Supervisor excluído!');
       queryClient.invalidateQueries({ queryKey: ['schools'] });
       queryClient.invalidateQueries({ queryKey: ['school', school.id] });
     } catch (error: any) {
-      toast.error('Erro ao excluir instrutor: ' + error.message);
+      toast.error('Erro ao excluir supervisor: ' + error.message);
     }
   };
 
@@ -100,12 +100,12 @@ export const AdminSchoolEditor = ({ school, onClose }: AdminSchoolEditorProps) =
         .eq('id', instructorId);
 
       if (error) throw error;
-      toast.success('Instrutor atualizado!');
+      toast.success('Supervisor atualizado!');
       setEditingInstructorId(null);
       queryClient.invalidateQueries({ queryKey: ['schools'] });
       queryClient.invalidateQueries({ queryKey: ['school', school.id] });
     } catch (error: any) {
-      toast.error('Erro ao atualizar instrutor: ' + error.message);
+      toast.error('Erro ao atualizar supervisor: ' + error.message);
     }
   };
 
@@ -192,7 +192,7 @@ export const AdminSchoolEditor = ({ school, onClose }: AdminSchoolEditorProps) =
       <Tabs defaultValue="basic" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="basic" className="text-xs">Dados Básicos</TabsTrigger>
-          <TabsTrigger value="instructors" className="text-xs">Instrutores</TabsTrigger>
+          <TabsTrigger value="instructors" className="text-xs">Supervisores</TabsTrigger>
           <TabsTrigger value="students" className="text-xs">Estagiários/Ex-Estagiários</TabsTrigger>
           <TabsTrigger value="contact" className="text-xs">Contato</TabsTrigger>
         </TabsList>
@@ -311,7 +311,7 @@ export const AdminSchoolEditor = ({ school, onClose }: AdminSchoolEditorProps) =
             <CardHeader>
               <CardTitle className="text-lg flex items-center">
                 <Users className="w-4 h-4 mr-2" />
-                Instrutores ({school.instructors.length})
+                Supervisores ({school.instructors.length})
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -344,7 +344,7 @@ export const AdminSchoolEditor = ({ school, onClose }: AdminSchoolEditorProps) =
                 </div>
               ))}
               {school.instructors.length === 0 && (
-                <p className="text-center py-8 text-muted-foreground italic">Nenhum instrutor cadastrado.</p>
+                <p className="text-center py-8 text-muted-foreground italic">Nenhum supervisor cadastrado.</p>
               )}
             </CardContent>
           </Card>

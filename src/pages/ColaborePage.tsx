@@ -22,6 +22,13 @@ const ColaborePage = () => {
 
   const collaborationOptions = [
     {
+      id: 'register-instructor',
+      title: "Cadastrar-se como Professor Supervisor",
+      description: "Para professores que desejam se cadastrar como supervisores e disponibilizar seus dados de contato para estudantes.",
+      buttonText: "Cadastrar como Supervisor",
+      form: RegisterInstructorForm,
+    },
+    {
       id: 'share-experience',
       title: "Recomendar um Supervisor e/ou Compartilhar Experiência",
       description: "Para estudantes que concluíram estágio e querem listar seus professores supervisores ou dar feedback sobre a escola.",
@@ -41,13 +48,6 @@ const ColaborePage = () => {
       description: "Para gestores escolares ou secretarias que desejam fornecer informações oficiais de contato, turmas e oportunidades.",
       buttonText: "Atualizar Dados da Escola",
       form: InstitutionalDataForm,
-    },
-    {
-      id: 'register-instructor',
-      title: "Cadastrar-se como Professor Supervisor",
-      description: "Para professores que desejam se cadastrar como supervisores e disponibilizar seus dados de contato para estudantes.",
-      buttonText: "Cadastrar como Supervisor",
-      form: RegisterInstructorForm,
     }
   ];
 

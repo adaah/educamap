@@ -409,7 +409,7 @@ export const usePendingSubmissions = () => {
           }
           
           // Acumular informações adicionais em vez de sobrescrever
-          if (pendingStudent.additional_info) {
+          if (pendingStudent.additional_info && !pendingStudent.skip_school_info) {
             const existingInfo = schoolData.additional_info || '';
             const contributorName = pendingStudent.contributor_name || 'Anônimo';
             const newEntry = `\n\n---\n📝 ${contributorName}:\n${pendingStudent.additional_info}`;
@@ -468,6 +468,104 @@ export const usePendingSubmissions = () => {
     },
   });
 
+  const markReviewed = async (
+    table: "pending_schools" | "pending_school_updates" | "pending_instructors" | "pending_former_students",
+    id: string,
+    status: "approved" | "rejected"
+  ) => {
+    const { data: user } = await supabase.auth.getUser();
+    await supabase
+      .from(table)
+      .update({ status, reviewed_at: new Date().toISOString(), reviewed_by: user.user?.id })
+      .eq("id", id);
+  };
+
+  const invalidateAllPending = () => {
+    queryClient.invalidateQueries({ queryKey: ["pendingSchools"] });
+    queryClient.invalidateQueries({ queryKey: ["pendingSchoolUpdates"] });
+    queryClient.invalidateQueries({ queryKey: ["pendingInstructors"] });
+    queryClient.invalidateQueries({ queryKey: ["pendingStudents"] });
+    queryClient.invalidateQueries({ queryKey: ["schools"] });
+  };
+
+  type PendingGroup = {
+    schools: any[];
+    updates: any[];
+    instructors: any[];
+    students: any[];
+  };
+
+  const approveGroup = useMutation({
+    mutationFn: async (group: PendingGroup) => {
+      let newSchoolId: string | null = null;
+      const schoolInstructorNames: string[] = [];
+
+      for (const school of group.schools) {
+        (school.instructors || []).forEach((i: any) => i?.name && schoolInstructorNames.push(String(i.name).toLowerCase()));
+        await approveSchool.mutateAsync(school);
+        const { data } = await supabase
+          .from("schools")
+          .select("id")
+          .eq("name", school.name)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        newSchoolId = data?.id ?? null;
+      }
+
+      for (const update of group.updates) {
+        await approveSchoolUpdate.mutateAsync({ ...update, school_id: update.school_id || newSchoolId });
+      }
+
+      const instructorNames: string[] = [];
+      for (const instructor of group.instructors) {
+        if (instructor.name) instructorNames.push(instructor.name);
+        // Evitar duplicar professores já inseridos junto com a nova escola
+        if (schoolInstructorNames.includes(String(instructor.name || "").toLowerCase())) {
+          await markReviewed("pending_instructors", instructor.id, "approved");
+          continue;
+        }
+        await approveInstructor.mutateAsync({ ...instructor, school_id: instructor.school_id || newSchoolId });
+      }
+
+      for (const student of group.students) {
+        let info = student.additional_info;
+        if (info && instructorNames.length > 0) {
+          info = `Relato sobre professor ${instructorNames.join(", ")}:\n${info}`;
+        }
+        await approveStudent.mutateAsync({
+          ...student,
+          additional_info: info,
+          school_id: student.school_id || newSchoolId,
+          skip_school_info: group.schools.length > 0,
+        });
+      }
+    },
+    onSuccess: () => {
+      invalidateAllPending();
+      toast.success("Envio aprovado por completo!");
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao aprovar envio: " + error.message);
+    },
+  });
+
+  const rejectGroup = useMutation({
+    mutationFn: async (group: PendingGroup) => {
+      for (const school of group.schools) await markReviewed("pending_schools", school.id, "rejected");
+      for (const update of group.updates) await markReviewed("pending_school_updates", update.id, "rejected");
+      for (const instructor of group.instructors) await markReviewed("pending_instructors", instructor.id, "rejected");
+      for (const student of group.students) await markReviewed("pending_former_students", student.id, "rejected");
+    },
+    onSuccess: () => {
+      invalidateAllPending();
+      toast.success("Envio rejeitado por completo!");
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao rejeitar envio: " + error.message);
+    },
+  });
+
   const rejectSubmission = useMutation({
     mutationFn: async ({
       table,
@@ -509,6 +607,8 @@ export const usePendingSubmissions = () => {
     approveSchoolUpdate,
     approveInstructor,
     approveStudent,
+    approveGroup,
+    rejectGroup,
     rejectSubmission,
   };
 };

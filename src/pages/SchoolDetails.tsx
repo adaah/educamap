@@ -272,7 +272,7 @@ const SchoolDetails = () => {
                         <div className="mt-3 space-y-2">
                           <div className="text-xs font-poppins font-semibold text-primary flex items-center">
                             <MessageCircle className="w-3 h-3 mr-1" />
-                            Relatos de Estagiários:
+                            Relato sobre professor {instructor.name}
                           </div>
                           {instructor.additionalInfo.split('\n\n---\n').map((entry, entryIndex) => (
                             <div key={entryIndex} className={`text-xs sm:text-sm font-montserrat text-foreground whitespace-pre-line bg-white/50 p-2 rounded border border-primary/10 ${entryIndex > 0 ? 'mt-2' : ''}`}>

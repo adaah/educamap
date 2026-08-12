@@ -275,6 +275,7 @@ export type Database = {
           school_id: string | null
           school_name: string | null
           status: string | null
+          submission_group_id: string | null
           submitted_at: string | null
           university: string
           whatsapp: string | null
@@ -294,6 +295,7 @@ export type Database = {
           school_id?: string | null
           school_name?: string | null
           status?: string | null
+          submission_group_id?: string | null
           submitted_at?: string | null
           university: string
           whatsapp?: string | null
@@ -313,6 +315,7 @@ export type Database = {
           school_id?: string | null
           school_name?: string | null
           status?: string | null
+          submission_group_id?: string | null
           submitted_at?: string | null
           university?: string
           whatsapp?: string | null
@@ -345,6 +348,7 @@ export type Database = {
           shifts: string[] | null
           status: string | null
           subject: string
+          submission_group_id: string | null
           submitted_at: string | null
           whatsapp: string | null
         }
@@ -365,6 +369,7 @@ export type Database = {
           shifts?: string[] | null
           status?: string | null
           subject: string
+          submission_group_id?: string | null
           submitted_at?: string | null
           whatsapp?: string | null
         }
@@ -385,6 +390,7 @@ export type Database = {
           shifts?: string[] | null
           status?: string | null
           subject?: string
+          submission_group_id?: string | null
           submitted_at?: string | null
           whatsapp?: string | null
         }
@@ -406,6 +412,7 @@ export type Database = {
           shifts: string[] | null
           status: string | null
           subjects: string[] | null
+          submission_group_id: string | null
           submitted_at: string | null
           website: string | null
         }
@@ -424,6 +431,7 @@ export type Database = {
           shifts?: string[] | null
           status?: string | null
           subjects?: string[] | null
+          submission_group_id?: string | null
           submitted_at?: string | null
           website?: string | null
         }
@@ -442,6 +450,7 @@ export type Database = {
           shifts?: string[] | null
           status?: string | null
           subjects?: string[] | null
+          submission_group_id?: string | null
           submitted_at?: string | null
           website?: string | null
         }
@@ -476,6 +485,7 @@ export type Database = {
           shifts: string[] | null
           status: string | null
           subjects: string[] | null
+          submission_group_id: string | null
           submitted_at: string | null
           website: string | null
         }
@@ -499,6 +509,7 @@ export type Database = {
           shifts?: string[] | null
           status?: string | null
           subjects?: string[] | null
+          submission_group_id?: string | null
           submitted_at?: string | null
           website?: string | null
         }
@@ -522,6 +533,7 @@ export type Database = {
           shifts?: string[] | null
           status?: string | null
           subjects?: string[] | null
+          submission_group_id?: string | null
           submitted_at?: string | null
           website?: string | null
         }

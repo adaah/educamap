@@ -141,6 +141,7 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
+    const groupId = crypto.randomUUID();
     try {
       const allSubjects = [...data.subjects, ...data.customSubjects];
 
@@ -160,6 +161,7 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
         const { error: schoolError } = await supabase
           .from('pending_schools')
           .insert({
+            submission_group_id: groupId,
             name: data.newSchoolName || 'Escola (nome não informado)',
             full_address: data.newSchoolAddress || '',
             neighborhood: data.newSchoolNeighborhood || '',
@@ -188,6 +190,7 @@ export const RegisterInstructorForm = ({ onSuccess }: RegisterInstructorFormProp
         const { error: instructorError } = await supabase
           .from('pending_instructors')
           .insert({
+            submission_group_id: groupId,
             name: data.name,
             subject: allSubjects.join(', '),
             contributor_name: data.name,

@@ -239,12 +239,14 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       return;
     }
     setIsSubmitting(true);
+    const groupId = crypto.randomUUID();
     try {
       // Se marcou que tem dados e/ou contato da escola (e a escola já existe), enviar como atualização pendente
       if (!isNewSchool && data.hasContactData && data.schoolId) {
         const { error: updateError } = await supabase
           .from('pending_school_updates')
           .insert({
+            submission_group_id: groupId,
             school_id: data.schoolId,
             email: data.schoolEmail || null,
             phone: data.schoolPhone || null,
@@ -279,6 +281,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
         const { error: schoolError } = await supabase
           .from('pending_schools')
           .insert({
+            submission_group_id: groupId,
             name: data.newSchoolName || 'Escola (nome não informado)',
             full_address: data.newSchoolAddress || '',
             neighborhood: data.newSchoolNeighborhood || '',
@@ -302,6 +305,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
       const { error: studentError } = await supabase
         .from('pending_former_students')
         .insert({
+          submission_group_id: groupId,
           name: data.studentName,
           university: data.university,
           course: data.course,
@@ -325,6 +329,7 @@ export const ShareExperienceForm = ({ onSuccess }: ShareExperienceFormProps) => 
         const { error: instructorError } = await supabase
           .from('pending_instructors')
           .insert({
+            submission_group_id: groupId,
             name: instructor.name,
             subject,
             school_id: !isNewSchool ? (data.schoolId || null) : null,

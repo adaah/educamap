@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { usePendingSubmissions } from "@/hooks/usePendingSubmissions";
@@ -31,8 +31,38 @@ const AdminPanel = () => {
     approveSchoolUpdate,
     approveInstructor,
     approveStudent,
+    approveGroup,
+    rejectGroup,
     rejectSubmission,
   } = usePendingSubmissions();
+
+  const groupedSubmissions = useMemo(() => {
+    const groups = new Map<string, { schools: any[]; updates: any[]; instructors: any[]; students: any[] }>();
+    const ensure = (id: string) => {
+      if (!groups.has(id)) groups.set(id, { schools: [], updates: [], instructors: [], students: [] });
+      return groups.get(id)!;
+    };
+    pendingSchools.forEach((s: any) => s.submission_group_id && ensure(s.submission_group_id).schools.push(s));
+    pendingSchoolUpdates.forEach((s: any) => s.submission_group_id && ensure(s.submission_group_id).updates.push(s));
+    pendingInstructors.forEach((s: any) => s.submission_group_id && ensure(s.submission_group_id).instructors.push(s));
+    pendingStudents.forEach((s: any) => s.submission_group_id && ensure(s.submission_group_id).students.push(s));
+    return Array.from(groups.entries())
+      .map(([id, items]) => ({ id, ...items }))
+      .filter((g) => g.schools.length + g.updates.length + g.instructors.length + g.students.length > 1);
+  }, [pendingSchools, pendingSchoolUpdates, pendingInstructors, pendingStudents]);
+
+  const groupedIds = useMemo(() => {
+    const ids = new Set<string>();
+    groupedSubmissions.forEach((g) => {
+      [...g.schools, ...g.updates, ...g.instructors, ...g.students].forEach((item: any) => ids.add(item.id));
+    });
+    return ids;
+  }, [groupedSubmissions]);
+
+  const soloSchools = pendingSchools.filter((s: any) => !groupedIds.has(s.id));
+  const soloSchoolUpdates = pendingSchoolUpdates.filter((s: any) => !groupedIds.has(s.id));
+  const soloInstructors = pendingInstructors.filter((s: any) => !groupedIds.has(s.id));
+  const soloStudents = pendingStudents.filter((s: any) => !groupedIds.has(s.id));
 
   const { data: schools = [] } = useSchools();
 
@@ -128,11 +158,82 @@ const AdminPanel = () => {
           <TabsContent value="pending" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Escolas Pendentes ({pendingSchools.length})</CardTitle>
+                <CardTitle>Envios Integrados ({groupedSubmissions.length})</CardTitle>
+                <CardDescription>
+                  Envios feitos de uma só vez (escola, professor e relato) — aprove ou rejeite tudo junto
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {groupedSubmissions.map((group) => {
+                  const contributor =
+                    group.students[0]?.contributor_name ||
+                    group.instructors[0]?.contributor_name ||
+                    group.schools[0]?.contributor_name ||
+                    group.updates[0]?.contributor_name ||
+                    "Anônimo";
+                  return (
+                    <div key={group.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold">Envio de {contributor}</h3>
+                        {group.schools.length > 0 && <Badge variant="secondary">{group.schools.length} escola(s)</Badge>}
+                        {group.updates.length > 0 && <Badge variant="secondary">{group.updates.length} atualização(ões)</Badge>}
+                        {group.instructors.length > 0 && <Badge variant="secondary">{group.instructors.length} professor(es)</Badge>}
+                        {group.students.length > 0 && <Badge variant="secondary">{group.students.length} relato(s)</Badge>}
+                      </div>
+
+                      <div className="space-y-2 text-sm">
+                        {group.schools.map((school: any) => (
+                          <p key={school.id}>Escola: <strong>{school.name}</strong> — {school.full_address}</p>
+                        ))}
+                        {group.updates.map((update: any) => (
+                          <p key={update.id}>Atualização institucional para escola existente</p>
+                        ))}
+                        {group.instructors.map((instructor: any) => (
+                          <p key={instructor.id}>Professor: <strong>{instructor.name}</strong> — {instructor.subject}</p>
+                        ))}
+                        {group.students.map((student: any) => (
+                          <div key={student.id} className="space-y-1">
+                            <p>Estagiário: <strong>{student.name}</strong> — {student.course} / {student.university}</p>
+                            {student.additional_info && (
+                              <p className="bg-muted p-2 rounded italic">
+                                {group.instructors[0]?.name
+                                  ? `Relato sobre professor ${group.instructors.map((i: any) => i.name).join(", ")}: `
+                                  : "Relato: "}
+                                {student.additional_info}
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={() => approveGroup.mutate(group)} disabled={approveGroup.isPending}>
+                          <Check className="mr-2 h-4 w-4" />Aprovar tudo
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => rejectGroup.mutate(group)}
+                          disabled={rejectGroup.isPending}
+                        >
+                          <X className="mr-2 h-4 w-4" />Rejeitar tudo
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {groupedSubmissions.length === 0 && (
+                  <p className="text-muted-foreground text-center py-8">Nenhum envio integrado pendente</p>
+                )}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Escolas Pendentes ({soloSchools.length})</CardTitle>
                 <CardDescription>Revisar e aprovar novas escolas</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {pendingSchools.map((school) => (
+                {soloSchools.map((school) => (
                   <div key={school.id} className="border rounded-lg p-4 space-y-2">
                     <h3 className="font-semibold">{school.name}</h3>
                     <p className="text-sm text-muted-foreground">{school.full_address}</p>
@@ -151,7 +252,7 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 ))}
-                {pendingSchools.length === 0 && (
+                {soloSchools.length === 0 && (
                   <p className="text-muted-foreground text-center py-8">Nenhuma escola pendente</p>
                 )}
               </CardContent>
@@ -159,11 +260,11 @@ const AdminPanel = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Atualizações Institucionais ({pendingSchoolUpdates.length})</CardTitle>
+                <CardTitle>Atualizações Institucionais ({soloSchoolUpdates.length})</CardTitle>
                 <CardDescription>Revisar atualizações enviadas para escolas existentes</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {pendingSchoolUpdates.map((update) => (
+                {soloSchoolUpdates.map((update) => (
                   <div key={update.id} className="border rounded-lg p-4 space-y-2">
                     <p className="text-sm text-muted-foreground">Escola ID: {update.school_id}</p>
                     {update.contributor_name && (
@@ -191,7 +292,7 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 ))}
-                {pendingSchoolUpdates.length === 0 && (
+                {soloSchoolUpdates.length === 0 && (
                   <p className="text-muted-foreground text-center py-8">Nenhuma atualização pendente</p>
                 )}
               </CardContent>
@@ -199,11 +300,11 @@ const AdminPanel = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Professores Pendentes ({pendingInstructors.length})</CardTitle>
+                <CardTitle>Professores Pendentes ({soloInstructors.length})</CardTitle>
                 <CardDescription>Revisar e aprovar novos professores</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {pendingInstructors.map((instructor) => (
+                {soloInstructors.map((instructor) => (
                   <div key={instructor.id} className="border rounded-lg p-4 space-y-2">
                     <h3 className="font-semibold">{instructor.name}</h3>
                     <p className="text-sm">Disciplina: {instructor.subject}</p>
@@ -224,7 +325,7 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 ))}
-                {pendingInstructors.length === 0 && (
+                {soloInstructors.length === 0 && (
                   <p className="text-muted-foreground text-center py-8">Nenhum professor pendente</p>
                 )}
               </CardContent>
@@ -232,11 +333,11 @@ const AdminPanel = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Estagiários Pendentes ({pendingStudents.length})</CardTitle>
+                <CardTitle>Estagiários Pendentes ({soloStudents.length})</CardTitle>
                 <CardDescription>Revisar e aprovar estagiários</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {pendingStudents.map((student) => (
+                {soloStudents.map((student) => (
                   <div key={student.id} className="border rounded-lg p-4 space-y-2">
                     <h3 className="font-semibold">{student.name}</h3>
                     <p className="text-sm">Curso: {student.course}</p>
@@ -257,7 +358,7 @@ const AdminPanel = () => {
                     </div>
                   </div>
                 ))}
-                {pendingStudents.length === 0 && (
+                {soloStudents.length === 0 && (
                   <p className="text-muted-foreground text-center py-8">Nenhum estagiário pendente</p>
                 )}
               </CardContent>

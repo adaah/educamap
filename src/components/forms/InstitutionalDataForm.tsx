@@ -101,6 +101,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
+    const groupId = crypto.randomUUID();
     try {
       const instructorsData = instructors
         .filter(i => i.name && i.subjects.length > 0)
@@ -133,6 +134,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         const { error: schoolError } = await supabase
           .from('pending_schools')
           .insert({
+            submission_group_id: groupId,
             name: data.newSchoolName,
             full_address: data.newSchoolAddress || '',
             neighborhood: data.newSchoolNeighborhood || '',
@@ -160,6 +162,7 @@ export const InstitutionalDataForm = ({ onSuccess }: InstitutionalDataFormProps)
         const { error: updateError } = await supabase
           .from('pending_school_updates')
           .insert({
+            submission_group_id: groupId,
             school_id: data.schoolId,
             email: data.email || null,
             phone: data.phone || null,

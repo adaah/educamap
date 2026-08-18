@@ -289,15 +289,16 @@ export const usePendingSubmissions = () => {
       const { data: user } = await supabase.auth.getUser();
 
       // Verificar se já existe um instrutor com mesmo nome na mesma escola
-      let existingInstructor = null;
+      let existingInstructor: { id: string; additional_info: string | null } | null = null;
       if (pendingInstructor.school_id) {
         const { data } = await supabase
           .from("instructors")
           .select("id, additional_info")
           .eq("school_id", pendingInstructor.school_id)
           .ilike("name", pendingInstructor.name)
-          .maybeSingle();
-        existingInstructor = data;
+          .order("created_at", { ascending: true })
+          .limit(1);
+        existingInstructor = data?.[0] ?? null;
       }
 
       if (existingInstructor) {
@@ -322,6 +323,36 @@ export const usePendingSubmissions = () => {
             .update(updateData)
             .eq("id", existingInstructor.id);
           if (error) throw error;
+        }
+
+        // Complementar turnos e períodos do professor existente (sem duplicar)
+        if (Array.isArray(pendingInstructor.shifts) && pendingInstructor.shifts.length > 0) {
+          const { data: currentShifts } = await supabase
+            .from("instructor_shifts")
+            .select("shift")
+            .eq("instructor_id", existingInstructor.id);
+          const existingShifts = new Set((currentShifts || []).map((s: any) => s.shift));
+          const newShifts = pendingInstructor.shifts.filter((s: string) => !existingShifts.has(s));
+          if (newShifts.length > 0) {
+            const { error } = await supabase.from("instructor_shifts").insert(
+              newShifts.map((shift: string) => ({ instructor_id: existingInstructor!.id, shift }))
+            );
+            if (error) throw error;
+          }
+        }
+        if (Array.isArray(pendingInstructor.periods) && pendingInstructor.periods.length > 0) {
+          const { data: currentPeriods } = await supabase
+            .from("instructor_periods")
+            .select("period")
+            .eq("instructor_id", existingInstructor.id);
+          const existingPeriods = new Set((currentPeriods || []).map((p: any) => p.period));
+          const newPeriods = pendingInstructor.periods.filter((p: string) => !existingPeriods.has(p));
+          if (newPeriods.length > 0) {
+            const { error } = await supabase.from("instructor_periods").insert(
+              newPeriods.map((period: string) => ({ instructor_id: existingInstructor!.id, period }))
+            );
+            if (error) throw error;
+          }
         }
       } else {
         // Formatar additional_info com nome do contribuidor

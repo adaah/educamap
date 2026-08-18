@@ -129,8 +129,6 @@ export const usePendingSubmissions = () => {
             instagram: instructor.instagram,
             contributor_name: pendingSchool.contributor_name,
             additional_info: instructor.additional_info,
-            shifts: instructor.shifts,
-            periods: instructor.periods,
           }))
         ).select("id");
 

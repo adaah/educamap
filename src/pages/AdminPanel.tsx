@@ -42,10 +42,27 @@ const AdminPanel = () => {
       if (!groups.has(id)) groups.set(id, { schools: [], updates: [], instructors: [], students: [] });
       return groups.get(id)!;
     };
-    pendingSchools.forEach((s: any) => s.submission_group_id && ensure(s.submission_group_id).schools.push(s));
-    pendingSchoolUpdates.forEach((s: any) => s.submission_group_id && ensure(s.submission_group_id).updates.push(s));
-    pendingInstructors.forEach((s: any) => s.submission_group_id && ensure(s.submission_group_id).instructors.push(s));
-    pendingStudents.forEach((s: any) => s.submission_group_id && ensure(s.submission_group_id).students.push(s));
+
+    // Fallback para envios antigos (sem submission_group_id):
+    // agrupa por contribuinte + janela de 10 minutos
+    const fallbackKeys: { key: string; time: number; contributor: string }[] = [];
+    const groupKey = (item: any) => {
+      if (item.submission_group_id) return item.submission_group_id as string;
+      const contributor = (item.contributor_name || "anônimo").trim().toLowerCase();
+      const time = new Date(item.submitted_at).getTime();
+      const match = fallbackKeys.find(
+        (k) => k.contributor === contributor && Math.abs(k.time - time) <= 10 * 60 * 1000
+      );
+      if (match) return match.key;
+      const key = `legacy:${contributor}:${time}`;
+      fallbackKeys.push({ key, time, contributor });
+      return key;
+    };
+
+    pendingSchools.forEach((s: any) => ensure(groupKey(s)).schools.push(s));
+    pendingSchoolUpdates.forEach((s: any) => ensure(groupKey(s)).updates.push(s));
+    pendingInstructors.forEach((s: any) => ensure(groupKey(s)).instructors.push(s));
+    pendingStudents.forEach((s: any) => ensure(groupKey(s)).students.push(s));
     return Array.from(groups.entries())
       .map(([id, items]) => ({ id, ...items }))
       .filter((g) => g.schools.length + g.updates.length + g.instructors.length + g.students.length > 1);

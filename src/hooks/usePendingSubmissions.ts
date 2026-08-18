@@ -259,8 +259,6 @@ export const usePendingSubmissions = () => {
             instagram: instructor.instagram,
             contributor_name: pendingUpdate.contributor_name ? `${pendingUpdate.contributor_name} - ${pendingUpdate.contributor_position || ""}`.trim() : null,
             additional_info: instructor.additional_info,
-            shifts: instructor.shifts,
-            periods: instructor.periods,
           }))
         );
         if (insError) throw insError;
